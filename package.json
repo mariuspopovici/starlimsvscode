@@ -1,0 +1,115 @@
+{
+    "name": "starlimsvscode",
+    "displayName": "Starlims VS Code Extension",
+    "description": "Source control, Enterprise explorer, syntax higlighting for STARLIMS",
+    "version": "0.0.1",
+    "publisher": "Marius Popovici",
+    "engines": {
+        "vscode": "^1.28.0"
+    },
+    "categories": [
+        "Other",
+        "SCM Providers",
+        "Language Packs"
+    ],
+    "activationEvents": [
+        "*",
+        "onCommand:STARLIMS.downloadApp"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "views": {
+            "explorer": [
+                {
+                    "id": "STARLIMS",
+                    "name": "STARLIMS Enterprise"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "STARLIMS.downloadApp",
+                "title": "Download App"
+            },
+            {
+                "command": "STARLIMS.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+            }
+        ],
+        "menus": {
+            "view/item/context": [
+                {
+                    "command": "STARLIMS.downloadApp",
+                    "when": "view == STARLIMS && viewItem == APP"
+                },
+                {
+                    "command": "STARLIMS.refresh",
+                    "when": "view == STARLIMS"
+                }
+            ]
+        },
+        "configuration": [
+            {
+                "type": "object",
+                "title": "STARLIMS VSCode Configuration",
+                "properties": {
+                    "STARLIMS.url": {
+                        "type": "string",
+                        "default": "",
+                        "description": "STARLIMS Installation URL"
+                    },
+                    "STARLIMS.user": {
+                        "type": "string",
+                        "default": "SYSADM",
+                        "description": "STARLIMS User ID"
+                    }
+                }
+            }
+        ],
+        "languages": [
+            {
+                "id": "SSL",
+                "aliases": [
+                    "SSL"
+                ],
+                "extensions": [
+                    ".ssl",
+                    ".starlims"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "SSL",
+                "scopeName": "SSL",
+                "path": "./src/syntaxes/SSL.tmLanguage"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/mkdirp": "^0.5.2",
+        "@types/mocha": "^5.2.5",
+        "@types/node": "^10.12.5",
+        "tslint": "^5.8.0",
+        "typescript": "^3.1.6",
+        "vscode": "^1.1.21"
+    },
+    "dependencies": {
+        "@types/request": "^2.48.1",
+        "@types/request-promise": "^4.1.42",
+        "async-mkdirp": "^1.2.7",
+        "mkdirp": "^0.5.1",
+        "request-promise": "^4.2.2"
+    }
+}
