@@ -1,0 +1,99 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Starlims Scripting Language",
+	"patterns": [
+		{
+			"include": "#comment"
+		},
+		{
+			"include": "#keywordsControl"
+		},
+		{
+			"include": "#keywordsStorage"
+		},
+		{
+			"include": "#blueFunctions"
+		},
+		{
+			"include": "#function"
+		},
+		{
+			"include": "#stringsDouble"
+		},
+		{
+			"include": "#stringsSingle"
+		},
+		{
+			"include": "#identifier"
+		},
+		{
+			"include": "#operator"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#langConstants"
+		}
+	],
+	"repository": {
+		"keywordsControl": {
+			"patterns": [{
+				"name": "keyword.control",
+				"match": ":(IF|DEFAULT|REGION|ENDREGION|ENDIF|ELSE|LOOP|WHILE|ENDWHILE|CASE|EXITCASE|RETURN)\\b"
+			}]
+		},
+		"keywordsStorage": {
+			"patterns": [{
+				"name": "storage.type",
+				"match": ":(PUBLIC|DECLARE|CLASS|PARAMETERS|PROCEDURE|ENDPROC)\\b"
+			}]
+		},
+		"blueFunctions": {
+			"patterns": [{
+				"name": "support.function",
+				"match": "\\b(usrmes|UsrMes|AAddd|aadd|Empty|empty|execfunction|ExecFunction|doproc|DoProc)(?=\\()"
+			}]
+		},
+		"comment": {
+			"name": "comment.block.srvsrc",
+			"begin": "/\\*",
+			"end": ";"
+		},
+		"identifier" : {
+			"patterns": [{
+				"name": "variables.other",
+				"match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?!\\()"
+			}]
+		},
+		"function" : {
+			"patterns": [{
+				"name": "entity.name.function",
+				"match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\()"
+			}]
+		},
+		"langConstants": {
+			"name":"constant.language",
+			"match":"\\.(t|T|f|F)\\."
+		},
+		"numbers": {
+			"name":"constant.numeric",
+			"match":"-?[0-9]+(\\.[0-9]*)?|(\\.[0-9]+)"
+		},
+		"operator": {
+			"name": "keyword.operator",
+			"match": "(\\.(and|AND|or|OR)\\.|=|:=|>=?|<=?|==)"
+		},
+		"stringsDouble": {
+			"name": "string.quoted.double",
+			"begin": "\"",
+			"end": "\""
+		},
+		"stringsSingle": {
+			"name": "string.quoted.sinlge",
+			"begin": "'",
+			"end": "'"
+		}
+	},
+	"scopeName": "source.SSL"
+}
