@@ -85,8 +85,8 @@
         "grammars": [
             {
                 "language": "SSL",
-                "scopeName": "SSL",
-                "path": "./src/syntaxes/SSL.tmLanguage"
+                "scopeName": "source.SSL",
+                "path": "./src/syntaxes/SSL4VSC.tmLanguage.json"
             }
         ]
     },
