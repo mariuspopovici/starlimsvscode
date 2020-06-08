@@ -5,6 +5,84 @@ import * as path from 'path';
 
 
 export class EnterpriseService {
+    public async save(itemID: string, code: string) {
+        let result : any = null;
+        
+        const options: any = {
+            method: 'POST',
+            headers: {
+                'STARLIMSUser': process.env.STARLIMS_USER,
+                'STARLIMSPass': process.env.STARLIMS_PASSWORD
+            },
+            qs: {
+                'ItemId': itemID
+            },
+            body: code
+        };
+
+        try {
+            result = await request(this.config.url  + '/SCM_API.SaveCode.lims', options);
+            vscode.window.showErrorMessage(result);
+        } catch (e) {
+            console.error(e);
+            vscode.window.showErrorMessage(e.error);
+        }
+
+        return result;
+    }
+    
+    public async checkin(itemType: string, itemID: string, reason: string) {
+        let result : any = null;
+        
+        const options: any = {
+            method: 'GET',
+            headers: {
+                'STARLIMSUser': process.env.STARLIMS_USER,
+                'STARLIMSPass': process.env.STARLIMS_PASSWORD
+            },
+            qs: {
+                'ItemId': itemID,
+                'FileType': itemType,
+                'Reason': reason
+            },
+            json: true
+        };
+
+        try {
+            result = await request(this.config.url  + '/SCM_API.Checkin.lims', options);
+        } catch (e) {
+            console.error(e);
+            vscode.window.showErrorMessage(e.error);
+        }
+
+        return result;
+    }
+
+    public async checkout(itemType: string, itemID: string) {
+        let result : any = null;
+        
+        const options: any = {
+            method: 'GET',
+            headers: {
+                'STARLIMSUser': process.env.STARLIMS_USER,
+                'STARLIMSPass': process.env.STARLIMS_PASSWORD
+            },
+            qs: {
+                'ItemId': itemID,
+                'FileType': itemType
+            },
+            json: true
+        };
+
+        try {
+            result = await request(this.config.url  + '/SCM_API.Checkout.lims', options);
+        } catch (e) {
+            console.error(e);
+            vscode.window.showErrorMessage(e.error);
+        }
+
+        return result;
+    }
     
     private config: any;
 
@@ -95,6 +173,7 @@ export class EnterpriseService {
         // create a folder for the app
         let appFolder = path.join(folder, app.CategoryName, app.AppName);
         appFolder = appFolder.substring(1, appFolder.length);
+        //let appFolder = folder.substring(1, 4);
         
         // for some reson fs.mkdir did not work when called from VS ext...       
         const mkdirp = require('async-mkdirp');

@@ -24,7 +24,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let password = await vscode.window.showInputBox({
         prompt: `Enter password for STARLIMS user '${user}'`,
         password: true,
-        ignoreFocusOut: true,
+        ignoreFocusOut: true
     });
 
     if (password) {
@@ -43,12 +43,11 @@ export async function activate(context: vscode.ExtensionContext) {
         }
         
         let result = await enterpriseService.getEntepriseItemCode(item.type, item.enterpriseId);
-        
         if (result) {
             // open code in new document
             const fileExtension = '.' + (result.Language !== undefined && result.Language !== '' ? result.Language.toLowerCase() : 'txt');
             
-            const newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath ? vscode.workspace.rootPath : '', item.label + fileExtension));
+            const newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath ? vscode.workspace.rootPath : '', result.FullPath + fileExtension));
             
             let document = await vscode.workspace.openTextDocument(newFile);
             const edit = new vscode.WorkspaceEdit();
@@ -59,8 +58,6 @@ export async function activate(context: vscode.ExtensionContext) {
             } else {
                 vscode.window.showInformationMessage('Error!');
             }
-
-            
         }
     });
 
@@ -82,7 +79,33 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    vscode.commands.registerCommand('STARLIMS.refresh', () => enterpriseProvider.refresh());
+    vscode.commands.registerCommand('STARLIMS.Checkout', async (item: TreeEnterpriseItem) => {
+        await enterpriseService.checkout(item.type, item.enterpriseId);
+    });
+
+    vscode.commands.registerCommand('STARLIMS.Checkin', async (item: TreeEnterpriseItem) => {
+        let checkinReason : string = await vscode.window.showInputBox( {
+            prompt: 'Enter checkin reason',
+            ignoreFocusOut: true,
+        })||'';
+       
+        await enterpriseService.checkin(item.type, item.enterpriseId, checkinReason);
+    });
+
+    vscode.commands.registerCommand('STARLIMS.refresh', async (item: TreeEnterpriseItem) => {
+        await enterpriseProvider.refresh();
+    });
+
+    vscode.commands.registerCommand('STARLIMS.save', async (item: vscode.TreeItem) => {
+        let activeEditor : any = vscode.window.activeTextEditor;
+        if(activeEditor !== undefined) {
+            let sFileName : any = activeEditor.document.fileName;
+            let sCode : any = activeEditor.document.getText();
+            sFileName = path.basename(sFileName);
+            sFileName = sFileName.substr(0, sFileName.lastIndexOf('.'));
+            await enterpriseService.save(sFileName, sCode);
+        }
+    });
 }
 
 // this method is called when your extension is deactivated
