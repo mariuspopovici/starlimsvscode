@@ -38,6 +38,19 @@
                     "light": "resources/light/refresh.svg",
                     "dark": "resources/dark/refresh.svg"
                 }
+            },
+            {
+                "command": "STARLIMS.Checkout",
+                "title": "Checkout"
+            },
+            {
+                "command": "STARLIMS.Checkin",
+                "title": "Checkin"
+            }
+            ,
+            {
+                "command": "STARLIMS.save",
+                "title": "Save To Server"
             }
         ],
         "menus": {
@@ -49,6 +62,18 @@
                 {
                     "command": "STARLIMS.refresh",
                     "when": "view == STARLIMS"
+                },
+                {
+                    "command": "STARLIMS.Checkout",
+                    "when": "view == STARLIMS && viewItem == HTMLFORMCODE  || view == STARLIMS && viewItem == HTMLFORMXML  || view == STARLIMS && viewItem == XFDFORMCODE  || view == STARLIMS && viewItem == XFDFORMXML  || view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == CS|| view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS  || view == STARLIMS && viewItem == APPCS"
+                },
+                {
+                    "command": "STARLIMS.Checkin",
+                    "when": "view == STARLIMS && viewItem == HTMLFORMCODE  || view == STARLIMS && viewItem == HTMLFORMXML  || view == STARLIMS && viewItem == XFDFORMCODE  || view == STARLIMS && viewItem == XFDFORMXML  || view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == CS|| view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS  || view == STARLIMS && viewItem == APPCS"
+                }
+                ,
+                {
+                    "command": "STARLIMS.save"
                 }
             ]
         },
