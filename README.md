@@ -4,6 +4,8 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 
 I recommend using this in conjunction with the [ssl-lang](https://marketplace.visualstudio.com/items?itemName=Janosch.ssl-lang) extension which provides syntax highlighting support for STARLIMS Scripting Language.
 
+![STARLIMS VS Code](resources/extension/demo.gif)
+
 ## Pre-requisites
 
 Requires a server side API which I will make available once the functionality becomes stable enough.
@@ -29,8 +31,6 @@ TODO:
 
 - Check-in / Check-out items - Merge local changes with remote
 - Others
-
-![STARLIMS VS Code](resources/extension/demo.gif)
 
 ## Extension Settings
 
