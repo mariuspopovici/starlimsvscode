@@ -2,3 +2,8 @@ out
 node_modules
 .vscode-test/
 *.vsix
+*.http
+apitest/*
+packages/*
+dist/*
+.vscode/*

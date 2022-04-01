@@ -1,22 +1,33 @@
 # STARLIMS VS Code README
 
-Extension provides Visual Studio Code integration with STARLIMS Enterprise Designer. Started as a fun project to brush up on Typescript and learn the Visual Studio Code
-extensibility API. At this moment the extension is not published in the VS Marketplace as I'm continuing to add new features that will bring it closer to offering some 
-actual value.
+Extension provides Visual Studio Code integration with STARLIMS Enterprise Designer. Started as a fun project to brush up on Typescript and learn the Visual Studio Code extensibility API. At this moment the extension is not published in the VS Marketplace as I'm continuing to add new features that will bring it closer to offering some actual value.
+
+I recommend using this in conjunction with the [ssl-lang](https://marketplace.visualstudio.com/items?itemName=Janosch.ssl-lang) extension which provides syntax highlighting support for STARLIMS Scripting Language.
+
+## Pre-requisites
+
+Requires a server side API which I will make available once the functionality becomes stable enough.
+
+## Disclaimer
+
+This is an unofficial, unsupported extension so use at your own risk. Maybe this will someday become officially supported or maybe not...
+
+## Vision
+
+Implement a Git-like mechanism for managing versions. Extension exploring remote tree
 
 ## Features
 
 Features:
 
-* Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts). 
-* Preview code with syntax higlighting for Starlims Scripting Language, JavaScript and SQL.
-* Download application code locally
+- Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts).
+- Download copies of STARLIMS code items to a local folder.
+- Edit local copies and compare changes with remote version
 
 TODO:
-* Check-in / Check-out items
-* Local vs remote code diff view
-* Advanced Intellisense support for SSL and StarLIMS Javascript extensions
-* Others
+
+- Check-in / Check-out items - Merge local changes with remote
+- Others
 
 ![STARLIMS VS Code](resources/extension/main.PNG)
 
@@ -24,8 +35,15 @@ TODO:
 
 This extension contributes the following settings:
 
-* `STARLIMS.url`: URL to starlims installation (e.g. http://starlimsdev/STARLIMS11.STARLIMS.DEV/)
-* `STARLIMS.user`: default user for STARLIMS authentication
+- `STARLIMS.url`: URL to starlims installation (e.g. http://starlimsdev/STARLIMS11.STARLIMS.DEV/)
+- `STARLIMS.user`: user for STARLIMS authentication
+- `STARLIMS.password`: user password STARLIMS authentication
+
+## How to Use
+
+- Install extension
+- Configure extension settings (STARLIMS url, user and password)
+- Activate extension using the _STARLIMS Connect_ command (press F1).
 
 ## Known Issues
 
@@ -37,4 +55,10 @@ N/A
 
 Initial release of STARLIMS VS Code
 
---------------------------------------------------------------------------------
+---
+
+## 1.1.0
+
+Resurrected this project. Updated dependencies including the new VS Code API.
+Replaced request-promise with node-fetch.
+Implemented a TextDocumentContentProvider for viewing STARLIMS code and refactored API to implement a URI based approach for referencing code items.
