@@ -26,3 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented remote copy view using a TextDocumentContentProvider implementation
 - Added _Compare local with remote_ command
 - LICENSE.md
+
+## [1.1.1] - 2022-04-01
+
+### Changed
+
+- Reversed window order in diff view to be consistent with VS Code / Git compare
+
+### Added
+
+- Added Get Local Version to remote version editor window context menu
+- Activation of extension when executing a compare command
+
+### Fixed
+
+- Made STARLIMS URL setting work with or without a trailing / or starthtml.lims

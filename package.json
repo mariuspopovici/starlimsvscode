@@ -3,7 +3,7 @@
     "displayName": "Starlims VS Code Extension",
     "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
     "license": "SEE LICENSE IN LICENSE.md",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "publisher": "Marius Popovici",
     "keywords": ["STARLIMS", "SSL", "STARLIMS Scripting Language"],
     "repository": {
@@ -19,7 +19,8 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onCommand:STARLIMS.Connect"
+        "onCommand:STARLIMS.Connect",
+        "onCommand:STARLIMS.Compare"
     ],
     "main": "./dist/extension.js",
     "contributes": {
@@ -34,7 +35,7 @@
         "commands": [
             {
                 "command": "STARLIMS.GetLocal",
-                "title": "Get Local Version"
+                "title": "STARLIMS - Get Local Version"
             },
             {
                 "command": "STARLIMS.refresh",
@@ -78,6 +79,10 @@
                 {
                     "command": "STARLIMS.Compare",
                     "when": "!editorReadonly"
+                },
+                {
+                    "command": "STARLIMS.GetLocal",
+                    "when": "editorReadonly"
                 }
             ]
         },
@@ -89,7 +94,7 @@
                     "STARLIMS.url": {
                         "type": "string",
                         "default": "",
-                        "description": "STARLIMS Installation URL"
+                        "description": "STARLIMS Installation URL. For example: https://server/STARLIMS.Dev/"
                     },
                     "STARLIMS.user": {
                         "type": "string",

@@ -7,13 +7,16 @@ import * as path from "path";
 
 export class EnterpriseService {
   private config: any;
+  private baseUrl: string;
 
   constructor(config: any) {
     this.config = config;
+    this.baseUrl = this.cleanUrl(config.url);
   }
 
   public async getEnterpriseItem(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
+    const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
     const headers = this.getAPIAuthHeaders();
     const options: any = {
       method: "GET",
@@ -21,10 +24,7 @@ export class EnterpriseService {
     };
 
     try {
-      const response = await fetch(
-        `${this.config.url}/SCM_API.GetEnterpriseItems.lims?${params}`,
-        options
-      );
+      const response = await fetch(url, options);
       const { success, data }: { success: boolean; data: any } =
         await response.json();
       if (success) {
@@ -43,6 +43,7 @@ export class EnterpriseService {
 
   public async getEntepriseItemCode(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
+    const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
     const headers = this.getAPIAuthHeaders();
     const options: any = {
       method: "GET",
@@ -50,10 +51,7 @@ export class EnterpriseService {
     };
 
     try {
-      const response = await fetch(
-        `${this.config.url}/SCM_API.GetCode.lims?${params}`,
-        options
-      );
+      const response = await fetch(url, options);
       const { success, data }: { success: boolean; data: any } =
         await response.json();
       if (success) {
@@ -126,6 +124,15 @@ export class EnterpriseService {
     }
 
     return null;
+  }
+
+  private cleanUrl(url: string) {
+    let newUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+    if (newUrl.endsWith(".lims")) {
+      newUrl = newUrl.slice(0, newUrl.lastIndexOf("/"));
+    }
+
+    return newUrl;
   }
 }
 

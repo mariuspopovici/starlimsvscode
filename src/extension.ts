@@ -114,12 +114,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(
     "STARLIMS.GetLocal",
-    async (item: TreeEnterpriseItem) => {
+    async (item: TreeEnterpriseItem | any) => {
       if (vscode.workspace.workspaceFolders !== undefined) {
         const workspaceFolderPath =
           vscode.workspace.workspaceFolders[0].uri.fsPath;
         const localFilePath = await enterpriseService.getLocalCopy(
-          item.uri,
+          item.uri ||
+            (item.path
+              ? item.path.slice(0, item.path.lastIndexOf("."))
+              : undefined),
           workspaceFolderPath
         );
         if (localFilePath) {
@@ -134,29 +137,34 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  vscode.commands.registerCommand("STARLIMS.Compare", async () => {
-    let editor = vscode.window.activeTextEditor;
-    if (editor) {
-      if (vscode.workspace.workspaceFolders !== undefined) {
-        const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
-        const workspaceFolderPath =
-          vscode.workspace.workspaceFolders[0].uri.path;
-        let remotePath = editor.document.uri.path.slice(
-          workspaceFolderPath.length
-        );
-        let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
-        vscode.commands.executeCommand(
-          "vscode.diff",
-          editor.document.uri,
-          remoteUri
-        );
-      } else {
-        vscode.window.showErrorMessage(
-          "STARLIMS: Working folder not found, open a workspace folder an try again."
-        );
+  vscode.commands.registerCommand(
+    "STARLIMS.Compare",
+    async (uri: vscode.Uri) => {
+      // is command executed on the file tree
+      let localUri = uri;
+      if (!localUri) {
+        // if not, compare with the open document
+        let editor = vscode.window.activeTextEditor;
+        if (editor) {
+          localUri = editor.document.uri;
+        }
+      }
+
+      if (localUri) {
+        if (vscode.workspace.workspaceFolders !== undefined) {
+          const workspaceFolderPath =
+            vscode.workspace.workspaceFolders[0].uri.path;
+          let remotePath = localUri.path.slice(workspaceFolderPath.length);
+          let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
+          vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
+        } else {
+          vscode.window.showErrorMessage(
+            "STARLIMS: Working folder not found, open a workspace folder an try again."
+          );
+        }
       }
     }
-  });
+  );
 
   vscode.commands.registerCommand(
     "STARLIMS.Checkout",
