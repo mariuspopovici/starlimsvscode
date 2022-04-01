@@ -31,7 +31,7 @@ export class EnterpriseTreeDataProvider
 
     let enterpriseItems: TreeEnterpriseItem[] =
       await this.service.getEnterpriseItem(uri);
-
+    const _this = this;
     enterpriseItems.forEach(function (item: any) {
       let enterpriseTreeItem = new TreeEnterpriseItem(
         item.Type,
@@ -48,10 +48,10 @@ export class EnterpriseTreeDataProvider
         arguments: [enterpriseTreeItem],
       };
       enterpriseTreeItem.contextValue = item.Type;
-      enterpriseTreeItem.iconPath = item.IsFolder
-        ? vscode.ThemeIcon.Folder
-        : vscode.ThemeIcon.File;
-
+      enterpriseTreeItem.iconPath = _this.getItemIcon(item);
+      enterpriseTreeItem.label = item.CheckedOutBy
+        ? `${enterpriseTreeItem.label} (Checked out by ${item.CheckedOutBy})`
+        : enterpriseTreeItem.label;
       enterpriseTreeItems.push(enterpriseTreeItem);
     });
 
@@ -60,6 +60,31 @@ export class EnterpriseTreeDataProvider
 
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     return item;
+  }
+
+  private getItemIcon(item: any): vscode.ThemeIcon {
+    if (item.IsFolder) {
+      return vscode.ThemeIcon.Folder;
+    } else if (item.CheckedOutBy) {
+      return new vscode.ThemeIcon("lock");
+    } else {
+      switch (item.Type) {
+        case "DS":
+        case "APPDS":
+          return new vscode.ThemeIcon("database");
+        case "SS":
+        case "APPSS":
+        case "APPCS":
+        case "HTMLFORMCODE":
+        case "XFDFORMCODE":
+          return new vscode.ThemeIcon("file-code");
+        case "XFDFORMXML":
+        case "HTMLFORMXML":
+          return new vscode.ThemeIcon("preview");
+        default:
+          return new vscode.ThemeIcon("file-code");
+      }
+    }
   }
 }
 
