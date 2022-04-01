@@ -6,11 +6,9 @@ import * as path from "path";
 import {
   EnterpriseTreeDataProvider,
   TreeEnterpriseItem,
-} from "./enterpriseProvider";
-import { EnterpriseService } from "./services/enterpriseService";
+} from "./enterprise-provider";
+import { EnterpriseService } from "./services/enterprise-service";
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
   let config = vscode.workspace.getConfiguration("STARLIMS");
   let user: string | undefined = config.get("user");
@@ -20,6 +18,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const enterpriseService = new EnterpriseService(config);
   const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
 
+  // ensure extension settings are defined and prompt for values if not
   if (!url) {
     url = await vscode.window.showInputBox({
       prompt: "Enter STARLIMS URL",
@@ -64,6 +63,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
+  // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
+  // schema
   const enterpriseTextContentProvider = new (class
     implements vscode.TextDocumentContentProvider
   {
@@ -87,7 +88,10 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  // register a custom tree data provider for the STARLIMS enterprise designer explorer
   vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
+
+  // hook into tree events for loading code items
   vscode.commands.registerCommand(
     "STARLIMS.selectEnterpriseItem",
     async (item: TreeEnterpriseItem) => {
@@ -112,6 +116,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // this command activates the extension
   vscode.commands.registerCommand("STARLIMS.Connect", () => {});
 
+  // registers the GetLocal version command handler.
   vscode.commands.registerCommand(
     "STARLIMS.GetLocal",
     async (item: TreeEnterpriseItem | any) => {
@@ -137,6 +142,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // registers the remote compare command
   vscode.commands.registerCommand(
     "STARLIMS.Compare",
     async (uri: vscode.Uri) => {
@@ -166,6 +172,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // registers the checkout command
   vscode.commands.registerCommand(
     "STARLIMS.Checkout",
     async (item: TreeEnterpriseItem) => {
@@ -173,6 +180,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // registers the check in command
   vscode.commands.registerCommand(
     "STARLIMS.Checkin",
     async (item: TreeEnterpriseItem) => {
