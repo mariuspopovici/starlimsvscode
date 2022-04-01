@@ -14,7 +14,8 @@ This is an unofficial, unsupported extension so use at your own risk. Maybe this
 
 ## Vision
 
-Implement a Git-like mechanism for managing versions. Extension exploring remote tree
+Implement a Git-like mechanism for managing versions. Extension can be used to explore the remote tree and download code to a local repo.
+Changes can be pushed back to the STARLIMS dictionary and merged with the remote version.
 
 ## Features
 
