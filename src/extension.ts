@@ -14,10 +14,14 @@ export async function activate(context: vscode.ExtensionContext) {
   let user: string | undefined = config.get("user");
   let password: string | undefined = config.get("password");
   let url: string | undefined = config.get("url");
+  let reloadConfig = false;
 
-  const enterpriseService = new EnterpriseService(config);
-  const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
-
+  if (!vscode.workspace.workspaceFolders) {
+    vscode.window.showErrorMessage(
+      "STARLIMS: Working folder not found, open a workspace folder an try again."
+    );
+    return;
+  }
   // ensure extension settings are defined and prompt for values if not
   if (!url) {
     url = await vscode.window.showInputBox({
@@ -25,7 +29,8 @@ export async function activate(context: vscode.ExtensionContext) {
       ignoreFocusOut: true,
     });
     if (url) {
-      config.update("url", url, false);
+      await config.update("url", url, false);
+      reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
         "Please configure STARLIMS URL in extension settings."
@@ -36,11 +41,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!user) {
     user = await vscode.window.showInputBox({
-      prompt: "Enter STARLIMS user name",
+      prompt: "Enter STARLIMS username",
       ignoreFocusOut: true,
     });
     if (user) {
-      config.update("user", user, false);
+      await config.update("user", user.toUpperCase(), false);
+      reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
         "Please configure STARLIMS user in extension settings."
@@ -55,12 +61,17 @@ export async function activate(context: vscode.ExtensionContext) {
       ignoreFocusOut: true,
     });
     if (password) {
-      config.update("password", user, false);
+      await config.update("password", password, false);
+      reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
         "Please configure STARLIMS password in extension settings."
       );
     }
+  }
+
+  if (reloadConfig) {
+    config = vscode.workspace.getConfiguration("STARLIMS");
   }
 
   // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
@@ -88,6 +99,8 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  const enterpriseService = new EnterpriseService(config);
+  const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
   vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
 

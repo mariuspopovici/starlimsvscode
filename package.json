@@ -1,144 +1,148 @@
 {
-    "name": "starlimsvscode",
-    "displayName": "Starlims VS Code Extension",
-    "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
-    "license": "SEE LICENSE IN LICENSE.md",
-    "version": "1.1.1",
-    "publisher": "Marius Popovici",
-    "keywords": ["STARLIMS", "SSL", "STARLIMS Scripting Language"],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mariuspopovici/starlimsvscode"
+  "name": "starlimsvscode",
+  "displayName": "Starlims VS Code Extension",
+  "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "version": "1.1.1",
+  "publisher": "Marius Popovici",
+  "keywords": [
+    "STARLIMS",
+    "SSL",
+    "STARLIMS Scripting Language"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariuspopovici/starlimsvscode"
+  },
+  "engines": {
+    "vscode": "^1.65.0"
+  },
+  "categories": [
+    "Other",
+    "SCM Providers",
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onCommand:STARLIMS.Connect",
+    "onCommand:STARLIMS.Compare"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "STARLIMS",
+          "name": "STARLIMS Enterprise"
+        }
+      ]
     },
-    "engines": {
-        "vscode": "^1.65.0"
-    },
-    "categories": [
-        "Other",
-        "SCM Providers",
-        "Programming Languages"
+    "commands": [
+      {
+        "command": "STARLIMS.GetLocal",
+        "title": "STARLIMS - Get Local Version"
+      },
+      {
+        "command": "STARLIMS.refresh",
+        "title": "Refresh Explorer"
+      },
+      {
+        "command": "STARLIMS.Checkout",
+        "title": "STARLIMS - Checkout"
+      },
+      {
+        "command": "STARLIMS.Checkin",
+        "title": "STARLIMS - Checkin"
+      },
+      {
+        "command": "STARLIMS.Connect",
+        "title": "STARLIMS - Connect"
+      },
+      {
+        "command": "STARLIMS.Compare",
+        "title": "STARLIMS - Compare with Remote Version"
+      }
     ],
-    "activationEvents": [
-        "onCommand:STARLIMS.Connect",
-        "onCommand:STARLIMS.Compare"
-    ],
-    "main": "./dist/extension.js",
-    "contributes": {
-        "views": {
-            "explorer": [
-                {
-                    "id": "STARLIMS",
-                    "name": "STARLIMS Enterprise"
-                }
-            ]
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "STARLIMS.refresh",
+          "when": "view == STARLIMS"
         },
-        "commands": [
-            {
-                "command": "STARLIMS.GetLocal",
-                "title": "STARLIMS - Get Local Version"
-            },
-            {
-                "command": "STARLIMS.refresh",
-                "title": "Refresh Explorer"
-            },
-            {
-                "command": "STARLIMS.Checkout",
-                "title": "STARLIMS - Checkout"
-            },
-            {
-                "command": "STARLIMS.Checkin",
-                "title": "STARLIMS - Checkin"
-            },
-            {
-                "command": "STARLIMS.Connect",
-                "title": "STARLIMS - Connect"
-            },
-            {
-                "command": "STARLIMS.Compare",
-                "title": "STARLIMS - Compare with Remote Version"
-            }
-        ],
-        "menus": {
-            "view/item/context": [
-                {
-                    "command": "STARLIMS.refresh",
-                    "when": "view == STARLIMS"
-                },
-                {
-                    "command": "STARLIMS.GetLocal",
-                    "when": "view == STARLIMS && viewItem == HTMLFORMCODE  || view == STARLIMS && viewItem == HTMLFORMXML  || view == STARLIMS && viewItem == XFDFORMCODE  || view == STARLIMS && viewItem == XFDFORMXML  || view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == CS|| view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS  || view == STARLIMS && viewItem == APPCS"
-                }
-            ],
-            "explorer/context": [
-                {
-                    "command": "STARLIMS.Compare",
-                    "when": "view != STARLIMS"
-                }
-            ],
-            "editor/context": [
-                {
-                    "command": "STARLIMS.Compare",
-                    "when": "!editorReadonly"
-                },
-                {
-                    "command": "STARLIMS.GetLocal",
-                    "when": "editorReadonly"
-                }
-            ]
+        {
+          "command": "STARLIMS.GetLocal",
+          "when": "view == STARLIMS && viewItem == HTMLFORMCODE  || view == STARLIMS && viewItem == HTMLFORMXML  || view == STARLIMS && viewItem == XFDFORMCODE  || view == STARLIMS && viewItem == XFDFORMXML  || view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == CS|| view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS  || view == STARLIMS && viewItem == APPCS"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "STARLIMS.Compare",
+          "when": "view != STARLIMS"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "STARLIMS.Compare",
+          "when": "!editorReadonly"
         },
-        "configuration": [
-            {
-                "type": "object",
-                "title": "STARLIMS VSCode Configuration",
-                "properties": {
-                    "STARLIMS.url": {
-                        "type": "string",
-                        "default": "",
-                        "description": "STARLIMS Installation URL. For example: https://server/STARLIMS.Dev/"
-                    },
-                    "STARLIMS.user": {
-                        "type": "string",
-                        "default": "SYSADM",
-                        "description": "STARLIMS User ID"
-                    },
-                    "STARLIMS.password": {
-                        "type": "string",
-                        "default": "",
-                        "description": "STARLIMS User Password"
-                    }
-                }
-            }
-        ]
+        {
+          "command": "STARLIMS.GetLocal",
+          "when": "editorReadonly"
+        }
+      ]
     },
-    "scripts": {
-        "vscode:prepublish": "npm run package",
-        "compile": "webpack",
-        "watch": "webpack --watch",
-        "package": "webpack --mode production --devtool hidden-source-map",
-        "compile-tests": "tsc -p . --outDir out",
-        "watch-tests": "tsc -p . -w --outDir out",
-        "pretest": "npm run compile-tests && npm run compile && npm run lint",
-        "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
-    },
-    "devDependencies": {
-        "@types/glob": "^7.2.0",
-        "@types/mocha": "^9.1.0",
-        "@types/node": "^14.18.12",
-        "@types/node-fetch": "^2.6.1",
-        "@types/vscode": "^1.65.0",
-        "@typescript-eslint/eslint-plugin": "^5.16.0",
-        "@typescript-eslint/parser": "^5.16.0",
-        "@vscode/test-electron": "^2.1.3",
-        "eslint": "^8.11.0",
-        "glob": "^7.2.0",
-        "mocha": "^9.2.2",
-        "ts-loader": "^9.2.8",
-        "typescript": "^4.5.5",
-        "webpack": "^5.70.0",
-        "webpack-cli": "^4.9.2"
-    },
-    "dependencies": {
-        "node-fetch": "^2.6.7"
-    }
+    "configuration": [
+      {
+        "type": "object",
+        "title": "STARLIMS VSCode Configuration",
+        "properties": {
+          "STARLIMS.url": {
+            "type": "string",
+            "default": "",
+            "description": "STARLIMS Installation URL. For example: https://server/STARLIMS.Dev/"
+          },
+          "STARLIMS.user": {
+            "type": "string",
+            "default": "",
+            "description": "STARLIMS User ID"
+          },
+          "STARLIMS.password": {
+            "type": "string",
+            "default": "",
+            "description": "STARLIMS User Password"
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "^14.18.12",
+    "@types/node-fetch": "^2.6.1",
+    "@types/vscode": "^1.65.0",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "@vscode/test-electron": "^2.1.3",
+    "eslint": "^8.11.0",
+    "glob": "^7.2.0",
+    "mocha": "^9.2.2",
+    "ts-loader": "^9.2.8",
+    "typescript": "^4.5.5",
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
 }
