@@ -30,7 +30,7 @@ TODO:
 - Check-in / Check-out items - Merge local changes with remote
 - Others
 
-![STARLIMS VS Code](resources/extension/main.PNG)
+![STARLIMS VS Code](resources/extension/demo.gif)
 
 ## Extension Settings
 
