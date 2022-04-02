@@ -63,3 +63,10 @@ Initial release of STARLIMS VS Code
 Resurrected this project. Updated dependencies including the new VS Code API.
 Replaced request-promise with node-fetch.
 Implemented a TextDocumentContentProvider for viewing STARLIMS code and refactored API to implement a URI based approach for referencing code items.
+
+## 1.1.1
+
+Bug fixes.
+Added Get Local Version to remote version editor window context menu
+Activation of extension when executing a compare command
+Showing remote checkout status in explorer tree
