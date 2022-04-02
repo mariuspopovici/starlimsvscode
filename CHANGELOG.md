@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Get Local Version to remote version editor window context menu
 - Activation of extension when executing a compare command
+- Showing remote checkout status in explorer tree
 
 ### Fixed
 
