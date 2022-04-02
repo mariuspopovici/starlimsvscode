@@ -25,6 +25,15 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
+   * Gets the service config.
+   *
+   * @returns the service configuration settings
+   */
+  public getConfig(): vscode.WorkspaceConfiguration {
+    return this.config;
+  }
+
+  /**
    * Gets a descriptor of the STARLIMS Enterprise code item referenced by the specified URI.
    *
    * @param uri the URI of the remote STARLIMS code item.

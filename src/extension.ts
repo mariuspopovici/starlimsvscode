@@ -2,12 +2,13 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import * as path from "path";
+import { EnterpriseFileDecorationProvider } from "./providers/enterpriseFileDecorationProvider";
 import {
   EnterpriseTreeDataProvider,
   TreeEnterpriseItem,
-} from "./enterprise-provider";
-import { EnterpriseService } from "./services/enterprise-service";
+} from "./providers/enterpriseTreeDataProvider";
+import { EnterpriseService } from "./services/enterpriseService";
+import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 
 export async function activate(context: vscode.ExtensionContext) {
   let config = vscode.workspace.getConfiguration("STARLIMS");
@@ -16,7 +17,13 @@ export async function activate(context: vscode.ExtensionContext) {
   let url: string | undefined = config.get("url");
   let reloadConfig = false;
 
-  if (!vscode.workspace.workspaceFolders) {
+  const rootPath =
+    vscode.workspace.workspaceFolders &&
+    vscode.workspace.workspaceFolders.length > 0
+      ? vscode.workspace.workspaceFolders[0].uri.fsPath
+      : undefined;
+
+  if (!rootPath) {
     vscode.window.showErrorMessage(
       "STARLIMS: Working folder not found, open a workspace folder an try again."
     );
@@ -25,6 +32,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure extension settings are defined and prompt for values if not
   if (!url) {
     url = await vscode.window.showInputBox({
+      title: "Configure STARLIMS",
       prompt: "Enter STARLIMS URL",
       ignoreFocusOut: true,
     });
@@ -41,6 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!user) {
     user = await vscode.window.showInputBox({
+      title: "Configure STARLIMS",
       prompt: "Enter STARLIMS username",
       ignoreFocusOut: true,
     });
@@ -56,6 +65,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!password) {
     password = await vscode.window.showInputBox({
+      title: "Configure STARLIMS",
       prompt: `Enter password for STARLIMS user '${user}'`,
       password: true,
       ignoreFocusOut: true,
@@ -74,23 +84,11 @@ export async function activate(context: vscode.ExtensionContext) {
     config = vscode.workspace.getConfiguration("STARLIMS");
   }
 
+  const enterpriseService = new EnterpriseService(config);
+
   // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
-  // schema
-  const enterpriseTextContentProvider = new (class
-    implements vscode.TextDocumentContentProvider
-  {
-    // emitter and its event
-    onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
-    onDidChange = this.onDidChangeEmitter.event;
-
-    async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
-      const result: any = await enterpriseService.getEntepriseItemCode(
-        uri.path
-      );
-
-      return result.Code || "";
-    }
-  })();
+  const enterpriseTextContentProvider =
+    new EnterpriseTextDocumentContentProvider(enterpriseService);
 
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider(
@@ -99,9 +97,8 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  const enterpriseService = new EnterpriseService(config);
-  const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
+  const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
   vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
 
   // hook into tree events for loading code items
@@ -126,6 +123,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register a decoration provider for the STARLIMS enterprise tree
+  const fileDecorationProvider = new EnterpriseFileDecorationProvider();
+  vscode.window.registerFileDecorationProvider(fileDecorationProvider);
+
   // this command activates the extension
   vscode.commands.registerCommand("STARLIMS.Connect", () => {});
 
@@ -133,24 +134,16 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.GetLocal",
     async (item: TreeEnterpriseItem | any) => {
-      if (vscode.workspace.workspaceFolders !== undefined) {
-        const workspaceFolderPath =
-          vscode.workspace.workspaceFolders[0].uri.fsPath;
-        const localFilePath = await enterpriseService.getLocalCopy(
-          item.uri ||
-            (item.path
-              ? item.path.slice(0, item.path.lastIndexOf("."))
-              : undefined),
-          workspaceFolderPath
-        );
-        if (localFilePath) {
-          let uri: vscode.Uri = vscode.Uri.file(localFilePath);
-          vscode.window.showTextDocument(uri);
-        }
-      } else {
-        vscode.window.showErrorMessage(
-          "STARLIMS: Working folder not found, open a workspace folder an try again."
-        );
+      const localFilePath = await enterpriseService.getLocalCopy(
+        item.uri ||
+          (item.path
+            ? item.path.slice(0, item.path.lastIndexOf("."))
+            : undefined),
+        rootPath
+      );
+      if (localFilePath) {
+        let uri: vscode.Uri = vscode.Uri.file(localFilePath);
+        vscode.window.showTextDocument(uri);
       }
     }
   );

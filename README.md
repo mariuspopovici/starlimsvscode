@@ -1,4 +1,4 @@
-# STARLIMS VS Code README
+# STARLIMS VS Code
 
 Extension provides Visual Studio Code integration with STARLIMS Enterprise Designer. Started as a fun project to brush up on Typescript and learn the Visual Studio Code extensibility API. At this moment the extension is not published in the VS Marketplace as I'm continuing to add new features that will bring it closer to offering some actual value.
 

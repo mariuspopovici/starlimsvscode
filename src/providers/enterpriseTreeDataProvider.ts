@@ -1,6 +1,8 @@
+"use strict";
+
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
-import { Enterprise } from "./services/enterprise";
+import { Enterprise } from "../services/enterprise";
 
 /**
  * Implements the VS Code TreeDataProvider to build the STARLIMS designer tree explorer.
@@ -31,6 +33,7 @@ export class EnterpriseTreeDataProvider
 
     let enterpriseItems: TreeEnterpriseItem[] =
       await this.service.getEnterpriseItem(uri);
+
     const _this = this;
     enterpriseItems.forEach(function (item: any) {
       let enterpriseTreeItem = new TreeEnterpriseItem(
@@ -52,6 +55,7 @@ export class EnterpriseTreeDataProvider
       enterpriseTreeItem.label = item.CheckedOutBy
         ? `${enterpriseTreeItem.label} (Checked out by ${item.CheckedOutBy})`
         : enterpriseTreeItem.label;
+      enterpriseTreeItem.resourceUri = _this.getItemResource(item);
       enterpriseTreeItems.push(enterpriseTreeItem);
     });
 
@@ -60,6 +64,18 @@ export class EnterpriseTreeDataProvider
 
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     return item;
+  }
+
+  private getItemResource(item: any): vscode.Uri | undefined {
+    const config = this.service.getConfig();
+    let resourceUri = undefined;
+    if (item.CheckedOutBy && item.CheckedOutBy === config.get("user")) {
+      resourceUri = vscode.Uri.parse("starlims:/checkedOutByMe");
+    } else if (item.CheckedOutBy) {
+      resourceUri = vscode.Uri.parse("starlims:/checkedOutByOtherUser");
+    }
+
+    return resourceUri;
   }
 
   private getItemIcon(item: any): vscode.ThemeIcon {
