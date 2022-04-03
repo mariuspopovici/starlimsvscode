@@ -25,6 +25,35 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
+   * Execute script remotely.
+   * @param uri the URI of the remote script.
+   */
+  async runScript(uri: string) {
+    const url = `${this.baseUrl}/SCM_API.RunScript.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        URI: uri,
+      }),
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } =
+        await response.json();
+      return data;
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage(
+        "Failed to execute HTTP call to remote service."
+      );
+      return;
+    }
+  }
+
+  /**
    * Gets the service config.
    *
    * @returns the service configuration settings
@@ -37,12 +66,12 @@ export class EnterpriseService implements Enterprise {
    * Gets a descriptor of the STARLIMS Enterprise code item referenced by the specified URI.
    *
    * @param uri the URI of the remote STARLIMS code item.
-   * @returns A descriptor object with the following properties: Name, Type, URI, Language, IsFolder
+   * @returns A descriptor object with the following properties: name, type, uri, language, isFolder
    */
   public async getEnterpriseItem(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
-    const headers = this.getAPIAuthHeaders();
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
       headers,
@@ -76,7 +105,7 @@ export class EnterpriseService implements Enterprise {
   public async getEntepriseItemCode(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
-    const headers = this.getAPIAuthHeaders();
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
       headers,
@@ -123,7 +152,7 @@ export class EnterpriseService implements Enterprise {
     if (item) {
       const localFilePath = path.join(
         workspaceFolder,
-        `${uri}.${item.Language.toLowerCase()}`
+        `${uri}.${item.language.toLowerCase()}`
       );
 
       try {
@@ -144,7 +173,7 @@ export class EnterpriseService implements Enterprise {
         }
 
         if (writeFile) {
-          await fs.writeFile(localFilePath, item.Code, {
+          await fs.writeFile(localFilePath, item.code, {
             encoding: "utf8",
           });
           vscode.window.showInformationMessage(
@@ -161,11 +190,13 @@ export class EnterpriseService implements Enterprise {
     return null;
   }
 
-  private getAPIAuthHeaders(): Headers {
-    return new Headers([
+  private getAPIHeaders(): string[][] {
+    return [
       ["STARLIMSUser", this.config.user],
       ["STARLIMSPass", this.config.password],
-    ]);
+      ["Content-Type", "application/json"],
+      ["Accept", "*/*"],
+    ];
   }
 
   /**

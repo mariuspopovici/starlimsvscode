@@ -148,6 +148,28 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const outputChannel = vscode.window.createOutputChannel("STARLIMS");
+
+  // registers the GetLocal version command handler.
+  vscode.commands.registerCommand(
+    "STARLIMS.RunScript",
+    async (item: TreeEnterpriseItem | any) => {
+      const uri =
+        item.uri ||
+        (item.path
+          ? item.path.slice(0, item.path.lastIndexOf("."))
+          : undefined);
+      outputChannel.appendLine(
+        `${new Date().toISOString()} Executing remote script at URI: ${uri}`
+      );
+      const result = await enterpriseService.runScript(uri);
+      if (result) {
+        outputChannel.appendLine(result);
+        outputChannel.show();
+      }
+    }
+  );
+
   // registers the remote compare command
   vscode.commands.registerCommand(
     "STARLIMS.Compare",

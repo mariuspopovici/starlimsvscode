@@ -18,6 +18,6 @@ export class EnterpriseTextDocumentContentProvider
   async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
     const result: any = await this.service.getEntepriseItemCode(uri.path);
 
-    return result.Code || "";
+    return result.code || "";
   }
 }

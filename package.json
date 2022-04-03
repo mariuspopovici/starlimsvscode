@@ -60,6 +60,10 @@
       {
         "command": "STARLIMS.Compare",
         "title": "STARLIMS - Compare with Remote Version"
+      },
+      {
+        "command": "STARLIMS.RunScript",
+        "title": "STARLIMS - Run Script"
       }
     ],
     "menus": {
@@ -71,6 +75,10 @@
         {
           "command": "STARLIMS.GetLocal",
           "when": "view == STARLIMS && viewItem == HTMLFORMCODE  || view == STARLIMS && viewItem == HTMLFORMXML  || view == STARLIMS && viewItem == XFDFORMCODE  || view == STARLIMS && viewItem == XFDFORMXML  || view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == CS|| view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS  || view == STARLIMS && viewItem == APPCS"
+        },
+        {
+          "command": "STARLIMS.RunScript",
+          "when": "view == STARLIMS && && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS"
         }
       ],
       "explorer/context": [
@@ -86,6 +94,10 @@
         },
         {
           "command": "STARLIMS.GetLocal",
+          "when": "editorReadonly"
+        },
+        {
+          "command": "STARLIMS.RunScript",
           "when": "editorReadonly"
         }
       ]

@@ -1,0 +1,263 @@
+openapi: 3.0.1
+tags:
+  - name: Code Management
+info:
+  title: STARLIMS VSCode Extension API
+  version: "1.0.0"
+  description: VSCode Extension API services.
+  contact:
+    name: API
+    email: marius@popovici.net
+servers:
+  - url: https://server/starlimsapp/
+security:
+  - starlims-user: []
+  - starlims-password: []
+
+paths:
+  /SCM_API.RunScript.lims:
+    post:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.RunScript.lims` endpoint executes the code referenced by the specified URI and returns the result.
+      operationId: RunScript
+      requestBody:
+        description: Run script request object.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunScriptRequest"
+        required: true
+      responses:
+        "200":
+          description: The execution result stats and return value.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunScriptResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.GetCode.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: |
+        The `SCM_API.GetCode.lims` endpoint returns code refererenced by the specified URI path.
+      operationId: GetCode
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the code item to retrieve.
+          example: /Applications/TestApplications/MyApp
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: The code text and code language of the requested item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.GetEnterpriseItems.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: |
+        The SCM_API.GetEnterpriseItems.lims endpoint returns the STARLIMS dictionary code tree from a specified URI.
+      operationId: GetEnterpriseItems
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the start point from which to retrieve STARLIMS enterprise items.
+          example: /Applications/TestApplications/MyApp
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: A collection of enterprise code items.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnterpriseItemList"
+        "500":
+          $ref: "#/components/responses/InternalError"
+components:
+  schemas:
+    Response:
+      required:
+        - success
+        - data
+      type: object
+      properties:
+        Success:
+          type: boolean
+        Result:
+          type: string
+    RunScriptRequest:
+      required:
+        - URI
+      properties:
+        URI:
+          type: string
+          example: "/ServerScripts/Test/TestServerScript"
+          description: The URI to the script or data source to execute.
+        Parameters:
+          type: array
+          description: Optional script parameters.
+          items:
+            type: object
+          example: ["P1 Value", "P2 Value"]
+    RunScriptResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          description: The return value of the remote script execution.
+    CodeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Item code text.
+              example: |
+                :RETURN .T.;
+            language:
+              type: string
+              description: |
+                Item code programming language. One of: SSL, JS, SQL, XML
+              example: SSL
+              enum:
+                - SSL
+                - JS
+                - XML
+                - SQL
+    EnterpriseItemList:
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/EnterpriseItem"
+    EnterpriseItem:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the code item.
+          example: TestServerScript
+        type:
+          type: string
+          description: |
+            The type of item. One of: CATEGORY, APPCATEGORY, APPCS, APPDS, APPSS, APP, CSCAT, DSCAT, SSCAT, CS, DS, SS
+          example: SS
+          enum:
+            - CATEGORY
+            - APPCATEGORY
+            - SSCAT
+            - CSCAT
+            - DSCAT
+            - APP
+            - APPCS
+            - APPDS
+            - APPSS
+            - SS
+            - CS
+            - DS
+        uri:
+          type: string
+          example: /ServerScripts/Test/TestServerScript
+          description: The URI of the code item
+        checkedOutBy:
+          type: string
+          example: MARIUS
+          description: The user ID who has the item checked out if item is currently checked out
+        language:
+          type: string
+          example: SSL
+          description: |
+            The programming language of the item. One of: SSL, JS, XML, SQL
+          enum:
+            - SSL
+            - JS
+            - XML
+            - SQL
+        isFolder:
+          type: boolean
+          example: false
+          description: Set to `true` when item is a category / folder type such as an Application, Application Category, Script Category etc.
+  responses:
+    OK:
+      description: Operation ran successfully.
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Response"
+          example:
+            success: true
+            data: Success
+    BadRequest:
+      description: Invalid input. Actual validation error message depends on context.
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Response"
+          example:
+            success: false
+            data: Bad request.
+    InternalError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Response"
+          example:
+            Success: false
+            Result: Internal server error.
+  securitySchemes:
+    starlims-user:
+      type: apiKey
+      description: |
+        The STARLIMS username.
+      name: STARLIMSUser
+      in: header
+    starlims-password:
+      type: apiKey
+      description: |
+        The STARLIMS user password.
+      name: STARLIMSPass
+      in: header

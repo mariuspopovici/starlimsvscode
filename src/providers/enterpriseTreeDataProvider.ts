@@ -37,11 +37,11 @@ export class EnterpriseTreeDataProvider
     const _this = this;
     enterpriseItems.forEach(function (item: any) {
       let enterpriseTreeItem = new TreeEnterpriseItem(
-        item.Type,
-        item.Name,
-        item.Language,
-        item.URI,
-        item.IsFolder
+        item.type,
+        item.name,
+        item.language,
+        item.uri,
+        item.isFolder
           ? vscode.TreeItemCollapsibleState.Collapsed
           : vscode.TreeItemCollapsibleState.None
       );
@@ -50,10 +50,10 @@ export class EnterpriseTreeDataProvider
         title: "Select Node",
         arguments: [enterpriseTreeItem],
       };
-      enterpriseTreeItem.contextValue = item.Type;
+      enterpriseTreeItem.contextValue = item.type;
       enterpriseTreeItem.iconPath = _this.getItemIcon(item);
-      enterpriseTreeItem.label = item.CheckedOutBy
-        ? `${enterpriseTreeItem.label} (Checked out by ${item.CheckedOutBy})`
+      enterpriseTreeItem.label = item.checkedOutBy
+        ? `${enterpriseTreeItem.label} (Checked out by ${item.checkedOutBy})`
         : enterpriseTreeItem.label;
       enterpriseTreeItem.resourceUri = _this.getItemResource(item);
       enterpriseTreeItems.push(enterpriseTreeItem);
@@ -69,9 +69,9 @@ export class EnterpriseTreeDataProvider
   private getItemResource(item: any): vscode.Uri | undefined {
     const config = this.service.getConfig();
     let resourceUri = undefined;
-    if (item.CheckedOutBy && item.CheckedOutBy === config.get("user")) {
+    if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByMe");
-    } else if (item.CheckedOutBy) {
+    } else if (item.checkedOutBy) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByOtherUser");
     }
 
@@ -79,12 +79,12 @@ export class EnterpriseTreeDataProvider
   }
 
   private getItemIcon(item: any): vscode.ThemeIcon {
-    if (item.IsFolder) {
+    if (item.isFolder) {
       return vscode.ThemeIcon.Folder;
-    } else if (item.CheckedOutBy) {
+    } else if (item.checkedOutBy) {
       return new vscode.ThemeIcon("lock");
     } else {
-      switch (item.Type) {
+      switch (item.type) {
         case "DS":
         case "APPDS":
           return new vscode.ThemeIcon("database");

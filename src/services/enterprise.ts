@@ -6,4 +6,5 @@ export interface Enterprise {
   getEntepriseItemCode(uri: string): any;
   getLocalCopy(uri: string, workspaceFolder: string): Promise<string | null>;
   getConfig(): any;
+  runScript(uri: string): any;
 }
