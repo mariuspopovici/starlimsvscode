@@ -43,7 +43,7 @@ export class EnterpriseService implements Enterprise {
       const response = await fetch(url, options);
       const { success, data }: { success: boolean; data: any } =
         await response.json();
-      return data;
+      return data instanceof Object ? JSON.stringify(data) : data;
     } catch (e: any) {
       console.error(e);
       vscode.window.showErrorMessage(

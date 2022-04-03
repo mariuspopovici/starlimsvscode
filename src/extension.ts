@@ -160,7 +160,7 @@ export async function activate(context: vscode.ExtensionContext) {
           ? item.path.slice(0, item.path.lastIndexOf("."))
           : undefined);
       outputChannel.appendLine(
-        `${new Date().toISOString()} Executing remote script at URI: ${uri}`
+        `${new Date().toLocaleString()} Executing remote script at URI: ${uri}`
       );
       const result = await enterpriseService.runScript(uri);
       if (result) {
