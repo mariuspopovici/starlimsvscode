@@ -26,6 +26,7 @@ Features:
 - Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts).
 - Download copies of STARLIMS code items to a local folder.
 - Edit local copies and compare changes with remote version
+- Execute remote scripts and view execution return values.
 
 TODO:
 
