@@ -43,9 +43,11 @@ This extension contributes the following settings:
 
 ## How to Use
 
-- Install extension
-- Configure extension settings (STARLIMS url, user and password)
+- Download extension files attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
+- (Install VSIX file, Import .sdp package into STARLIMS)
+- Open a local workspace folder. This will serve as your local STARLIMS code repository.
 - Activate extension using the _STARLIMS Connect_ command (press F1).
+- Configure extension settings (STARLIMS url, user and password). You will be prompted to set these upon attempting to activate the extension for the first time.
 
 ## Known Issues
 
