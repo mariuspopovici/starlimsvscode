@@ -1,0 +1,227 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	MARIUS
+Date......... : 2018-11-02
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+:CLASS Utils;
+
+:PROCEDURE TranslateFileTypeToItemType;
+:PARAMETERS sFileType;
+
+:DECLARE sItemType;
+
+	:BEGINCASE;
+		:CASE sFileType == "SS";
+			sItemType := "ServerScript";
+		:EXITCASE;
+		:CASE sFileType == "CS";
+			sItemType := "ClientScript";
+		:EXITCASE;
+		:CASE sFileType == "APPSS";
+			sItemType := "AppServerScript";
+		:EXITCASE;
+		:CASE sFileType == "APPCS";
+			sItemType := "AppClientScript";
+		:EXITCASE;
+		:CASE sFileType == "FRM";
+			sItemType := "Form";
+		:EXITCASE;
+		:CASE sFileType == "DS";
+			sItemType := "DataSourceScript";
+		:EXITCASE;
+		:CASE sFileType == "APPDS";
+			sItemType := "AppDataSourceScript";
+		:EXITCASE;
+		:OTHERWISE;
+			sItemType := "Unknown";
+		:EXITCASE;
+	:ENDCASE;
+	
+	:RETURN sItemType;
+:ENDPROC;
+
+:PROCEDURE GetSCMItemGUID;
+:PARAMETERS sItemType, sCategory, sItemName;
+
+:DECLARE sGUID;
+
+	:BEGINCASE;
+		:CASE sItemType == "ServerScript";
+			/* Global Server Script; 
+			:TRY;
+				sGUID := DoProc("Enterprise_Data_Providers.ServerScriptProvider.GetScriptIdByName", {sCategory + "." + sItemName});
+			:CATCH;
+				/* TODO: set distinction between not found and general error;
+				sGUID := NIL;
+			:ENDTRY;
+		:EXITCASE;
+	:ENDCASE;
+
+	:RETURN sGUID;
+:ENDPROC;
+
+:PROCEDURE GetDataSetTableFromString;
+:PARAMETERS sDataSet;
+:DECLARE oDataSet;
+	oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+	:IF oDataSet:Tables:Count > 0;
+		:RETURN oDataSet:Tables[0];
+	:ELSE;
+		:RETURN NIL;
+	:ENDIF;
+:ENDPROC;
+
+:PROCEDURE RemoveDBNull;
+:PARAMETERS oObject;
+	:DECLARE oDBNull;
+	oDBNull := LimsNetConnect("System", "System.DBNull");
+
+	:DECLARE aProps, i;
+	aProps := oObject:GetProperties();
+	:FOR i := 1 :TO Len(aProps);
+		:DECLARE oValue;
+		oValue := GetInternal(oObject, aProps[i]);
+		:IF oDBNull:Value:Equals(oValue);
+			SetInternal(oObject, aProps[i], ""); 
+		:ENDIF;
+	:NEXT;
+	
+	:RETURN oObject;
+:ENDPROC;
+
+:PROCEDURE ParseURI;
+:PARAMETERS sURI;
+:DEFAULT sURI, "";
+:DECLARE aComponents, oEnterpriseItem, nCount;
+	oEnterpriseItem := CreateUDObject();
+	aComponents := Me:GetURIComponents(sURI);
+	nCount := Len(aComponents);
+	
+	:IF Empty(aComponents);
+		oEnterpriseItem:Type := "ROOT";
+		:RETURN oEnterpriseItem;
+	:ENDIF;
+	
+	:DECLARE sEnterpriseCategory;
+	sEnterpriseCategory := aComponents[1];
+	
+	:BEGINCASE;
+		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 1;
+			oEnterpriseItem:Type := "ENT_CAT_APPS";
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 2;
+			oEnterpriseItem:Type := "APPCATEGORY";
+			oEnterpriseItem:Name := aComponents[2];
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 3;
+			oEnterpriseItem:Type := "APP";
+			oEnterpriseItem:Category := aComponents[2];
+			oEnterpriseItem:Name := aComponents[3];
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 4;
+			oEnterpriseItem:Type := "APPSUBCATEGORY";
+			oEnterpriseItem:Category := aComponents[2];
+			oEnterpriseItem:AppName := aComponents[3];
+			oEnterpriseItem:Name := aComponents[4];
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "Applications" .AND. nCount >= 5;
+			:DECLARE sSubCategory, sFormCodeType;
+			sSubCategory := aComponents[4];
+			oEnterpriseItem:AppName := aComponents[3];
+			:BEGINCASE;
+				:CASE sSubCategory == "ServerScripts";
+					oEnterpriseItem:Type := "APPSS";
+					oEnterpriseItem:Name := aComponents[5];
+				:EXITCASE;
+				:CASE sSubCategory == "ClientScripts";
+					oEnterpriseItem:Type := "APPCS";
+					oEnterpriseItem:Name := aComponents[5];
+				:EXITCASE;
+				:CASE sSubCategory == "DataSources";
+					oEnterpriseItem:Type := "APPDS";
+					oEnterpriseItem:Name := aComponents[5];
+				:EXITCASE;
+				:CASE sSubCategory == "HTMLForms";
+					sFormCodeType := aComponents[5];
+					oEnterpriseItem:Name := aComponents[6];
+					:IF sFormCodeType == "XML";
+						oEnterpriseItem:Type := "HTMLFORMXML";
+					:ELSE;
+						oEnterpriseItem:Type := "HTMLFORMCODE";
+					:ENDIF;
+				:EXITCASE;
+				:CASE sSubCategory == "XFDForms";
+					sFormCodeType := aComponents[5];
+					oEnterpriseItem:Name := aComponents[6];
+					:IF sFormCodeType == "XML";
+						oEnterpriseItem:Type := "XFDFORMXML";
+					:ELSE;
+						oEnterpriseItem:Type := "XFDFORMCODE";
+					:ENDIF;
+				:EXITCASE;
+			:ENDCASE;	
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "ServerScripts" .AND. nCount == 1;
+			oEnterpriseItem:Type := "ENT_CAT_SS";
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "ServerScripts" .AND. nCount == 2;
+			oEnterpriseItem:Type := "SSCATEGORY";
+			oEnterpriseItem:Name := aComponents[2];;
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "ServerScripts" .AND. nCount == 3;
+			oEnterpriseItem:Type := "SS";
+			oEnterpriseItem:CategoryName := aComponents[2];;
+			oEnterpriseItem:Name := aComponents[3];;
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "ClientScripts" .AND. nCount == 1;
+			oEnterpriseItem:Type := "ENT_CAT_CS";
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "ClientScripts" .AND. nCount == 2;
+			oEnterpriseItem:Type := "CSCATEGORY";
+			oEnterpriseItem:Name := aComponents[2];;
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "ClientScripts" .AND. nCount == 3;
+			oEnterpriseItem:Type := "CS";
+			oEnterpriseItem:CategoryName := aComponents[2];;
+			oEnterpriseItem:Name := aComponents[3];;
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "DataSources" .AND. nCount == 1;
+			oEnterpriseItem:Type := "ENT_CAT_DS";
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "DataSources" .AND. nCount == 2;
+			oEnterpriseItem:Type := "DSCATEGORY";
+			oEnterpriseItem:Name := aComponents[2];;
+		:EXITCASE;
+		:CASE sEnterpriseCategory == "DataSources" .AND. nCount == 3;
+			oEnterpriseItem:Type := "DS";
+			oEnterpriseItem:CategoryName := aComponents[2];;
+			oEnterpriseItem:Name := aComponents[3];;
+		:EXITCASE;
+	:ENDCASE;
+	
+	:RETURN oEnterpriseItem;
+:ENDPROC;
+
+:PROCEDURE GetURIComponents;
+:PARAMETERS sURI;
+:DECLARE aURIComponents;
+	aURIComponents := BuildArray(sURI,,"/",,.T.);
+	:IF Len(aURIComponents) > 0;
+		:RETURN DelArray(aURIComponents, 1);
+	:ELSE;
+		:RETURN {};
+	:ENDIF;
+:ENDPROC;

@@ -1,0 +1,108 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	MARIUS
+Date......... : 2022-04-02
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+:DECLARE oPayload;
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:TRY;
+	:DECLARE sRequestAsFile;
+	sRequestAsFile := Request:SaveInputStream();
+	oPayload := FromJSON(ReadText(sRequestAsFile));
+	FileSupport(sRequestAsFile, "DELETE");
+:CATCH;
+	UsrMes("ERROR:", GetLastSSLError():FullDescription);
+	Response:ContentType := "application/problem+json";
+	Response:StatusCode := 500;
+	oResponse:success := .F.;
+	oResponse:data := "Could not deserialize request body.";
+	:RETURN oResponse;
+:ENDTRY;
+
+:DECLARE sURI, aParams, String;
+String := "";
+
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("URI");
+	:DECLARE oUtils;
+    sURI := oPayload:URI;
+	oUtils := CreateUDObject("SCM_API.Utils", {});
+	:DECLARE oEnterpriseItem;
+	oEnterpriseItem := oUtils:ParseURI(sURI);
+:ELSE;
+    Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required property '{0}'", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("Parameters");
+    aParams := oPayload:Parameters;
+	:IF LimsTypeEx(aParams) != "ARRAY";
+		Response:StatusCode := 400;
+    	oResponse:success := .F.;
+		oResponse:data := "Parameters must be an array";
+		:RETURN oResponse;
+	:ENDIF;
+:ELSE;
+    aParams := {};
+:ENDIF;
+
+:DECLARE sScript;
+:TRY;
+	:BEGINCASE;
+		:CASE oEnterpriseItem:Type == "APPSS";
+			sScript := oEnterpriseItem:AppName + "." + oEnterpriseItem:Name;
+			oResult := ExecFunction(sScript, aParams);
+		:EXITCASE;
+		:CASE oEnterpriseItem:Type == "SS";
+			sScript := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;
+			oResult := ExecFunction(sScript, aParams);
+		:EXITCASE;
+		:CASE oEnterpriseItem:Type == "DS";
+			sScript := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;
+			oResult := RunDS(sScript);
+		:EXITCASE;
+		:CASE oEnterpriseItem:Type == "APPDS";
+			sScript := oEnterpriseItem:AppName + "." + oEnterpriseItem:Name;
+			oResult := RunDS(sScript);
+		:EXITCASE;
+		:OTHERWISE;
+			oResponse:success := .F.;
+			oResponse:data := "Unsupported script type.";
+			:RETURN oResponse;
+		:EXITCASE;
+	:ENDCASE;
+:CATCH;
+	UsrMes("ERROR:" + sScript, GetLastSSLError():FullDescription);
+	Response:StatusCode := 500;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("An error occurred executing script '{0} : {1}'", 
+		sScript, GetLastSSLError():FullDescription);
+	:RETURN oResponse;
+:ENDTRY;
+
+
+oResponse:data := oResult;
+Response:StatusCode := 200;
+
+:RETURN oResponse;

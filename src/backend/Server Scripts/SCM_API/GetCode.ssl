@@ -1,0 +1,158 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	MARIUS
+Date......... : 2018-11-07
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+oResult:language := "";
+oResult:code := "";
+
+:DECLARE oUtils;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+
+:DECLARE oEnterpriseItem, sItemID;
+oEnterpriseItem := oUtils:ParseURI(sURI);
+
+:DECLARE oDataSet, sDataSet, sItemName, nRowNo;
+sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
+
+:BEGINCASE;	
+	:CASE oEnterpriseItem:Type == "SS";
+		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.ServerScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oResult:code := DoProc("Enterprise_Data_Providers.ServerScriptProvider.GetCode", {sItemID});		
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "APPSS";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.AppServerScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oResult:code := DoProc("Enterprise_Data_Providers.AppServerScriptProvider.GetCode", {sItemID});
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "CS";
+		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.ClientScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oResult:code := DoProc("Enterprise_Data_Providers.ClientScriptProvider.GetCode", {sItemID});
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "APPCS";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oResult:code := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.GetCode", {sItemID});
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "DS";
+		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.DataSourceProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oResult:code := DoProc("Enterprise_Data_Providers.DataSourceProvider.GetCode", {oDataSet:Tables[0]:Rows[0]["DATASOURCEID"]});
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "APPDS";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.AppDataSourceProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oResult:code := DoProc("Enterprise_Data_Providers.AppDataSourceProvider.GetCode", {oDataSet:Tables[0]:Rows[0]["DATASOURCEID"]});
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "HTMLFORMXML" .OR. oEnterpriseItem:Type == "XFDFORMXML";		
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		:IF oDataSet:Tables[0]:Rows:Count == 2;
+			nRowNo := IIf(oEnterpriseItem:Type == "XFDFORMXML", 1, 0);
+		:ELSE;
+			nRowNo := 0;
+		:ENDIF;
+		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
+		oResult:language := "XML";
+	:EXITCASE;
+	:CASE oEnterpriseItem:Type == "HTMLFORMCODE" .OR. oEnterpriseItem:Type == "XFDFORMCODE";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		
+		:IF oDataSet:Tables[0]:Rows:Count == 2;
+			nRowNo := IIf(oEnterpriseItem:Type == "XFDFORMCODE", 1, 0);
+		:ELSE;
+			nRowNo := 0;
+		:ENDIF;
+		
+		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetCodeBehind", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
+		oResult:language := "JS";
+	:EXITCASE;
+:ENDCASE; 
+
+:IF Empty(oResult:language);
+	oResult:language := oDataSet:Tables[0]:Rows[0]["SCRIPTLANGUAGE"];
+	:BEGINCASE;
+		:CASE Upper(oResult:language) == "STARLIMS";
+			oResult:language := "SSL";
+		:EXITCASE;
+		:CASE Upper(oResult:language) == "JSCRIPT";
+			oResult:language := "JS";
+		:EXITCASE;
+	:ENDCASE;
+:ENDIF;
+
+oResult:name := sItemName;
+
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+oResponse:data := oResult;
+:RETURN oResponse;
+
+
+:PROCEDURE _ExtractName;
+:PARAMETERS oRow, sItemType;
+	:DECLARE sName;
+	:BEGINCASE;	
+		:CASE sItemType == "SS" .OR. sItemType == "APPSS" .OR. sItemType == "CS" .OR. sItemType == "APPCS";
+			sName := oRow["SCRIPTNAME"];
+		:EXITCASE;
+		:CASE sItemType == "DS" .OR. sItemType == "APPDS";
+			sName := oRow["DSNAME"];
+		:EXITCASE;
+		:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "XFDFORMXML";
+			sName := oRow["FORMNAME"];
+		:EXITCASE;
+		:CASE sItemType == "HTMLFORMCODE" .OR. sItemType == "XFDFORMCODE";
+			sName := oRow["FORMNAME"] + "_Codebehind";
+		:EXITCASE;
+	:ENDCASE; 
+	
+	:RETURN sName;
+:ENDPROC;
