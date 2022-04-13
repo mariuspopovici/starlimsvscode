@@ -8,7 +8,13 @@ I recommend using this in conjunction with the [ssl-lang](https://marketplace.vi
 
 ## Pre-requisites
 
-Requires a server side API which I will make available once the functionality becomes stable enough.
+- Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
+- Import .sdp package into STARLIMS Designer.
+- Add the following setting to STARLIMS web.config file
+
+```
+<add key="HTTPServices" value="SCM_API.*"/>
+```
 
 ## Disclaimer
 
