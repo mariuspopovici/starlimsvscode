@@ -1,0 +1,12 @@
+Package Name: SCM_API
+Package Date: 2022-12-15 09:00:55
+
+Exported languages: English.
+
+Server Script Category: SCM_API
+	- GetCode
+	- GetEnterpriseItems
+	- RunScript
+	- Utils
+
+
