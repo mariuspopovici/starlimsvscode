@@ -97,6 +97,8 @@ export class EnterpriseTreeDataProvider
         case "XFDFORMXML":
         case "HTMLFORMXML":
           return new vscode.ThemeIcon("preview");
+        case "HTMLFORMGUIDE":
+          return new vscode.ThemeIcon("list-flat");
         default:
           return new vscode.ThemeIcon("file-code");
       }
@@ -132,6 +134,7 @@ export enum EnterpriseItemType {
   XFDFormCode = "XFDFORMCODE",
   HTMLFormXML = "HTMLFORMXML",
   HTMLFormCode = "HTMLFORMCODE",
+  HTMLFormGuide = "HTMLFORMGUIDE",
   PhoneForm = "PHONEFORM",
   TabletForm = "TABLETFORM",
   AppServerScript = "APPSS",
