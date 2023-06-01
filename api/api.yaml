@@ -155,13 +155,13 @@ components:
             language:
               type: string
               description: |
-                Item code programming language. One of: SSL, JS, SQL, XML
+                Item code programming language. One of: SSL, JS, SLSQL, XML
               example: SSL
               enum:
                 - SSL
                 - JS
                 - XML
-                - SQL
+                - SLSQL
     EnterpriseItemList:
       properties:
         success:
@@ -210,12 +210,12 @@ components:
           type: string
           example: SSL
           description: |
-            The programming language of the item. One of: SSL, JS, XML, SQL
+            The programming language of the item. One of: SSL, JS, XML, SLSQL
           enum:
             - SSL
             - JS
             - XML
-            - SQL
+            - SLSQL
         isFolder:
           type: boolean
           example: false
