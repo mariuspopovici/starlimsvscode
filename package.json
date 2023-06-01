@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "Marius Popovici",
   "keywords": [
     "STARLIMS",
@@ -21,10 +21,6 @@
     "Other",
     "SCM Providers",
     "Programming Languages"
-  ],
-  "activationEvents": [
-    "onCommand:STARLIMS.Connect",
-    "onCommand:STARLIMS.Compare"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -78,7 +74,7 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMS && && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS"
+          "when": "view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS"
         }
       ],
       "explorer/context": [
@@ -155,6 +151,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "vscode": "^1.1.37"
   }
 }

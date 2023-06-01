@@ -1,26 +1,12 @@
 /********************************************************************************
 Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
 Author....... :	MARIUS
 Date......... : 2018-11-02
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
+*******************************************************************************/;
 :CLASS Utils;
 
 :PROCEDURE TranslateFileTypeToItemType;
 :PARAMETERS sFileType;
-
 :DECLARE sItemType;
 
 	:BEGINCASE;
@@ -49,22 +35,21 @@ _______________________________________________________________________________
 			sItemType := "Unknown";
 		:EXITCASE;
 	:ENDCASE;
-	
+
 	:RETURN sItemType;
 :ENDPROC;
 
 :PROCEDURE GetSCMItemGUID;
 :PARAMETERS sItemType, sCategory, sItemName;
-
 :DECLARE sGUID;
 
 	:BEGINCASE;
 		:CASE sItemType == "ServerScript";
-			/* Global Server Script; 
+			/* Global Server Script */; 
 			:TRY;
 				sGUID := DoProc("Enterprise_Data_Providers.ServerScriptProvider.GetScriptIdByName", {sCategory + "." + sItemName});
 			:CATCH;
-				/* TODO: set distinction between not found and general error;
+				/* TODO: set distinction between not found and general error */;
 				sGUID := NIL;
 			:ENDTRY;
 		:EXITCASE;
