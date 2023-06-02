@@ -3,10 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { EnterpriseFileDecorationProvider } from "./providers/enterpriseFileDecorationProvider";
-import {
-  EnterpriseTreeDataProvider,
-  TreeEnterpriseItem,
-} from "./providers/enterpriseTreeDataProvider";
+import { EnterpriseTreeDataProvider, TreeEnterpriseItem, } from "./providers/enterpriseTreeDataProvider";
 import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 
@@ -17,15 +14,11 @@ export async function activate(context: vscode.ExtensionContext) {
   let url: string | undefined = config.get("url");
   let reloadConfig = false;
 
-  const rootPath =
-    vscode.workspace.workspaceFolders &&
-    vscode.workspace.workspaceFolders.length > 0
-      ? vscode.workspace.workspaceFolders[0].uri.fsPath
-      : undefined;
+  const rootPath = vscode.workspace.workspaceFolders &&  vscode.workspace.workspaceFolders.length > 0? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
   if (!rootPath) {
     vscode.window.showErrorMessage(
-      "STARLIMS: Working folder not found, open a workspace folder an try again."
+      "STARLIMS: Working folder not found, open a workspace folder and try again."
     );
     return;
   }
@@ -91,10 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
     new EnterpriseTextDocumentContentProvider(enterpriseService);
 
   context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(
-      "starlims",
-      enterpriseTextContentProvider
-    )
+    vscode.workspace.registerTextDocumentContentProvider("starlims", enterpriseTextContentProvider)
   );
 
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
@@ -110,13 +100,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const fileExtension =
-        item.language !== undefined &&
-        item.language !== "" &&
-        item.language !== "N/A"
-          ? item.language.toLowerCase()
-          : "txt";
-
+      const fileExtension = item.language !== undefined && item.language !== "" && item.language !== "N/A"? item.language.toLowerCase() : "txt";
       const uri = vscode.Uri.parse(`starlims://${item.uri}.${fileExtension}`);
       const doc = await vscode.workspace.openTextDocument(uri); // calls back into the provider
       await vscode.window.showTextDocument(doc, { preview: false });
@@ -135,12 +119,8 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.GetLocal",
     async (item: TreeEnterpriseItem | any) => {
       const localFilePath = await enterpriseService.getLocalCopy(
-        item.uri ||
-          (item.path
-            ? item.path.slice(0, item.path.lastIndexOf("."))
-            : undefined),
-        rootPath
-      );
+        item.uri || (item.path? item.path.slice(0, item.path.lastIndexOf(".")) : undefined), rootPath);
+      
       if (localFilePath) {
         let uri: vscode.Uri = vscode.Uri.file(localFilePath);
         vscode.window.showTextDocument(uri);
@@ -235,4 +215,4 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

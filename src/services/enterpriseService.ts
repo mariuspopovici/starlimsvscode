@@ -96,7 +96,7 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
-   * Gets the code and code language (XML, JS, SSL, SQL etc.) of the STARLIMS Enterprise Designer referenced
+   * Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
    * by the specified URI.
    *
    * @param uri the URI of the remote STARLIMS script / code item.
