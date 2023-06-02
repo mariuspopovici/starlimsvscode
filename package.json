@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "Marius Popovici",
   "keywords": [
     "STARLIMS",
@@ -151,6 +151,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "vscode": "^1.1.37"
   }
 }

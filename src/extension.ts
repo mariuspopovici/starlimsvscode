@@ -87,6 +87,32 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.workspace.registerTextDocumentContentProvider("starlims", enterpriseTextContentProvider)
   );
 
+  // register save file event
+  vscode.workspace.onDidSaveTextDocument(
+    async (document: vscode.TextDocument) => {
+      // if the document is a remote STARLIMS code item, save it back to STARLIMS
+      if (document.uri.scheme === "starlims") {
+        const uri = document.uri;
+        const content = document.getText();
+        const item = enterpriseService.getEnterpriseItem(uri.path);
+        if (item) {
+          await enterpriseService.saveEnterpriseItem(item, content);
+        }
+      }
+      else
+      {
+        // if the document is a local copy of a STARLIMS code item, save it back to STARLIMS
+        const uri = document.uri;
+        const content = document.getText();
+        const item = enterpriseService.getEnterpriseItem(uri);
+        if (item) {
+          await enterpriseService.saveEnterpriseItem(item, content);
+        }
+      }
+    }
+  );
+
+
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
   const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
   vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
@@ -100,10 +126,33 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const fileExtension = item.language !== undefined && item.language !== "" && item.language !== "N/A"? item.language.toLowerCase() : "txt";
+      var fileExtension =
+        item.language !== undefined &&
+        item.language !== "" &&
+        item.language !== "N/A"
+          ? item.language.toLowerCase().replace("sql", "slsql")
+          : "txt";
+
       const uri = vscode.Uri.parse(`starlims://${item.uri}.${fileExtension}`);
-      const doc = await vscode.workspace.openTextDocument(uri); // calls back into the provider
-      await vscode.window.showTextDocument(doc, { preview: false });
+      var doc = await vscode.workspace.openTextDocument(uri); // calls back into the provider
+
+      // save file to a temp location before opening
+      const tempFilePath = await enterpriseService.getLocalCopy(
+        item.uri,
+        rootPath
+      );
+
+      // re-open the file from the temp location
+      if (tempFilePath) {
+        doc = await vscode.workspace.openTextDocument(tempFilePath);
+      }
+
+      // show document in editor
+      await vscode.window.showTextDocument(doc, {
+        preview: false,
+        preserveFocus: true,
+        viewColumn: vscode.ViewColumn.One,
+      });
     }
   );
 

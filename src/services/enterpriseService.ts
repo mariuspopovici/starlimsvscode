@@ -102,7 +102,7 @@ export class EnterpriseService implements Enterprise {
    * @param uri the URI of the remote STARLIMS script / code item.
    * @returns an object with Language: string and Code: string
    */
-  public async getEntepriseItemCode(uri: string) {
+  public async getEnterpriseItemCode(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
@@ -148,11 +148,11 @@ export class EnterpriseService implements Enterprise {
     uri: string,
     workspaceFolder: string
   ): Promise<string | null> {
-    const item = await this.getEntepriseItemCode(uri);
+    const item = await this.getEnterpriseItemCode(uri);
     if (item) {
       const localFilePath = path.join(
         workspaceFolder,
-        `${uri}.${item.language.toLowerCase()}`
+        `${uri}.${item.language.toLowerCase().replace("sql", "slsql")}`
       );
 
       try {
@@ -188,6 +188,35 @@ export class EnterpriseService implements Enterprise {
     }
 
     return null;
+  }
+
+  // save code back to STARLIMS
+  public async saveEnterpriseItemCode(uri: string, code: string) {
+    const url = `${this.baseUrl}/SCM_API.SaveCode.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        URI: uri,
+        Code: code,
+      }),
+    };
+    
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } =
+        await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Enterprise item saved.");
+      } else {
+        vscode.window.showErrorMessage("Could not save enterprise item.");
+        console.log(data);
+      }
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage("Could not save enterprise item.");
+    }
   }
 
   private getAPIHeaders(): string[][] {
