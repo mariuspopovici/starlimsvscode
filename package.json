@@ -24,8 +24,18 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "STARLIMSVSCode",
+          "title": "STARLIMS",
+          "icon": "resources/starlims.png",
+          "alwaysShow": true
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "STARLIMSVSCode": [
         {
           "id": "STARLIMS",
           "name": "STARLIMS Enterprise"
@@ -38,16 +48,16 @@
         "title": "STARLIMS - Get Local Version"
       },
       {
-        "command": "STARLIMS.refresh",
+        "command": "STARLIMS.Refresh",
         "title": "Refresh Explorer"
       },
       {
         "command": "STARLIMS.Checkout",
-        "title": "STARLIMS - Checkout"
+        "title": "STARLIMS - Check out"
       },
       {
         "command": "STARLIMS.Checkin",
-        "title": "STARLIMS - Checkin"
+        "title": "STARLIMS - Check in"
       },
       {
         "command": "STARLIMS.Connect",
@@ -60,12 +70,16 @@
       {
         "command": "STARLIMS.RunScript",
         "title": "STARLIMS - Run Script"
+      },
+      {
+        "command": "STARLIMS.Save",
+        "title": "STARLIMS - Save"
       }
     ],
     "menus": {
       "view/item/context": [
         {
-          "command": "STARLIMS.refresh",
+          "command": "STARLIMS.Refresh",
           "when": "view == STARLIMS"
         },
         {
@@ -75,6 +89,14 @@
         {
           "command": "STARLIMS.RunScript",
           "when": "view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS"
+        },
+        {
+          "command": "STARLIMS.Checkout",
+          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+        },
+        {
+          "command": "STARLIMS.Checkin",
+          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
         }
       ],
       "explorer/context": [
@@ -94,7 +116,17 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "editorReadonly"
+          "when": "editorLangId == 'SSL'"
+        },
+        {
+          "command": "STARLIMS.Checkout"
+        },
+        {
+          "command": "STARLIMS.Checkin"
+        },
+        {
+          "command": "STARLIMS.Save",
+          "when": "!editorReadonly"
         }
       ]
     },

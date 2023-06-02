@@ -6,17 +6,14 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { Enterprise } from "./enterprise";
 
-/**
- * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
+/** STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
  * at time using the SCM_API REST services in STARLIMS backed.
  */
 export class EnterpriseService implements Enterprise {
   private config: any;
   private baseUrl: string;
 
-  /**
-   * Constructor.
-   *
+  /** Constructor
    * @param config Workspace config object for the STARLIMS VS Code extension.
    */
   constructor(config: vscode.WorkspaceConfiguration) {
@@ -24,8 +21,7 @@ export class EnterpriseService implements Enterprise {
     this.baseUrl = this.cleanUrl(config.url);
   }
 
-  /**
-   * Execute script remotely.
+  /** Execute script remotely.
    * @param uri the URI of the remote script.
    */
   async runScript(uri: string) {
@@ -35,36 +31,28 @@ export class EnterpriseService implements Enterprise {
       method: "POST",
       headers,
       body: JSON.stringify({
-        URI: uri,
-      }),
+        URI: uri
+      })
     };
 
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       return data instanceof Object ? JSON.stringify(data) : data;
     } catch (e: any) {
       console.error(e);
-      vscode.window.showErrorMessage(
-        "Failed to execute HTTP call to remote service."
-      );
+      vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
       return;
     }
   }
 
-  /**
-   * Gets the service config.
-   *
-   * @returns the service configuration settings
-   */
+  /** Gets the service config
+   * @returns the service configuration settings */
   public getConfig(): vscode.WorkspaceConfiguration {
     return this.config;
   }
 
-  /**
-   * Gets a descriptor of the STARLIMS Enterprise code item referenced by the specified URI.
-   *
+  /** Gets a descriptor of the STARLIMS Enterprise code item referenced by the specified URI.
    * @param uri the URI of the remote STARLIMS code item.
    * @returns A descriptor object with the following properties: name, type, uri, language, isFolder
    */
@@ -95,10 +83,8 @@ export class EnterpriseService implements Enterprise {
     }
   }
 
-  /**
-   * Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
+  /** Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
    * by the specified URI.
-   *
    * @param uri the URI of the remote STARLIMS script / code item.
    * @returns an object with Language: string and Code: string
    */
@@ -116,6 +102,10 @@ export class EnterpriseService implements Enterprise {
       const { success, data }: { success: boolean; data: any } =
         await response.json();
       if (success) {
+        if(data.language === "JS") {
+          // comment out all occurences of '#include' for eslint to work       
+          data.code = data.code.replace(/^#include/gm, "//#include");
+        }
         return data;
       } else {
         vscode.window.showErrorMessage("Could not retrieve item code.");
@@ -130,16 +120,37 @@ export class EnterpriseService implements Enterprise {
   }
 
   public async checkin(uri: string, reason: string) {
-    vscode.window.showErrorMessage("Not implemented. Coming soon...");
+    
   }
 
   public async checkout(uri: string) {
-    vscode.window.showErrorMessage("Not implemented. Coming soon...");
+    const params = new URLSearchParams([["URI", uri]]);
+    const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers,
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } =
+        await response.json();
+      if (success) {
+        return data.items;
+      } else {
+        vscode.window.showErrorMessage("Could not retrieve enterprise items.");
+        console.log(data);
+        return [];
+      }
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage("Could not retrieve enterprise items.");
+      return [];
+    }
   }
 
-  /**
-   * Downloads the specified STARLIMS enterprise designer item to a local workspace folder.
-   *
+  /** Downloads the specified STARLIMS enterprise designer item to a local workspace folder.
    * @param uri the URI to the remote script / code item
    * @param workspaceFolder the local workspace folder where to download the file
    * @returns the local path to the downloaded file
@@ -150,10 +161,7 @@ export class EnterpriseService implements Enterprise {
   ): Promise<string | null> {
     const item = await this.getEnterpriseItemCode(uri);
     if (item) {
-      const localFilePath = path.join(
-        workspaceFolder,
-        `${uri}.${item.language.toLowerCase().replace("sql", "slsql")}`
-      );
+      const localFilePath = path.join(workspaceFolder, `${uri}.${item.language.toLowerCase().replace("sql", "slsql")}`);
 
       try {
         const localFolder = path.dirname(localFilePath);
@@ -162,17 +170,16 @@ export class EnterpriseService implements Enterprise {
         let writeFile = true;
         try {
           await fs.stat(localFilePath);
-          let answer = await vscode.window.showInformationMessage(
-            "A local copy already exists. Would you local to overwrite it with the remote version?",
-            "Yes",
-            "No"
-          );
+          let answer = await vscode.window.showInformationMessage("A local copy already exists. Would you like to overwrite it with the remote version?", "Yes", "No");
           writeFile = answer === "Yes";
         } catch {
           // ignore - file does not exist
         }
 
         if (writeFile) {
+          // comment out all occurences of '#include' for eslint to work       
+          item.code = item.code.replace(/^#include/gm, "//#include");
+
           await fs.writeFile(localFilePath, item.code, {
             encoding: "utf8",
           });
@@ -186,12 +193,17 @@ export class EnterpriseService implements Enterprise {
         console.error(e);
       }
     }
-
     return null;
   }
 
-  // save code back to STARLIMS
+/**
+ * Saves the code of the STARLIMS Enterprise Designer item referenced by the specified URI.
+ * @param uri The URI of the remote STARLIMS script / code item.
+ * @param code The code to save.
+ */
   public async saveEnterpriseItemCode(uri: string, code: string) {
+    // uncomment all occurences of '#include'
+    code = code.replace(/^\/\/#include/gm, "#include");
     const url = `${this.baseUrl}/SCM_API.SaveCode.lims`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -199,26 +211,31 @@ export class EnterpriseService implements Enterprise {
       headers,
       body: JSON.stringify({
         URI: uri,
-        Code: code,
-      }),
+        Code: code
+      })
     };
-    
+
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
-        vscode.window.showInformationMessage("Enterprise item saved.");
+        vscode.window.showInformationMessage("Code saved successfully.");
       } else {
-        vscode.window.showErrorMessage("Could not save enterprise item.");
+        vscode.window.showErrorMessage("Could not save code.");
         console.log(data);
       }
+      return data instanceof Object ? JSON.stringify(data) : data;
     } catch (e: any) {
       console.error(e);
-      vscode.window.showErrorMessage("Could not save enterprise item.");
+      vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
+      return;
     }
   }
 
+  /**
+   * Get API headers for HTTP calls to STARLIMS.
+   * @returns an array of string arrays with header name and value.
+   */
   private getAPIHeaders(): string[][] {
     return [
       ["STARLIMSUser", this.config.user],
@@ -228,18 +245,15 @@ export class EnterpriseService implements Enterprise {
     ];
   }
 
-  /**
+  /** 
    * Cleans up the configured app URL by removing unnecessary things suchs as extra / characters.
-   *
    * @param url the STARLIMS app URL
-   * @returns the base URL for REST API calls
-   */
+   * @returns the base URL for REST API calls */
   private cleanUrl(url: string) {
     let newUrl = url.endsWith("/") ? url.slice(0, -1) : url;
     if (newUrl.endsWith(".lims")) {
       newUrl = newUrl.slice(0, newUrl.lastIndexOf("/"));
     }
-
     return newUrl;
   }
 }
