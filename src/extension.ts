@@ -14,14 +14,16 @@ export async function activate(context: vscode.ExtensionContext) {
   let url: string | undefined = config.get("url");
   let reloadConfig = false;
 
-  const rootPath = vscode.workspace.workspaceFolders &&  vscode.workspace.workspaceFolders.length > 0? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
+  // get the root path of the workspace
+  const rootPath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0 ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
+  // ensure a workspace folder is open
   if (!rootPath) {
     vscode.window.showErrorMessage("STARLIMS: Working folder not found, open a workspace folder and try again.");
     return;
   }
 
-  // ensure extension settings are defined and prompt for values if not
+  // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
     url = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
@@ -37,10 +39,11 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
+  // ensure user and password are defined and prompt for values if not
   if (!user) {
     user = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      prompt: "Enter STARLIMS username",
+      prompt: "Enter STARLIMS Username",
       ignoreFocusOut: true,
     });
     if (user) {
@@ -54,7 +57,7 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!password) {
     password = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      prompt: `Enter password for STARLIMS user '${user}'`,
+      prompt: `Enter Password for STARLIMS User '${user}'`,
       password: true,
       ignoreFocusOut: true,
     });
@@ -66,11 +69,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
+  // reload the configuration if it was updated
   if (reloadConfig) {
     config = vscode.workspace.getConfiguration("STARLIMS");
   }
 
+  // create the enterprise service
   const enterpriseService = new EnterpriseService(config);
+
+  // create the output channel for the extension
+  const outputChannel = vscode.window.createOutputChannel("STARLIMS");
 
   // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
   const enterpriseTextContentProvider = new EnterpriseTextDocumentContentProvider(enterpriseService);
@@ -80,19 +88,43 @@ export async function activate(context: vscode.ExtensionContext) {
   const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
   vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
 
+  // execute the STARLIMS.Save command when a document is saved
+  vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
+    // check if the document is in the configured workspace
+    if (document.uri.fsPath.startsWith(rootPath)) {
+      const result = await vscode.commands.executeCommand("STARLIMS.Save", document.uri);
+      if (result) {
+        vscode.window.showInformationMessage(`STARLIMS: ${document.uri.path} saved successfully.`);
+      } else {
+        vscode.window.showErrorMessage(`STARLIMS: ${document.uri.path} save failed.`);
+      }
+    }
+  });
+  
   // hook into tree events for loading code items
-  vscode.commands.registerCommand(
-    "STARLIMS.selectEnterpriseItem",
+  vscode.commands.registerCommand("STARLIMS.selectEnterpriseItem",
     async (item: TreeEnterpriseItem) => {
-      // open only leaf nodes
+      // open leaf nodes only
       if (item.collapsibleState !== vscode.TreeItemCollapsibleState.None) {
         return;
       }
 
-      const fileExtension = item.language !== undefined && item.language !== "" && item.language !== "N/A"? item.language.toLowerCase() : "txt";
-      const uri = vscode.Uri.parse(`starlims://${item.uri}.${fileExtension}`);
-      const doc = await vscode.workspace.openTextDocument(uri); // calls back into the provider
-      await vscode.window.showTextDocument(doc, { preview: false });
+      // check if the item is already open, switch the tab if it is
+      const openDocument = vscode.workspace.textDocuments.find((doc) => doc.uri.fsPath === item.filePath);
+      if (openDocument) {
+        await vscode.window.showTextDocument(openDocument);
+        return;
+      }
+
+      // get local copy of the item
+      const localFilePath = await enterpriseService.getLocalCopy(item.uri, rootPath);
+
+      // open the file locally
+      if (localFilePath) {
+        item.filePath = localFilePath;
+        let uri: vscode.Uri = vscode.Uri.file(localFilePath);
+        vscode.window.showTextDocument(uri);
+      }
     }
   );
 
@@ -101,14 +133,13 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.window.registerFileDecorationProvider(fileDecorationProvider);
 
   // this command activates the extension
-  vscode.commands.registerCommand("STARLIMS.Connect", () => {});
+  vscode.commands.registerCommand("STARLIMS.Connect", () => { });
 
-  // registers the GetLocal version command handler
-  vscode.commands.registerCommand(
-    "STARLIMS.GetLocal",
+  // registers the GetLocal command handler
+  vscode.commands.registerCommand("STARLIMS.GetLocal",
     async (item: TreeEnterpriseItem | any) => {
-      const localFilePath = await enterpriseService.getLocalCopy(item.uri || 
-                                  (item.path? item.path.slice(0, item.path.lastIndexOf(".")) : undefined), rootPath);
+      // get local copy of the item
+      const localFilePath = await enterpriseService.getLocalCopy(item.uri || (item.path ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined), rootPath);
       if (localFilePath) {
         let uri: vscode.Uri = vscode.Uri.file(localFilePath);
         vscode.window.showTextDocument(uri);
@@ -116,12 +147,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const outputChannel = vscode.window.createOutputChannel("STARLIMS");
-
-  // registers the GetLocal version command handler
+  // registers the RunScript command handler
   vscode.commands.registerCommand("STARLIMS.RunScript",
     async (item: TreeEnterpriseItem | any) => {
-      const uri = (item.path? item.path.slice(0, item.path.lastIndexOf(".")) : undefined);
+      const uri = (item.path ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined);
       outputChannel.appendLine(`${new Date().toLocaleString()} Executing remote script at URI: ${uri}`);
       const result = await enterpriseService.runScript(uri);
       if (result) {
@@ -134,7 +163,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // registers the remote compare command
   vscode.commands.registerCommand("STARLIMS.Compare",
     async (uri: vscode.Uri) => {
-      // is command executed on the file tree
+      // command executed on the file tree
       let localUri = uri;
       if (!localUri) {
         // if not, compare with the open document
@@ -152,9 +181,7 @@ export async function activate(context: vscode.ExtensionContext) {
           let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
           vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
         } else {
-          vscode.window.showErrorMessage(
-            "STARLIMS: Working folder not found, open a workspace folder an try again."
-          );
+          vscode.window.showErrorMessage("STARLIMS: Working folder not found, open a workspace folder an try again.");
         }
       }
     }
@@ -164,7 +191,14 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Checkout",
     async (item: TreeEnterpriseItem) => {
-      await enterpriseService.checkout(item.uri);
+      let bSuccess = await enterpriseService.CheckOut(item.uri);
+      if (bSuccess) {
+        item.checkedOutBy = user;
+        enterpriseProvider.refresh();
+
+        // execute getlocal command
+        vscode.commands.executeCommand("STARLIMS.GetLocal", item);
+      }
     }
   );
 
@@ -172,13 +206,16 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Checkin",
     async (item: TreeEnterpriseItem) => {
-      let checkinReason: string =
-        (await vscode.window.showInputBox({
+      let checkinReason: string = (await vscode.window.showInputBox({
           prompt: "Enter checkin reason",
           ignoreFocusOut: true,
-        })) || "";
+        })) || "Checked in from VSCode";
 
-      await enterpriseService.checkin(item.uri, checkinReason);
+      let bSuccess = await enterpriseService.CheckIn(item.uri, checkinReason);
+      if (bSuccess) {
+        item.checkedOutBy = "";
+        enterpriseProvider.refresh();
+      }
     }
   );
 
@@ -195,19 +232,19 @@ export async function activate(context: vscode.ExtensionContext) {
     async (item: TreeEnterpriseItem) => {
       const editor = vscode.window.activeTextEditor;
       if (editor) {
-      var localUri = editor.document.uri;
-      if (localUri) {
-        if (vscode.workspace.workspaceFolders !== undefined) {
-          const workspaceFolderPath = vscode.workspace.workspaceFolders[0].uri.path;
-          let remotePath = localUri.path.slice(workspaceFolderPath.length);
-          enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
+        var localUri = editor.document.uri;
+        if (localUri) {
+          if (vscode.workspace.workspaceFolders !== undefined) {
+            const workspaceFolderPath = vscode.workspace.workspaceFolders[0].uri.path;
+            let remotePath = localUri.path.slice(workspaceFolderPath.length);
+            enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
+          }
         }
       }
-    }
-  });
+    });
 
   vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

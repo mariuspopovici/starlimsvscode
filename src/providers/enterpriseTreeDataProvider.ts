@@ -25,9 +25,7 @@ export class EnterpriseTreeDataProvider
     this._onDidChangeTreeData.fire(null);
   }
 
-  public async getChildren(
-    element?: TreeEnterpriseItem
-  ): Promise<TreeEnterpriseItem[]> {
+  public async getChildren(element?: TreeEnterpriseItem): Promise<TreeEnterpriseItem[]> {
     var enterpriseTreeItems: TreeEnterpriseItem[] = [];
     var uri: string = element ? element.uri : "";
 
@@ -41,9 +39,8 @@ export class EnterpriseTreeDataProvider
         item.name,
         item.language,
         item.uri,
-        item.isFolder
-          ? vscode.TreeItemCollapsibleState.Collapsed
-          : vscode.TreeItemCollapsibleState.None
+        item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed
+                      : vscode.TreeItemCollapsibleState.None
       );
       enterpriseTreeItem.command = {
         command: "STARLIMS.selectEnterpriseItem",
@@ -52,9 +49,7 @@ export class EnterpriseTreeDataProvider
       };
       enterpriseTreeItem.contextValue = item.type;
       enterpriseTreeItem.iconPath = _this.getItemIcon(item);
-      enterpriseTreeItem.label = item.checkedOutBy
-        ? `${enterpriseTreeItem.label} (Checked out by ${item.checkedOutBy})`
-        : enterpriseTreeItem.label;
+      enterpriseTreeItem.label = item.checkedOutBy ? `${enterpriseTreeItem.label} (Checked out by ${item.checkedOutBy})` : enterpriseTreeItem.label;
       enterpriseTreeItem.resourceUri = _this.getItemResource(item);
       enterpriseTreeItems.push(enterpriseTreeItem);
     });
@@ -66,15 +61,23 @@ export class EnterpriseTreeDataProvider
     return item;
   }
 
+  /**
+   *  Returns a URI for the item if it is checked out by the current user.
+   * @param item The item to check
+   * @returns A URI for the item if it is checked out by the current user, otherwise undefined.
+   */
   private getItemResource(item: any): vscode.Uri | undefined {
     const config = this.service.getConfig();
     let resourceUri = undefined;
     if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByMe");
+      // change the color of the item
+      item.color = new vscode.ThemeColor("gitDecoration.modifiedResourceForeground");
     } else if (item.checkedOutBy) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByOtherUser");
+      // change the color of the item
+      item.color = new vscode.ThemeColor("gitDecoration.untrackedResourceForeground");
     }
-
     return resourceUri;
   }
 
@@ -92,19 +95,24 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   type: EnterpriseItemType;
   language: string;
   uri: string;
+  filePath: string | undefined;
+  checkedOutBy: string | undefined;
+
   constructor(
     type: EnterpriseItemType,
     label: string,
     language: string,
     uri: string,
     collapsibleState: vscode.TreeItemCollapsibleState,
-    command?: vscode.Command
+    command?: vscode.Command,
+    filePath?: string
   ) {
     super(label, collapsibleState);
     this.type = type;
     this.language = language;
     this.command = command;
     this.uri = uri;
+    this.filePath = filePath;
   }
 }
 
