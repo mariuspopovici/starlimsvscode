@@ -66,12 +66,6 @@ N/A
 
 Initial release of STARLIMS VS Code
 
----
-## 1.2.0
-* Forked this project.
-* Automatically export items to local workspace.
-* Added the ability to check in/out items.
-
 ## 1.1.0
 
 Resurrected this project. Updated dependencies including the new VS Code API.
@@ -84,3 +78,8 @@ Bug fixes.
 Added Get Local Version to remote version editor window context menu
 Activation of extension when executing a compare command
 Showing remote checkout status in explorer tree
+
+## 1.2.0
+* Forked this project.
+* Automatically export items to local workspace.
+* Added the ability to check in/out items.
