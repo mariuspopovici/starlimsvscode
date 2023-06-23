@@ -4,11 +4,12 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 
 I recommend using this in conjunction with the [ssl-lang](https://marketplace.visualstudio.com/items?itemName=Janosch.ssl-lang) extension which provides syntax highlighting support for STARLIMS Scripting Language.
 
+![STARLIMS VS Code](resources/screenshot.png)
 ![STARLIMS VS Code](resources/extension/demo.gif)
 
 ## Pre-requisites
 
-- Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
+- Download STARLIMS .sdp package attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
 - Import .sdp package into STARLIMS Designer.
 - Add the following setting to STARLIMS web.config file
 
@@ -23,7 +24,8 @@ This is an unofficial, unsupported extension so use at your own risk. Maybe this
 ## Vision
 
 Implement a Git-like mechanism for managing versions. Extension can be used to explore the remote tree and download code to a local repo.
-Changes can be pushed back to the STARLIMS dictionary and merged with the remote version.
+Changes can be pushed back to the STARLIMS dictionary and merged with the remote version. 
+Design HTML forms directly in VS Code via a HTML preview window.
 
 ## Features
 
@@ -38,7 +40,7 @@ Features:
 To Do:
 
 - Edit form resources
-- Edit HTML forms visually instead of XML files
+- Edit HTML forms visually
 
 ## Extension Settings
 
@@ -50,7 +52,7 @@ This extension contributes the following settings:
 
 ## How to Use
 
-- Download extension files attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
+- Download extension files attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
 - (Install VSIX file, Import SCM_API.sdp package into STARLIMS)
 - Open a local workspace folder. This will serve as your local STARLIMS code repository.
 - Activate extension using the _STARLIMS Connect_ command (press F1).
@@ -80,6 +82,7 @@ Activation of extension when executing a compare command
 Showing remote checkout status in explorer tree
 
 ## 1.2.0
+
 * Forked this project.
 * Automatically export items to local workspace.
 * Added the ability to check in/out items.
