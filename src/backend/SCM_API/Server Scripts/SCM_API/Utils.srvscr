@@ -215,7 +215,6 @@ Date......... : 2018-11-02
 :PARAMETERS sItemName, sItemType;
 :DECLARE sGUID, aItemName;
 aItemName := BuildArray(sItemName,, ".");
-
 :BEGINCASE;
 	:CASE sItemType == "SS".OR. sItemType == "APPSS";
         sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetServerScriptId", {aItemName[1], aItemName[2]});
@@ -227,11 +226,9 @@ aItemName := BuildArray(sItemName,, ".");
         sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetDataSourceId", {aItemName[1], aItemName[2]});
 	:EXITCASE;
 	:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE";
-		aItemName := BuildArray(sItemName,, ".");
 		sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetFormId", {aItemName[1], aItemName[2], "HTML"});
 	:EXITCASE;
     :CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE";
-		aItemName := BuildArray(sItemName,, ".");
         sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetFormId", {aItemName[1], aItemName[2], "XFD"});
     :EXITCASE;
 :ENDCASE;
