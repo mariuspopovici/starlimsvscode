@@ -1,29 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>D9637EA9-2758-4670-8236-5DDC2E366304</ItemID>
+  <ItemID>333839BA-09FB-46A8-803D-400D4C1D4A4F</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2022-12-15T09:00:55.2410823-05:00</PackageDate>
+  <PackageDate>2023-06-23T14:20:39.5758646+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
   <OverwriteLayer>false</OverwriteLayer>
+  <ApplicationCategoryCollection />
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>5D57E81F-0651-4895-BEFB-B1FA9EE8E7FF</ItemID>
-      <ItemName>SCM_API</ItemName>
-      <LayerId>200</LayerId>
-      <ItemDescription />
+      <ItemID>CFB0DA44-50D0-E546-9084-2962BEB4EC33</ItemID>
+      <ItemName>Enterprise_Data_Providers</ItemName>
+      <LayerId>300</LayerId>
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
       <ItemIsSystem>N</ItemIsSystem>
       <ServerScriptCollection>
         <ServerScript>
-          <ItemID>2125F634-42D7-4E95-B40D-B376A7F2F87F</ItemID>
-          <ItemName>GetCode</ItemName>
-          <LayerId>200</LayerId>
+          <ItemID>455E83C1-933F-B949-8006-D77902629B98</ItemID>
+          <ItemName>NameTranslators</ItemName>
+          <LayerId>300</LayerId>
           <ItemDescription />
+          <ItemCategory>ENTERPRISE_DATA_PROVIDERS</ItemCategory>
+          <ItemContent>Server Scripts\Enterprise_Data_Providers\NameTranslators.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+      </ServerScriptCollection>
+    </ServerScriptCategory>
+    <ServerScriptCategory>
+      <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
+      <ItemName>SCM_API</ItemName>
+      <LayerId>200</LayerId>
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemIsSystem>N</ItemIsSystem>
+      <ServerScriptCollection>
+        <ServerScript>
+          <ItemID>F165D253-C777-4D9B-944D-57CFC4A606D1</ItemID>
+          <ItemName>CheckIn</ItemName>
+          <LayerId>300</LayerId>
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\CheckIn.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
+          <ItemName>CheckOut</ItemName>
+          <LayerId>300</LayerId>
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\CheckOut.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
+          <ItemName>GetCode</ItemName>
+          <LayerId>300</LayerId>
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\GetCode.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
@@ -33,10 +79,9 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>C70E01EB-5FBA-46E6-912B-A04C6127A0C8</ItemID>
+          <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
-          <LayerId>200</LayerId>
-          <ItemDescription />
+          <LayerId>300</LayerId>
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\GetEnterpriseItems.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
@@ -46,10 +91,9 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
+          <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
           <ItemName>RunScript</ItemName>
-          <LayerId>200</LayerId>
-          <ItemDescription />
+          <LayerId>300</LayerId>
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\RunScript.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
@@ -59,10 +103,21 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
+          <ItemID>DA13B299-C2B1-4DE1-B8A8-3F3EBF35131A</ItemID>
+          <ItemName>SaveCode</ItemName>
+          <LayerId>300</LayerId>
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\SaveCode.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
           <ItemName>Utils</ItemName>
-          <LayerId>200</LayerId>
-          <ItemDescription />
+          <LayerId>300</LayerId>
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\Utils.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
@@ -84,7 +139,7 @@
       <ItemFlag>
         <ItemID>FEDE7B57-F733-8340-A311-77F05D153799</ItemID>
         <ItemName>USA</ItemName>
-        <LayerId>200</LayerId>
+        <LayerId>300</LayerId>
         <ItemDescription>USA.gif</ItemDescription>
         <ItemCategory>FLAGS16X16</ItemCategory>
         <ItemContent>Images\FLAGS16X16\USA.img</ItemContent>
