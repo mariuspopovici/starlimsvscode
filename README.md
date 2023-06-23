@@ -30,14 +30,15 @@ Changes can be pushed back to the STARLIMS dictionary and merged with the remote
 Features:
 
 - Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts).
-- Download copies of STARLIMS code items to a local folder.
+- Check out STARLIMS code items to a local folder.
 - Edit local copies and compare changes with remote version
+- Check in changes to a server
 - Execute remote scripts and view execution return values.
 
-TODO:
+To Do:
 
-- Check-in / Check-out items - Merge local changes with remote
-- Others
+- Edit form resources
+- Edit HTML forms visually instead of XML files
 
 ## Extension Settings
 
@@ -50,7 +51,7 @@ This extension contributes the following settings:
 ## How to Use
 
 - Download extension files attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
-- (Install VSIX file, Import .sdp package into STARLIMS)
+- (Install VSIX file, Import SCM_API.sdp package into STARLIMS)
 - Open a local workspace folder. This will serve as your local STARLIMS code repository.
 - Activate extension using the _STARLIMS Connect_ command (press F1).
 - Configure extension settings (STARLIMS url, user and password). You will be prompted to set these upon attempting to activate the extension for the first time.
@@ -66,6 +67,10 @@ N/A
 Initial release of STARLIMS VS Code
 
 ---
+## 1.2.0
+* Forked this project.
+* Automatically export items to local workspace.
+* Added the ability to check in/out items.
 
 ## 1.1.0
 

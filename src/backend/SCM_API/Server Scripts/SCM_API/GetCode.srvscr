@@ -1,21 +1,8 @@
 /********************************************************************************
-Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
+Description.. :	Script to get the code of an Enterprise item
 Author....... :	MARIUS
 Date......... : 2018-11-07
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
+*******************************************************************************/;
 :DECLARE String;
 String := "";
 
@@ -48,8 +35,6 @@ oEnterpriseItem := oUtils:ParseURI(sURI);
 
 :DECLARE oDataSet, sDataSet, sItemName, nRowNo;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
- 
-UsrMes(oEnterpriseItem);
 
 :BEGINCASE;	
 	:CASE oEnterpriseItem:Type == "SS";
@@ -115,36 +100,6 @@ UsrMes(oEnterpriseItem);
 		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetCodeBehind", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
 		oResult:language := "JS";
 	:EXITCASE;
-	:CASE oEnterpriseItem:Type == "HTMLFORMGUIDE";
-		sItemID := oEnterpriseItem:AppName + "." + sItemName;
-		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetById", {sItemID, .F.});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
-		
-		:IF oDataSet:Tables[0]:Rows:Count == 2;
-			nRowNo := IIf(oEnterpriseItem:Type == "XFDFORMCODE", 1, 0);
-		:ELSE;
-			nRowNo := 0;
-		:ENDIF;
-		
-		:DECLARE sProgramaticResourceXML, oResourceDS, sResourceID;
-		sProgramaticResourceXML := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocumentResources", {
-			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"],
-			NIL, "Y"
-		}); 
-
-		oResourceDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sProgramaticResourceXML});
-		oResult:code := "[]";
-		:IF oResourceDS:Tables:Count > 0;
-			:FOR i := 0 :TO oResourceDS:Tables[0]:Rows:Count - 1;
-				sResourceID := LimsString(oResourceDS:Tables[0]:Rows[i]['ResourceId']);
-				:IF sResourceID == "GUIDE";
-					oResult:code := LimsString(oResourceDS:Tables[0]:Rows[i]['ResourceValue']);
-					:EXITFOR;
-				:ENDIF;
-			:NEXT;
-		:ENDIF;
-		oResult:language := "JSON";
-	:EXITCASE;
 :ENDCASE; 
 
 :IF Empty(oResult:language);
@@ -160,13 +115,10 @@ UsrMes(oEnterpriseItem);
 :ENDIF;
 
 oResult:name := sItemName;
-
-
 Response:StatusCode := 200;
 oResponse:success := .T.;
 oResponse:data := oResult;
 :RETURN oResponse;
-
 
 :PROCEDURE _ExtractName;
 :PARAMETERS oRow, sItemType;

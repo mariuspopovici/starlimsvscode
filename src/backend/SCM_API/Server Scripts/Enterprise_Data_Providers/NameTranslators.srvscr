@@ -1,0 +1,225 @@
+/**********************************************************
+Description:		Translates between human readable names
+					and guids differen STARLIMS entities.
+Developed by:		MV
+Completion Date:
+***********************************************************/;
+
+/* ------------------------------------------------------------------
+Returns the name of an XFDForm in format CATEGORY.FORMNAME
+based on form GUID.
+------------------------------------------------------------------;
+:PROCEDURE GetFormName;
+:PARAMETERS Id;
+	:DECLARE strSql;
+
+	strSql := "SELECT LIMSAPPLICATIONS.APPNAME, LIMSXFDFORMS.FORMNAME FROM LIMSXFDFORMS, LIMSAPPLICATIONS
+				WHERE LIMSXFDFORMS.APPID = LIMSAPPLICATIONS.APPID
+				AND FORMID = ?Id?";
+	
+	:RETURN DoProc("GetEntityName", {Id, strSql});
+:ENDPROC;
+
+/* ------------------------------------------------------------------
+Returns the name of a STARLIMS Server Script in format CATEGORY.Script
+based on script GUID.
+------------------------------------------------------------------;
+:PROCEDURE GetServerScriptName;
+:PARAMETERS Id;
+	:DECLARE strSql;
+
+	strSql := "SELECT LIMSSERVERSCRIPTCATEGORIES.CATNAME, LIMSSERVERSCRIPTS.SCRIPTNAME FROM LIMSSERVERSCRIPTS, LIMSSERVERSCRIPTCATEGORIES
+				WHERE LIMSSERVERSCRIPTS.CATEGORYID = LIMSSERVERSCRIPTCATEGORIES.CATEGORYID
+				AND SCRIPTID = ?Id?";
+	
+	:RETURN DoProc("GetEntityName", {Id, strSql});
+
+:ENDPROC;
+
+
+/* ------------------------------------------------------------------
+Returns the name of a Client Script in format CATEGORY.ScriptName
+based on script GUID
+------------------------------------------------------------------;
+:PROCEDURE GetClientScriptName;
+:PARAMETERS Id;
+	:DECLARE strSql;
+
+	strSql := "SELECT LIMSCLIENTSCRIPTCATEGORIES.CATNAME, LIMSCLIENTSCRIPTS.SCRIPTNAME FROM LIMSCLIENTSCRIPTS, LIMSCLIENTSCRIPTCATEGORIES
+				WHERE LIMSCLIENTSCRIPTS.CATEGORYID = LIMSCLIENTSCRIPTCATEGORIES.CATEGORYID
+				AND SCRIPTID = ?Id?";
+	
+	:RETURN DoProc("GetEntityName", {Id, strSql});
+
+:ENDPROC;
+
+
+/* ------------------------------------------------------------------
+Returns the name of an Image in format CATEGORY.ImageName
+based on Image GUID
+------------------------------------------------------------------;
+:PROCEDURE GetImageName;
+:PARAMETERS Id;
+	:DECLARE strSql;
+
+	strSql := "SELECT LIMSIMAGECATEGORIES.CATNAME, LIMSIMAGES.IMAGENAME FROM LIMSIMAGES, LIMSIMAGECATEGORIES
+				WHERE LIMSIMAGES.CATEGORYID = LIMSIMAGECATEGORIES.CATEGORYID
+				AND IMAGEID = ?Id?";
+	
+	:RETURN DoProc("GetEntityName", {Id, strSql});
+
+:ENDPROC;
+
+
+/* -------------------------------------------------------------------
+Returns the Form GUID for the form identified by AppName and FormName
+----------------------------------------------------------------------;
+:PROCEDURE GetFormId;
+:PARAMETERS AppName, FormName, formType;
+:DEFAULT formType, 'XFD';
+
+	:DECLARE strAppName, strFormName;
+	:DECLARE strSql, arSql, sysLayerId;
+	
+	sysLayerId := GetSystemLayerId();
+	strAppName := Upper(AppName);
+	strFormName := Upper(FormName);
+	
+	strSql := "SELECT f.FORMID 
+				FROM LIMSXFDFORMS f, LIMSAPPLICATIONS
+				WHERE f.APPID = LIMSAPPLICATIONS.APPID
+					AND LIMSAPPLICATIONS.APPNAME = ?strAppName?
+					AND f.FORMNAME = ?strFormName?
+					AND FORMTYPE = ?formType?
+				order by
+					case
+						when f.LAYERID <= ?sysLayerId? then ?sysLayerId? - f.LAYERID
+						else f.LAYERID
+					end";
+
+	arSql := SqlExecute(strSql, "DICTIONARY");
+	
+	:IF Len(arSql) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN arSql[1, 1];
+:ENDPROC;
+
+
+/* -------------------------------------------------------------------------------
+Returns the Client script GUID for the script identified by CatName and ScriptName
+----------------------------------------------------------------------------------;
+:RETURN DoProc("GetClientScriptId", {"Sandbox", "csTest"});
+
+:PROCEDURE GetClientScriptId;
+:PARAMETERS CatName, ScriptName;
+	:DECLARE strCatName, strScriptName;
+	:DECLARE strSql, arSql, sysLayerId;
+	
+	sysLayerId := GetSystemLayerId();
+	strCatName := Upper(CatName);
+	strScriptName := Upper(ScriptName);
+	
+	strSql := "SELECT s.SCRIPTID 
+				FROM LIMSCLIENTSCRIPTS s, LIMSCLIENTSCRIPTCATEGORIES
+				WHERE s.CATEGORYID = LIMSCLIENTSCRIPTCATEGORIES.CATEGORYID
+					AND LIMSCLIENTSCRIPTCATEGORIES.CATNAME = ?strCatName?
+					AND s.SCRIPTNAME = ?strScriptName?
+				order by
+					case
+						when s.LAYERID <= ?sysLayerId? then ?sysLayerId? - s.LAYERID
+						else s.LAYERID
+					end";
+
+	arSql := SqlExecute(strSql, "DICTIONARY");
+	
+	:IF Len(arSql) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN arSql[1, 1];
+:ENDPROC;
+
+
+/* -------------------------------------------------------------------------------
+Returns the Server script GUID for the script identified by CatName and ScriptName
+----------------------------------------------------------------------------------;
+:PROCEDURE GetServerScriptId;
+:PARAMETERS CatName, ScriptName;
+	:DECLARE strCatName, strScriptName;
+	:DECLARE strSql, arSql, sysLayerId;
+	
+	sysLayerId := GetSystemLayerId();	
+	strCatName := Upper(CatName);
+	strScriptName := Upper(ScriptName);
+	
+	strSql := "SELECT s.SCRIPTID 
+				FROM LIMSSERVERSCRIPTS s, LIMSSERVERSCRIPTCATEGORIES
+				WHERE s.CATEGORYID = LIMSSERVERSCRIPTCATEGORIES.CATEGORYID
+					AND LIMSSERVERSCRIPTCATEGORIES.CATNAME = ?strCatName?
+					AND s.SCRIPTNAME = ?strScriptName?
+				order by
+					case
+						when s.LAYERID <= ?sysLayerId? then ?sysLayerId? - s.LAYERID
+						else s.LAYERID
+					end";
+
+	arSql := SqlExecute(strSql, "DICTIONARY");
+	
+	:IF Len(arSql) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN arSql[1, 1];
+:ENDPROC;
+
+/* ------------------------------------------------------------------
+Private function used by other functions in this module.
+Returns the name of an entity in cat.name format based on
+an sql statement and an Id.
+------------------------------------------------------------------;
+:PROCEDURE GetEntityName;
+:PARAMETERS Id, SqlStatement;
+	:DECLARE arSql;
+
+	arSql := SqlExecute(SqlStatement, "DICTIONARY");
+
+	:IF Len(arSql) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN arSql[1, 1] + "." + arSql[1, 2];
+:ENDPROC;
+
+/* -------------------------------------------------------------------------------
+Returns the Data source GUID for the script identified by CatName and ScriptName
+----------------------------------------------------------------------------------;
+:PROCEDURE GetDataSourceId;
+:PARAMETERS CatName, ScriptName;
+	:DECLARE strCatName, strScriptName;
+	:DECLARE strSql, arSql, sysLayerId;
+	
+	sysLayerId := GetSystemLayerId();
+	strCatName := Upper(CatName);
+	strScriptName := Upper(ScriptName);
+	
+	strSql := "SELECT d.SCRIPTID 
+				FROM LIMSDATASOURCES d, LIMSDATASOURCECATEGORIES c
+				WHERE d.CATEGORYID = c.CATEGORYID
+					AND c.CATNAME = ?strCatName?
+					AND d.SCRIPTNAME = ?strScriptName?
+				order by
+					case
+						when d.LAYERID <= ?sysLayerId? then ?sysLayerId? - d.LAYERID
+						else d.LAYERID
+					end";
+
+	arSql := SqlExecute(strSql, "DICTIONARY");
+	
+	:IF Len(arSql) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN arSql[1, 1];
+:ENDPROC;

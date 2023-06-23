@@ -1,1 +1,1 @@
-update limsSOURCECONTROL set REASONFORCHECKOUT = '(MARIUS - 12/15/2022 9:00:29 AM) - Checked in without any comments.' where versionID = ?
+update limsSOURCECONTROL set REASONFORCHECKOUT = '' where versionID = ?

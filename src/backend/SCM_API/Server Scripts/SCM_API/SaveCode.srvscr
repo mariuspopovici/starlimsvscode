@@ -1,0 +1,117 @@
+/******************************************************************************
+Description.. :	Script to save code of an Enterprise item
+Author....... :	DC
+Date......... : 2023-06-02
+*******************************************************************************/;
+:DECLARE oPayload;
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:TRY;
+	:DECLARE sRequestAsFile;
+	sRequestAsFile := Request:SaveInputStream();
+	oPayload := FromJSON(ReadText(sRequestAsFile));
+	FileSupport(sRequestAsFile, "DELETE");
+:CATCH;
+	UsrMes("ERROR:", GetLastSSLError():FullDescription);
+	Response:ContentType := "application/problem+json";
+	Response:StatusCode := 500;
+	oResponse:success := .F.;
+	oResponse:data := "Could not deserialize request body.";
+	:RETURN oResponse;
+:ENDTRY;
+
+:DECLARE sURI, String;
+String := "";
+
+/* check for uri;
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("URI");
+	:DECLARE oUtils;
+    sURI := oPayload:URI;
+	oUtils := CreateUDObject("SCM_API.Utils", {});
+	:DECLARE oEnterpriseItem;
+	oEnterpriseItem := oUtils:ParseURI(sURI);
+:ELSE;
+    Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required property '{0}'", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+/* check for code;
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("Code");
+    sCode := oPayload:Code;
+:ELSE;
+    Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required property '{0}'", "Code");
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE sLang, sItemName, sItemID, sType;
+sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
+sLang := GetSetting("DEFAULTLANGUAGE");
+sType := oEnterpriseItem:Type;
+
+:BEGINCASE;
+	:CASE sType == "SS";
+		sItemName := oEnterpriseItem:CategoryName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.ServerScriptProvider.SaveCode", {sItemID, sCode});
+	:EXITCASE;
+	:CASE sType == "CS";
+		sItemName := oEnterpriseItem:CategoryName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.ClientScriptProvider.SaveCode", {sItemID, sCode});
+	:EXITCASE;
+	:CASE sType == "DS";
+		sItemName := oEnterpriseItem:CategoryName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.DataSourceProvider.SaveCode", {sItemID, sCode});
+	:EXITCASE;
+	:CASE sType == "APPDS";
+		sItemName := oEnterpriseItem:AppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.AppDataSourceProvider.SaveCode", {sItemID, sCode});
+	:EXITCASE;
+	:CASE sType == "APPSS";
+		sItemName := oEnterpriseItem:AppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.AppServerScriptProvider.SaveCode", {sItemID, sCode});
+	:EXITCASE;
+	:CASE sType == "APPCS";
+		sItemName := oEnterpriseItem:AppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.AppClientScriptProvider.SaveCode", {sItemID, sCode});
+	:EXITCASE;
+	:CASE sType == "HTMLFORMXML" .OR. sType == "XFDFORMXML";
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.FormProvider.SaveXFDDocument", {sItemID, sLang, sCode});
+	:EXITCASE;
+	:CASE sType == "HTMLFORMCODE" .OR. sType == "XFDFORMCODE";
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		:TRY;
+        	DoProc("Enterprise_Data_Providers.FormProvider.SaveCodeBehind", {sItemID, sCode});
+		:CATCH;
+			Error := GetLastSSLError();
+			:IF Error:Code = 3574;
+				oResponse:data := "Item is not checked out - please check it out first to save it on the server!";
+			:ELSE;
+				oResponse:data := Error:FullDescription;
+			:ENDIF;
+			Response:StatusCode := 400;
+			oResponse:success := .F.;
+			:RETURN oResponse;
+		:ENDTRY;
+	:EXITCASE;
+:ENDCASE;  
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+oResponse:data := "Done";
+:RETURN oResponse;

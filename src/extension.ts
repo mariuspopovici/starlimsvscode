@@ -92,12 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidSaveTextDocument(async (document: vscode.TextDocument) => {
     // check if the document is in the configured workspace
     if (document.uri.fsPath.startsWith(rootPath)) {
-      const result = await vscode.commands.executeCommand("STARLIMS.Save", document.uri);
-      if (result) {
-        vscode.window.showInformationMessage(`STARLIMS: ${document.uri.path} saved successfully.`);
-      } else {
-        vscode.window.showErrorMessage(`STARLIMS: ${document.uri.path} save failed.`);
-      }
+      vscode.commands.executeCommand("STARLIMS.Save", document.uri);
     }
   });
   

@@ -263,13 +263,12 @@ export class EnterpriseService implements Enterprise {
       if (success) {
         vscode.window.showInformationMessage("Code saved successfully.");
       } else {
-        vscode.window.showErrorMessage("Could not save code.");
-        console.log(data);
+        vscode.window.showErrorMessage(data);
       }
       return data instanceof Object ? JSON.stringify(data) : data;
     } catch (e: any) {
-      console.error(e);
       vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
+      console.error(e);
       return;
     }
   }
