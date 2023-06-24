@@ -4,7 +4,7 @@
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
   "version": "1.2.0",
-  "publisher": "Christoph Döllinger",
+  "publisher": "Marius Popovici, Christoph Döllinger",
   "keywords": [
     "STARLIMS",
     "SSL",
@@ -12,7 +12,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/MrDoe/starlimsvscode"
+    "url": "https://github.com/mariuspopovici/starlimsvscode"
   },
   "engines": {
     "vscode": "^1.65.0"
