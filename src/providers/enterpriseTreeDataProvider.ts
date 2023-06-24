@@ -84,9 +84,27 @@ export class EnterpriseTreeDataProvider
   private getItemIcon(item: any): vscode.ThemeIcon {
     if (item.isFolder) {
       return vscode.ThemeIcon.Folder;
-    }
-    else {
-      return vscode.ThemeIcon.File;
+    } else if (item.checkedOutBy) {
+      return new vscode.ThemeIcon("lock");
+    } else {
+      switch (item.type) {
+        case "DS":
+        case "APPDS":
+          return new vscode.ThemeIcon("database");
+        case "SS":
+        case "APPSS":
+        case "APPCS":
+        case "HTMLFORMCODE":
+        case "XFDFORMCODE":
+          return new vscode.ThemeIcon("file-code");
+        case "XFDFORMXML":
+        case "HTMLFORMXML":
+          return new vscode.ThemeIcon("preview");
+        case "HTMLFORMGUIDE":
+          return new vscode.ThemeIcon("list-flat");
+        default:
+          return new vscode.ThemeIcon("file-code");
+      }
     }
   }
 }
