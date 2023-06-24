@@ -1,28 +1,13 @@
 /********************************************************************************
-Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
-Author....... :	MARIUS
+Description.. :	Utility functions
+Author....... :	MARIUS, DC
 Date......... : 2018-11-02
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
+*******************************************************************************/;
 :CLASS Utils;
 
 :PROCEDURE TranslateFileTypeToItemType;
 :PARAMETERS sFileType;
-
 :DECLARE sItemType;
-
 	:BEGINCASE;
 		:CASE sFileType == "SS";
 			sItemType := "ServerScript";
@@ -160,11 +145,7 @@ _______________________________________________________________________________
 					:IF sFormCodeType == "XML";
 						oEnterpriseItem:Type := "HTMLFORMXML";
 					:ELSE;
-						:IF sFormCodeType == "Guide";
-							oEnterpriseItem:Type := "HTMLFORMGUIDE";
-						:ELSE;
-							oEnterpriseItem:Type := "HTMLFORMCODE";
-						:ENDIF;
+						oEnterpriseItem:Type := "HTMLFORMCODE";
 					:ENDIF;
 				:EXITCASE;
 				:CASE sSubCategory == "XFDForms";
@@ -228,4 +209,28 @@ _______________________________________________________________________________
 	:ELSE;
 		:RETURN {};
 	:ENDIF;
+:ENDPROC;
+
+:PROCEDURE GetItemGUID;
+:PARAMETERS sItemName, sItemType;
+:DECLARE sGUID, aItemName;
+aItemName := BuildArray(sItemName,, ".");
+:BEGINCASE;
+	:CASE sItemType == "SS".OR. sItemType == "APPSS";
+        sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetServerScriptId", {aItemName[1], aItemName[2]});
+	:EXITCASE;
+	:CASE sItemType == "CS" .OR. sItemType == "APPCS";
+        sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetClientScriptId", {aItemName[1], aItemName[2]});
+	:EXITCASE;
+	:CASE sItemType == "DS" .OR. sItemType == "APPDS";
+        sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetDataSourceId", {aItemName[1], aItemName[2]});
+	:EXITCASE;
+	:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE";
+		sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetFormId", {aItemName[1], aItemName[2], "HTML"});
+	:EXITCASE;
+    :CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE";
+        sGUID := DoProc("Enterprise_Data_Providers.NameTranslators.GetFormId", {aItemName[1], aItemName[2], "XFD"});
+    :EXITCASE;
+:ENDCASE;
+:RETURN sGUID;
 :ENDPROC;

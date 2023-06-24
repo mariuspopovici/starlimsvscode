@@ -1,0 +1,94 @@
+/******************************************************************************
+Description.. :	Check out item
+Author....... :	DC
+Date......... : 2023-06-02
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+/* get parameters;
+:DECLARE sURI, sReason;
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:IF Request:QueryString:IsProperty("Reason");
+	sReason := Request:QueryString:Reason;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "Reason");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils, oEnterpriseItem, sItemID, sItemName, sLang, sType, sCategory, sAppName;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oEnterpriseItem := oUtils:ParseURI(sURI);
+sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
+sType := oEnterpriseItem:Type;
+
+:IF oEnterpriseItem:IsProperty("CategoryName");
+	sCategory := oEnterpriseItem:CategoryName;
+:ENDIF;
+
+:IF oEnterpriseItem:IsProperty("AppName");
+	sAppName := oEnterpriseItem:AppName;
+:ENDIF;
+
+sLang := GetSetting("DEFAULTLANGUAGE");
+
+:BEGINCASE;
+	:CASE sType == "SS";
+		sItemName := sCategory + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "ServerScript", NIL, sReason, NIL, .F.});
+	:EXITCASE;
+	:CASE sType == "APPSS";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppServerScript", NIL, sReason, NIL, .F.});
+	:EXITCASE;
+	:CASE sType == "CS";
+		sItemName := sCategory + "." + sItemName;
+        sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "ClientScript", sLang});
+	:EXITCASE;
+	:CASE sType == "APPCS";
+		sItemName := sAppName + "." + sItemName;
+        sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppClientScript", sLang});
+	:EXITCASE;
+	:CASE sType == "DS";
+		sItemName := sCategory + "." + sItemName;
+        sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "DataSource", sLang});
+	:EXITCASE;
+	:CASE sType == "APPDS";
+		sItemName := sCategory + "." + sItemName;
+        sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppDataSource", sLang});
+	:EXITCASE;
+	:CASE sType == "HTMLFORMXML" .OR. sType == "HTMLFORMCODE" .OR.
+		  sType == "XFDFORMXML" .OR. sType == "XFDFORMCODE";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "Form", sLang});
+	:EXITCASE;
+:ENDCASE; 
+Response:StatusCode := 200;
+oResponse:success := .T.;
+:RETURN oResponse;

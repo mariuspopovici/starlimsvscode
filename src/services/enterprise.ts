@@ -3,8 +3,9 @@
  */
 export interface Enterprise {
   getEnterpriseItem(uri: string): any;
-  getEntepriseItemCode(uri: string): any;
-  getLocalCopy(uri: string, workspaceFolder: string): Promise<string | null>;
+  getEnterpriseItemCode(uri: string): any;
+  getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean): Promise<string | null>;
   getConfig(): any;
+  saveEnterpriseItemCode(uri: string, code: string): any;
   runScript(uri: string): any;
 }

@@ -1,24 +1,9 @@
 /********************************************************************************
-Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
-Author....... :	MARIUS
+Description.. :	Run a script on vscode
+Author....... :	MARIUS, DC
 Date......... : 2022-04-02
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
-:DECLARE oPayload;
-
-:DECLARE oResponse, oResult;
+*******************************************************************************/;
+:DECLARE oPayload, oResponse, oResult;
 oResult := CreateUDObject();
 oResponse := CreateUDObject({
 	{"success", .T.},
@@ -100,7 +85,6 @@ String := "";
 		sScript, GetLastSSLError():FullDescription);
 	:RETURN oResponse;
 :ENDTRY;
-
 
 oResponse:data := oResult;
 Response:StatusCode := 200;

@@ -4,11 +4,11 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 
 I recommend using this in conjunction with the [ssl-lang](https://marketplace.visualstudio.com/items?itemName=Janosch.ssl-lang) extension which provides syntax highlighting support for STARLIMS Scripting Language.
 
-![STARLIMS VS Code](resources/extension/demo.gif)
+![STARLIMS VS Code Screenshot](resources/screenshot.png)
 
 ## Pre-requisites
 
-- Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
+- Download STARLIMS .sdp package attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
 - Import .sdp package into STARLIMS Designer.
 - Add the following setting to STARLIMS web.config file
 
@@ -23,21 +23,23 @@ This is an unofficial, unsupported extension so use at your own risk. Maybe this
 ## Vision
 
 Implement a Git-like mechanism for managing versions. Extension can be used to explore the remote tree and download code to a local repo.
-Changes can be pushed back to the STARLIMS dictionary and merged with the remote version.
+Changes can be pushed back to the STARLIMS dictionary and merged with the remote version. 
+Design HTML forms directly in VS Code via a HTML preview window.
 
 ## Features
 
 Features:
 
 - Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts).
-- Download copies of STARLIMS code items to a local folder.
+- Check out STARLIMS code items to a local folder.
 - Edit local copies and compare changes with remote version
+- Check in changes to a server
 - Execute remote scripts and view execution return values.
 
-TODO:
+To Do:
 
-- Check-in / Check-out items - Merge local changes with remote
-- Others
+- Edit form resources
+- Edit HTML forms visually
 
 ## Extension Settings
 
@@ -49,8 +51,8 @@ This extension contributes the following settings:
 
 ## How to Use
 
-- Download extension files attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
-- (Install VSIX file, Import .sdp package into STARLIMS)
+- Download extension files attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
+- (Install VSIX file, Import SCM_API.sdp package into STARLIMS)
 - Open a local workspace folder. This will serve as your local STARLIMS code repository.
 - Activate extension using the _STARLIMS Connect_ command (press F1).
 - Configure extension settings (STARLIMS url, user and password). You will be prompted to set these upon attempting to activate the extension for the first time.
@@ -65,8 +67,6 @@ N/A
 
 Initial release of STARLIMS VS Code
 
----
-
 ## 1.1.0
 
 Resurrected this project. Updated dependencies including the new VS Code API.
@@ -79,3 +79,9 @@ Bug fixes.
 Added Get Local Version to remote version editor window context menu
 Activation of extension when executing a compare command
 Showing remote checkout status in explorer tree
+
+## 1.2.0
+
+* Forked this project.
+* Automatically export items to local workspace.
+* Added the ability to check in/out items.

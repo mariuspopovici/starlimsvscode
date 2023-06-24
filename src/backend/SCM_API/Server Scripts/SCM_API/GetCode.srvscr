@@ -1,21 +1,8 @@
 /********************************************************************************
-Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
+Description.. :	Script to get the code of an Enterprise item
 Author....... :	MARIUS
 Date......... : 2018-11-07
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
+*******************************************************************************/;
 :DECLARE String;
 String := "";
 
@@ -48,8 +35,6 @@ oEnterpriseItem := oUtils:ParseURI(sURI);
 
 :DECLARE oDataSet, sDataSet, sItemName, nRowNo;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
- 
-UsrMes(oEnterpriseItem);
 
 :BEGINCASE;	
 	:CASE oEnterpriseItem:Type == "SS";
@@ -160,13 +145,10 @@ UsrMes(oEnterpriseItem);
 :ENDIF;
 
 oResult:name := sItemName;
-
-
 Response:StatusCode := 200;
 oResponse:success := .T.;
 oResponse:data := oResult;
 :RETURN oResponse;
-
 
 :PROCEDURE _ExtractName;
 :PARAMETERS oRow, sItemType;

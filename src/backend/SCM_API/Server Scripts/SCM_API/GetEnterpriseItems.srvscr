@@ -1,21 +1,8 @@
 /********************************************************************************
-Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
-Author....... :	MARIUS
+Description.. :	Get enterprise tree
+Author....... :	MARIUS, DC
 Date......... : 2018-11-06
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
+*******************************************************************************/;
 :DECLARE sOutType, aItems, aEnterpriseCategories, i, oResult, sDataSet, oDataSet, bFolder;
 :DECLARE aApplicationSubCategories, sURI, oRow;
 
@@ -90,19 +77,18 @@ bFolder := .T.;
 		:DECLARE sCategoryID;
 		sCategoryID := LSearch("select CATEGORYID from LIMSAPPCATEGORIES where CATNAME=?", "", "DICTIONARY", {Upper(oEnterpriseItem:Name)});
 		sDataSet := DoProc("Enterprise_Data_Providers.AppProvider.GetList", {sCategoryID});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["APPNAME"], sOutType, "N/A", sURI + "/" + oRow["APPNAME"], NIL});
 		:NEXT;
 	:EXITCASE;
-	
-	
+
 	:CASE oEnterpriseItem:Type == "APPSUBCATEGORY" .AND. oEnterpriseItem:Name == "ClientScripts";
 		sOutType := "APPCS";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.GetList", {oEnterpriseItem:AppName});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"]});
@@ -113,7 +99,7 @@ bFolder := .T.;
 		sOutType := "APPDS";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.AppDataSourceProvider.GetList", {oEnterpriseItem:AppName});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["DSNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["DSNAME"], oRow["CHECKEDOUTBY"]});
@@ -123,7 +109,7 @@ bFolder := .T.;
 	:CASE oEnterpriseItem:Type == "APPSUBCATEGORY" .AND. oEnterpriseItem:Name == "HTMLForms";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetList", {oEnterpriseItem:AppName, "HTML"});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"]});
@@ -135,7 +121,7 @@ bFolder := .T.;
 	:CASE oEnterpriseItem:Type == "APPSUBCATEGORY" .AND. oEnterpriseItem:Name == "XFDForms";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetList", {oEnterpriseItem:AppName, "XFD"});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"]});
@@ -147,7 +133,7 @@ bFolder := .T.;
 		sOutType := "APPSS";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.AppServerScriptProvider.GetList", {oEnterpriseItem:AppName});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"]});
@@ -158,7 +144,7 @@ bFolder := .T.;
 		sOutType := "SS";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.ServerScriptProvider.GetList", {oEnterpriseItem:Name});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"]});
@@ -169,7 +155,7 @@ bFolder := .T.;
 		sOutType := "CS";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.ClientScriptProvider.GetList", {oEnterpriseItem:Name});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"]});
@@ -180,7 +166,7 @@ bFolder := .T.;
 		sOutType := "DS";
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.DataSourceProvider.GetList", {oEnterpriseItem:Name});
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["DSNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["DSNAME"], oRow["CHECKEDOUTBY"]});
@@ -219,10 +205,8 @@ oResult := CreateUDObject({
 	{"data", CreateUDObject({{"items", aResultItems}})}
 });
 
-
 Response:StatusCode := 200;
 :RETURN oResult;
-
 
 :PROCEDURE _GetCategoryItems;
 :PARAMETERS sDataSet, sOutType, sURI;
@@ -233,7 +217,7 @@ Response:StatusCode := 200;
 :DECLARE aItems, i, oDataSet, oRow;
 	aItems := {};
 	:IF !Empty(sDataSet);
-		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["CATNAME"], sOutType, "N/A", sURI + "/" + oRow["CATNAME"], NIL});

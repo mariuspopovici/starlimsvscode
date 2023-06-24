@@ -42,3 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Made STARLIMS URL setting work with or without a trailing / or starthtml.lims
+
+## [1.2.0] - 2023-06-23
+
+### Changed
+- Display the extension on the activity bar of vscode
+- Automatically copy selected files to local folder and open it
+
+### Added
+- Check in/out items
+
+

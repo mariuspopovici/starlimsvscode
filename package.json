@@ -3,8 +3,8 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.1.1",
-  "publisher": "Marius Popovici",
+  "version": "1.2.0",
+  "publisher": "Marius Popovici, Christoph Döllinger",
   "keywords": [
     "STARLIMS",
     "SSL",
@@ -22,14 +22,20 @@
     "SCM Providers",
     "Programming Languages"
   ],
-  "activationEvents": [
-    "onCommand:STARLIMS.Connect",
-    "onCommand:STARLIMS.Compare"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "STARLIMSVSCode",
+          "title": "STARLIMS",
+          "icon": "resources/starlims.png",
+          "alwaysShow": true
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "STARLIMSVSCode": [
         {
           "id": "STARLIMS",
           "name": "STARLIMS Enterprise"
@@ -39,19 +45,19 @@
     "commands": [
       {
         "command": "STARLIMS.GetLocal",
-        "title": "STARLIMS - Get Local Version"
+        "title": "STARLIMS - Edit Document"
       },
       {
-        "command": "STARLIMS.refresh",
+        "command": "STARLIMS.Refresh",
         "title": "Refresh Explorer"
       },
       {
         "command": "STARLIMS.Checkout",
-        "title": "STARLIMS - Checkout"
+        "title": "Check Out"
       },
       {
         "command": "STARLIMS.Checkin",
-        "title": "STARLIMS - Checkin"
+        "title": "Check In"
       },
       {
         "command": "STARLIMS.Connect",
@@ -64,27 +70,45 @@
       {
         "command": "STARLIMS.RunScript",
         "title": "STARLIMS - Run Script"
+      },
+      {
+        "command": "STARLIMS.Save",
+        "title": "STARLIMS - Save"
       }
     ],
     "menus": {
       "view/item/context": [
         {
-          "command": "STARLIMS.refresh",
+          "command": "STARLIMS.Refresh",
           "when": "view == STARLIMS"
         },
         {
           "command": "STARLIMS.GetLocal",
-          "when": "view == STARLIMS && viewItem == HTMLFORMCODE  || view == STARLIMS && viewItem == HTMLFORMXML  || view == STARLIMS && viewItem == XFDFORMCODE  || view == STARLIMS && viewItem == XFDFORMXML  || view == STARLIMS && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == CS|| view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS  || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMS && && viewItem == SS  || view == STARLIMS && viewItem == DS  || view == STARLIMS && viewItem == APPSS  || view == STARLIMS && viewItem == APPDS"
+          "when": "view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS"
+        },
+        {
+          "command": "STARLIMS.Checkout",
+          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+        },
+        {
+          "command": "STARLIMS.Checkin",
+          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
         }
       ],
       "explorer/context": [
         {
           "command": "STARLIMS.Compare",
           "when": "view != STARLIMS"
+        },
+        {
+          "command": "STARLIMS.Checkout"
+        },
+        {
+          "command": "STARLIMS.Checkin"
         }
       ],
       "editor/context": [
@@ -98,7 +122,11 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "editorReadonly"
+          "when": "editorLangId == 'SSL'"
+        },
+        {
+          "command": "STARLIMS.Save",
+          "when": "!editorReadonly"
         }
       ]
     },
@@ -141,7 +169,7 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.0",
     "@types/node": "^14.18.12",
-    "@types/node-fetch": "^2.6.1",
+    "@types/node-fetch": "^2.6.4",
     "@types/vscode": "^1.65.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
@@ -151,8 +179,8 @@
     "mocha": "^9.2.2",
     "ts-loader": "^9.2.8",
     "typescript": "^4.5.5",
-    "webpack": "^5.70.0",
-    "webpack-cli": "^4.9.2"
+    "webpack": "^5.84.1",
+    "webpack-cli": "^4.10.0"
   },
   "dependencies": {
     "node-fetch": "^2.6.7"
