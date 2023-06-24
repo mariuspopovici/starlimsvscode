@@ -10,8 +10,5 @@
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
     "typescript.tsc.autoDetect": "off",
-    "STARLIMS.url": "http://161.42.232.235/starlims",
-    "STARLIMS.user": "DC",
-    "STARLIMS.password": "8ukoimRina!!",
     "typescript.experimental.tsserver.web.enableProjectWideIntellisense": true
 }
