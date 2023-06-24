@@ -33,8 +33,11 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 :DECLARE oEnterpriseItem, sItemID;
 oEnterpriseItem := oUtils:ParseURI(sURI);
 
-:DECLARE oDataSet, sDataSet, sItemName, nRowNo;
+:DECLARE oDataSet, sDataSet, sItemName, nRowNo, sUserLang;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
+
+
+sUserLang := GetSetting("DEFAULTLANGUAGE");
 
 :BEGINCASE;	
 	:CASE oEnterpriseItem:Type == "SS";
@@ -112,10 +115,9 @@ sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
 		:ENDIF;
 		
 		:DECLARE sProgramaticResourceXML, oResourceDS, sResourceID;
-		sProgramaticResourceXML := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocumentResources", {
-			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"],
-			NIL, "Y"
-		}); 
+		sProgramaticResourceXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {
+			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"], sUserLang
+		})); 
 
 		oResourceDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sProgramaticResourceXML});
 		oResult:code := "[]";

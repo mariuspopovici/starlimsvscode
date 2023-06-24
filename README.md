@@ -8,7 +8,7 @@ I recommend using this in conjunction with the [ssl-lang](https://marketplace.vi
 
 ## Pre-requisites
 
-- Download STARLIMS .sdp package attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
+- Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
 - Import .sdp package into STARLIMS Designer.
 - Add the following setting to STARLIMS web.config file
 
@@ -23,7 +23,7 @@ This is an unofficial, unsupported extension so use at your own risk. Maybe this
 ## Vision
 
 Implement a Git-like mechanism for managing versions. Extension can be used to explore the remote tree and download code to a local repo.
-Changes can be pushed back to the STARLIMS dictionary and merged with the remote version. 
+Changes can be pushed back to the STARLIMS dictionary and merged with the remote version.
 Design HTML forms directly in VS Code via a HTML preview window.
 
 ## Features
@@ -82,6 +82,5 @@ Showing remote checkout status in explorer tree
 
 ## 1.2.0
 
-* Forked this project.
-* Automatically export items to local workspace.
-* Added the ability to check in/out items.
+- Automatically export items to local workspace.
+- Added the ability to check in/out items.
