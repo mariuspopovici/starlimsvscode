@@ -114,6 +114,7 @@ bFolder := .T.;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"]});
 			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "HTMLFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"]});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Guide]", "HTMLFORMGUIDE", "JSON", sURI + "/Guide/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"]});
 		:NEXT;
 	:EXITCASE;
 	
