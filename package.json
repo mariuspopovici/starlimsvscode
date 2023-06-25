@@ -22,6 +22,7 @@
     "SCM Providers",
     "Programming Languages"
   ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
