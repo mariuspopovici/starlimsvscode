@@ -86,7 +86,7 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 		:ELSE;
 			nRowNo := 0;
 		:ENDIF;
-		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
+		oResult:code := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]}));
 		oResult:language := "XML";
 	:EXITCASE;
 	:CASE oEnterpriseItem:Type == "HTMLFORMCODE" .OR. oEnterpriseItem:Type == "XFDFORMCODE";
