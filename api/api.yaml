@@ -3,10 +3,10 @@ tags:
   - name: Code Management
 info:
   title: STARLIMS VSCode Extension API
-  version: "1.0.0"
+  version: "1.2.0"
   description: VSCode Extension API services.
   contact:
-    name: API
+    name: API Support
     email: marius@popovici.net
 servers:
   - url: https://server/starlimsapp/
@@ -15,6 +15,103 @@ security:
   - starlims-password: []
 
 paths:
+  /SCM_API.CheckOut.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.CheckOut.lims` endpoint checks out the item at the specified URI.
+      operationId: CheckIn
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the code item to check out.
+          example: /Applications/TestApplications/MyApp/ServerScripts/Script1
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: The operation response (success status and error or success message).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckOutResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.CheckIn.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.CheckIn.lims` endpoint checks in the item at the specified URI.
+      operationId: CheckIn
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the code item to check in.
+          example: /Applications/TestApplications/MyApp/ServerScripts/Script1
+          required: true
+        - in: query
+          name: Reason
+          schema:
+            type: string
+          description: The check in reason.
+          example: Checked in bug fix.
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: The operation response (success status and error or success message).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckInResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.SaveCode.lims:
+    post:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.SaveCode.lims` endpoint saves the code at the specified URI and returns the result.
+      operationId: SaveCode
+      requestBody:
+        description: Save code script request object.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveCodeRequest"
+        required: true
+      responses:
+        "200":
+          description: The save operation response (success status and error or success message).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveCodeResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /SCM_API.RunScript.lims:
     post:
       tags:
@@ -117,6 +214,47 @@ components:
           type: boolean
         Result:
           type: string
+    SaveCodeRequest:
+      required:
+        - URI
+        - Code
+      properties:
+        URI:
+          type: string
+          example: "/ServerScripts/Test/TestServerScript"
+          description: The URI to the item to save.
+        Code:
+          type: string
+          description: The item code
+          example: |
+            :RETURN 1+1;
+    SaveCodeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          example: Done
+          description: Done if successful or an error message otherwise.
+    CheckInResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          example: null
+          description: Empty if successful or an error message otherwise.
+    CheckOutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          example: null
+          description: Empty if successful or an error message otherwise.
     RunScriptRequest:
       required:
         - URI
