@@ -74,7 +74,11 @@
       },
       {
         "command": "STARLIMS.Save",
-        "title": "STARLIMS - Save"
+        "title": "STARLIMS - Save Script"
+      },
+      {
+        "command": "STARLIMS.ClearLog",
+        "title": "Clear Log"
       }
     ],
     "menus": {
@@ -98,6 +102,10 @@
         {
           "command": "STARLIMS.Checkin",
           "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+        },
+        {
+          "command": "STARLIMS.ClearLog",
+          "when": "view == STARLIMS && viewItem == SERVERLOG"
         }
       ],
       "explorer/context": [
@@ -115,7 +123,7 @@
       "editor/context": [
         {
           "command": "STARLIMS.Compare",
-          "when": "!editorReadonly"
+          "when": "!editorReadonly && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.GetLocal",
@@ -127,7 +135,7 @@
         },
         {
           "command": "STARLIMS.Save",
-          "when": "!editorReadonly"
+          "when": "!editorReadonly && editorLangId != 'log'"
         }
       ]
     },

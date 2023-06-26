@@ -8,4 +8,5 @@ export interface Enterprise {
   getConfig(): any;
   saveEnterpriseItemCode(uri: string, code: string): any;
   runScript(uri: string): any;
+  clearLog(uri: string): any;
 }

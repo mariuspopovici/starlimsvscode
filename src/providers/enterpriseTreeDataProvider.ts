@@ -25,9 +25,12 @@ export class EnterpriseTreeDataProvider
     this._onDidChangeTreeData.fire(null);
   }
 
-  public async getChildren(
-    element?: TreeEnterpriseItem
-  ): Promise<TreeEnterpriseItem[]> {
+  /**
+   *  Returns the children of the given element or root if no element is passed.
+   * @param element The element to return the children for.
+   * @returns The children of the given element or root if no element is passed.
+   */
+  public async getChildren(element?: TreeEnterpriseItem): Promise<TreeEnterpriseItem[]> {
     var enterpriseTreeItems: TreeEnterpriseItem[] = [];
     var uri: string = element ? element.uri : "";
 
@@ -62,6 +65,11 @@ export class EnterpriseTreeDataProvider
     return enterpriseTreeItems;
   }
 
+  /**
+   * Returns the parent of the given element or undefined if no element is passed.
+   * @param element The element to return the parent for.
+   * @returns The parent of the given element or undefined if no element is passed.
+  */   
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     return item;
   }
@@ -90,6 +98,11 @@ export class EnterpriseTreeDataProvider
     return resourceUri;
   }
 
+  /**
+   *  Returns an icon for the item.
+   * @param item The item to check
+   * @returns An icon for the item.
+   */
   private getItemIcon(item: any): vscode.ThemeIcon {
     const config = this.service.getConfig();
     if (item.isFolder) {
@@ -114,6 +127,8 @@ export class EnterpriseTreeDataProvider
           return new vscode.ThemeIcon("preview");
         case "HTMLFORMGUIDE":
           return new vscode.ThemeIcon("list-flat");
+        case "SERVERLOG":
+          return new vscode.ThemeIcon("output");
         default:
           return new vscode.ThemeIcon("file-code");
       }
@@ -121,6 +136,9 @@ export class EnterpriseTreeDataProvider
   }
 }
 
+/**
+ * Represents a tree item in the STARLIMS designer tree explorer.
+ */
 export class TreeEnterpriseItem extends vscode.TreeItem {
   type: EnterpriseItemType;
   language: string;
@@ -146,10 +164,21 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   }
 }
 
+/**
+ * Represents the type of an enterprise item.
+ */
 export enum EnterpriseItemType {
   EnterpriseCategory = "CATEGORY",
   AppCategory = "APPCATEGORY",
   Application = "APP",
+  AppServerScript = "APPSS",
+  AppClientScript = "APPCS",
+  AppDataSource = "APPDS",
+  ClientScriptCategory = "CSCAT",
+  DataSource = "DS",
+  DataSourceCategory = "DSCAT",
+  ServerScriptCategory = "SSCAT",
+  ServerScript = "SS",
   XFDFormXML = "XFDFORMXML",
   XFDFormCode = "XFDFORMCODE",
   HTMLFormXML = "HTMLFORMXML",
@@ -157,12 +186,5 @@ export enum EnterpriseItemType {
   HTMLFormGuide = "HTMLFORMGUIDE",
   PhoneForm = "PHONEFORM",
   TabletForm = "TABLETFORM",
-  AppServerScript = "APPSS",
-  AppClientScript = "APPCS",
-  AppDataSource = "APPDS",
-  ServerScriptCategory = "SSCAT",
-  ServerScript = "SS",
-  ClientScriptCategory = "CSCAT",
-  DataSource = "DS",
-  DataSourceCategory = "DSCAT",
+  ServerLog = "SERVERLOGCAT"
 }

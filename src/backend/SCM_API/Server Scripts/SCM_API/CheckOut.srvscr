@@ -21,6 +21,7 @@ oResponse := CreateUDObject({
 	Response:StatusCode := 400;
 	oResponse:success := .F.;
 	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	usrmes(oResponse:data);
 	:RETURN oResponse;
 :ENDIF;
 
@@ -69,7 +70,8 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 	:CASE sType == "APPDS";
 		sItemName := sAppName + "." + sItemName;
         sItemID := oUtils:GetItemGUID(sItemName, sType);
-        DoProc("Enterprise_Data_Providers.CheckOutProvider.CheckOutItem", {sItemID, "AppDataSource", sLang});
+		usrmes(sItemID);
+        DoProc("Enterprise_Data_Providers.CheckOutProvider.CheckOutItem", {sItemID, "AppDataSourceScript", sLang});
 	:EXITCASE;
 	:CASE sType == "HTMLFORMXML" .OR. sType == "HTMLFORMCODE";
 		sItemName := sAppName + "." + sItemName;

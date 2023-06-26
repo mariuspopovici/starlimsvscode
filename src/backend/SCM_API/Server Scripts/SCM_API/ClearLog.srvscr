@@ -1,0 +1,34 @@
+/********************************************************************************
+Description.. :	Clear selected user's log file
+Author....... :	DC
+Date......... : 2023-06-26
+*******************************************************************************/;
+:DECLARE sUser, oResponse, String;
+String := "";
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:IF Request:QueryString:IsProperty("User");
+	sUser := Request:QueryString:User;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "User");
+	:RETURN oResponse;
+:ENDIF;
+
+bReturn := DoProc("Enterprise_Data_Providers.EnterpriseUtilsProvider.DelServerLog", {sUser});
+
+:IF bReturn;
+	Response:StatusCode := 200;
+	oResponse:success := .T.;
+	oResponse:data := "";
+:ELSE;
+	Response:StatusCode := 500;
+	oResponse:success := .F.;
+	oResponse:data := "";
+:ENDIF;
+
+:RETURN oResponse;

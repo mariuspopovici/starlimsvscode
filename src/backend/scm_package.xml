@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>65E1F8BC-4913-4C73-A130-5B6095039004</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-06-26T11:59:00.9644453+02:00</PackageDate>
+  <PackageDate>0001-01-01T00:00:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
   <OverwriteLayer>false</OverwriteLayer>
   <ServerScriptCategoryCollection>
+    <ServerScriptCategory>
+      <ItemID>CFB0DA44-50D0-E546-9084-2962BEB4EC33</ItemID>
+      <ItemName>Enterprise_Data_Providers</ItemName>
+      <LayerId>300</LayerId>
+      <ItemDescription />
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemIsSystem>N</ItemIsSystem>
+      <ServerScriptCollection>
+        <ServerScript>
+          <ItemID>455E83C1-933F-B949-8006-D77902629B98</ItemID>
+          <ItemName>NameTranslators</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>Enterprise_Data_Providers</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+      </ServerScriptCollection>
+    </ServerScriptCategory>
     <ServerScriptCategory>
       <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
@@ -22,10 +44,9 @@
         <ServerScript>
           <ItemID>F165D253-C777-4D9B-944D-57CFC4A606D1</ItemID>
           <ItemName>CheckIn</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\CheckIn.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -35,10 +56,9 @@
         <ServerScript>
           <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
           <ItemName>CheckOut</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\CheckOut.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -51,7 +71,6 @@
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\ClearLog.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -61,10 +80,9 @@
         <ServerScript>
           <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
           <ItemName>GetCode</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\GetCode.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -74,10 +92,9 @@
         <ServerScript>
           <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\GetEnterpriseItems.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -87,10 +104,9 @@
         <ServerScript>
           <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
           <ItemName>RunScript</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\RunScript.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -100,10 +116,9 @@
         <ServerScript>
           <ItemID>DA13B299-C2B1-4DE1-B8A8-3F3EBF35131A</ItemID>
           <ItemName>SaveCode</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\SaveCode.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -113,10 +128,9 @@
         <ServerScript>
           <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
           <ItemName>Utils</ItemName>
-          <LayerId>200</LayerId>
+          <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\Utils.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -136,10 +150,9 @@
       <ItemFlag>
         <ItemID>FEDE7B57-F733-8340-A311-77F05D153799</ItemID>
         <ItemName>USA</ItemName>
-        <LayerId>200</LayerId>
+        <LayerId>300</LayerId>
         <ItemDescription>USA.gif</ItemDescription>
         <ItemCategory>FLAGS16X16</ItemCategory>
-        <ItemContent>Images\FLAGS16X16\USA.img</ItemContent>
         <IsMandatory>false</IsMandatory>
         <ItemBehaviour>overwrite</ItemBehaviour>
         <ImageType />

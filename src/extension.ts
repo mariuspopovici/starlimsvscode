@@ -251,11 +251,10 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Checkin",
     async (item: TreeEnterpriseItem) => {
-      let checkinReason: string =
-        (await vscode.window.showInputBox({
-          prompt: "Enter checkin reason",
-          ignoreFocusOut: true,
-        })) || "Checked in from VSCode";
+      let checkinReason: string = (await vscode.window.showInputBox({
+        prompt: "Enter checkin reason",
+        ignoreFocusOut: true,
+      })) || "Checked in from VSCode";
 
       let bSuccess = await enterpriseService.CheckIn(item.uri, checkinReason);
       if (bSuccess) {
@@ -295,9 +294,23 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  vscode.window.showInformationMessage(
-    `Connected to STARLIMS on ${config.url}.`
-  );
+  // register the clear log command
+  vscode.commands.registerCommand("STARLIMS.ClearLog",
+    async (item: TreeEnterpriseItem) => {
+      // ask for confirmation
+      const confirm = await vscode.window.showWarningMessage(
+        `Are you sure you want to clear the log for ${item.label}?`,
+        { modal: true },
+        "Yes"
+      );
+      if (confirm !== "Yes") {
+        return;
+      }
+      enterpriseService.clearLog(item.uri);
+    });
+
+
+  vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
 }
 
 // this method is called when your extension is deactivated
