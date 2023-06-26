@@ -44,8 +44,9 @@ export class EnterpriseTreeDataProvider
         item.name,
         item.language,
         item.uri,
-        item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed
-                      : vscode.TreeItemCollapsibleState.None
+        item.isFolder
+          ? vscode.TreeItemCollapsibleState.Collapsed
+          : vscode.TreeItemCollapsibleState.None
       );
       enterpriseTreeItem.command = {
         command: "STARLIMS.selectEnterpriseItem",
@@ -54,7 +55,9 @@ export class EnterpriseTreeDataProvider
       };
       enterpriseTreeItem.contextValue = item.type;
       enterpriseTreeItem.iconPath = _this.getItemIcon(item);
-      enterpriseTreeItem.label = item.checkedOutBy ? `${enterpriseTreeItem.label} (Checked out by ${item.checkedOutBy})` : enterpriseTreeItem.label;
+      enterpriseTreeItem.label = item.checkedOutBy
+        ? `${enterpriseTreeItem.label} (Checked out by ${item.checkedOutBy})`
+        : enterpriseTreeItem.label;
       enterpriseTreeItem.resourceUri = _this.getItemResource(item);
       enterpriseTreeItems.push(enterpriseTreeItem);
     });
@@ -82,11 +85,15 @@ export class EnterpriseTreeDataProvider
     if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByMe");
       // change the color of the item
-      item.color = new vscode.ThemeColor("gitDecoration.modifiedResourceForeground");
+      item.color = new vscode.ThemeColor(
+        "gitDecoration.modifiedResourceForeground"
+      );
     } else if (item.checkedOutBy) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByOtherUser");
       // change the color of the item
-      item.color = new vscode.ThemeColor("gitDecoration.untrackedResourceForeground");
+      item.color = new vscode.ThemeColor(
+        "gitDecoration.untrackedResourceForeground"
+      );
     }
     return resourceUri;
   }
@@ -97,10 +104,13 @@ export class EnterpriseTreeDataProvider
    * @returns An icon for the item.
    */
   private getItemIcon(item: any): vscode.ThemeIcon {
+    const config = this.service.getConfig();
     if (item.isFolder) {
       return vscode.ThemeIcon.Folder;
     } else if (item.checkedOutBy) {
-      return new vscode.ThemeIcon("lock");
+      return item.checkedOutBy === config.get("user")
+        ? new vscode.ThemeIcon("unlock")
+        : new vscode.ThemeIcon("lock");
     } else {
       switch (item.type) {
         case "DS":

@@ -1,6 +1,6 @@
 /******************************************************************************
 Description.. :	Script to save code of an Enterprise item
-Author....... :	DC
+Author....... :	DC, MARIUS
 Date......... : 2023-06-02
 *******************************************************************************/;
 :DECLARE oPayload;
@@ -52,7 +52,7 @@ String := "";
 	oResponse:data := String:Format("Missing required property '{0}'", "Code");
 	:RETURN oResponse;
 :ENDIF;
-
+ 
 :DECLARE sLang, sItemName, sItemID, sType, sAppName, sCategory;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
 sType := oEnterpriseItem:Type;
@@ -119,9 +119,92 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 			:RETURN oResponse;
 		:ENDTRY;
 	:EXITCASE;
+	:CASE sType == "HTMLFORMGUIDE";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		:TRY;
+			DoProc("SaveGuideScript", {sItemId, sCode});
+		:CATCH;
+			Error := GetLastSSLError();
+			UsrMes("ERROR", Error:FullDescription);
+			:IF Error:Code = 3574;
+				oResponse:data := "Item is not checked out - please check it out first to save it on the server!";
+			:ELSE;
+				oResponse:data := Error:FullDescription;
+			:ENDIF;
+			Response:StatusCode := 400;
+			oResponse:success := .F.;
+			:RETURN oResponse;
+		:ENDTRY;
+	:EXITCASE;
 :ENDCASE;  
 
 Response:StatusCode := 200;
 oResponse:success := .T.;
 oResponse:data := "Done";
 :RETURN oResponse;
+
+:PROCEDURE SaveGuideScript;
+:PARAMETERS sItemId, sCode;
+
+	:DECLARE sResourcesXML, oResourcesDS, nIterator, sKey, sValue, bFound;
+	sResourcesXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {sItemID, sLang}));
+	oResourcesDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResourcesXML});
+	bFound := .F.;
+	
+	:IF oResourcesDS:Tables:Count == 0;
+		oResourcesDS := DoProc("CreateResourceDataSet", {});
+	:ENDIF;
+	
+	:FOR nIterator := 0 :TO oResourcesDS:Tables[0]:Rows:Count - 1;
+		sKey := LimsString(oResourcesDS:Tables[0]:Rows[nIterator]['ResourceId']);
+		:IF sKey == "GUIDE";
+			oResourcesDS:Tables[0]:Rows[nIterator]['ResourceValue'] := sCode;
+			bFound := .T.;
+		:ENDIF;
+	:NEXT;
+	:IF !bFound;
+		:DECLARE oNewRow;
+		oNewRow := oResourcesDS:Tables[0]:NewRow();
+		oNewRow["ResourceId"] := "GUIDE";
+		oNewRow["ResourceValue"] := sCode;
+		oNewRow["Guid"] := CreateGuid();
+		oNewRow := oResourcesDS:Tables[0]:Rows:Add(oNewRow);
+	:ENDIF;
+	
+	sResourcesXML := DoProc("DStoString", {oResourcesDS});				
+	DoProc("Enterprise_Data_Providers.FormProvider.SaveProgramaticXfdResources", {sItemID, sLang, sResourcesXML});
+
+:ENDPROC;
+
+:PROCEDURE CreateResourceDataSet;
+
+	:DECLARE oDataSet, oDataTable, oPKColumn;
+	oDataSet := LimsNetConnect("", "System.Data.DataSet", {"ResourcesDataset"});
+	oDataTable := LimsNetConnect("", "System.Data.DataTable", {"ResourcesTable"});
+	oDataTable:Columns:Add("Guid");
+	oPKColumn := oDataTable:Columns:Add("ResourceId");
+	oDataTable:Columns:Add("ResourceValue");
+	oDataTable:PrimaryKey := LimsNetCast({oPKColumn}, "System.Data.DataColumn[]");
+	oDataSet:Tables:Add(oDataTable);
+
+	:RETURN oDataSet;
+:ENDPROC;
+
+:PROCEDURE DSToString;
+:PARAMETERS oDataSet, bAddXmlHeader;
+:DEFAULT bAddXmlHeader, .F.;
+
+	:DECLARE oStringWriter, sXmlDataSet;
+	
+	oStringWriter := LimsNETConnect("", "System.IO.StringWriter");
+	oDataSet:WriteXml(oStringWriter);
+	sXmlDataSet := oStringWriter:ToString();
+	oStringWriter:Close();
+
+	:IF bAddXmlHeader .AND. !(sXmlDataSet = "<?xml");
+		sXmlDataSet := '<?xml version="1.0" standalone="yes" ?>' + CrLf + sXmlDataSet;
+	:ENDIF;
+	
+	:RETURN sXmlDataSet;	
+:ENDPROC;
