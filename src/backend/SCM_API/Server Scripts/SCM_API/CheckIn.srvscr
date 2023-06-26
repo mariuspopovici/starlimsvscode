@@ -80,7 +80,7 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 	:CASE sType == "APPDS";
 		sItemName := sCategory + "." + sItemName;
         sItemID := oUtils:GetItemGUID(sItemName, sType);
-        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppDataSource", sLang});
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppDataSourceScript", sLang});
 	:EXITCASE;
 	:CASE sType == "HTMLFORMXML" .OR. sType == "HTMLFORMCODE" .OR.
 		  sType == "XFDFORMXML" .OR. sType == "XFDFORMCODE";

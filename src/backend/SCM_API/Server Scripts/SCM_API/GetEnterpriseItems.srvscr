@@ -24,7 +24,8 @@ aEnterpriseCategories := {
 	{"Applications", "CATEGORY", "N/A", sURI + "/Applications", NIL},
 	{"Server Scripts", "CATEGORY", "N/A", sURI + "/ServerScripts", NIL},
 	{"Client Scripts", "CATEGORY", "N/A", sURI + "/ClientScripts", NIL},
-	{"Data Sources", "CATEGORY", "N/A", sURI + "/DataSources", NIL}
+	{"Data Sources", "CATEGORY", "N/A", sURI + "/DataSources", NIL},
+	{"Server Log", "CATEGORY", "N/A", sURI + "/ServerLogs", NIL}
 };
 
 aApplicationSubCategories := {
@@ -164,7 +165,6 @@ bFolder := .T.;
 	
 	:CASE oEnterpriseItem:Type == "DSCATEGORY";
 		sOutType := "DS";
-		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.DataSourceProvider.GetList", {oEnterpriseItem:Name});
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
@@ -173,6 +173,14 @@ bFolder := .T.;
 		:NEXT;
 	:EXITCASE;
 	
+	:CASE oEnterpriseItem:Type == "ENT_CAT_LOG";
+		sOutType := "SERVERLOG";
+		bFolder := .F.;
+		aDataSet := DoProc("Enterprise_Data_Providers.EnterpriseUtilsProvider.GetUsersWithLog");
+		:FOR i := 1 :TO Len(aDataSet);
+			AAdd(aItems, {aDataSet[i], sOutType, sOutType, sURI + "/" + aDataSet[i], ""});
+		:NEXT;
+	:EXITCASE;
 :ENDCASE;
 
 :DECLARE aResultItems;
@@ -186,6 +194,9 @@ aResultItems := {};
 		:EXITCASE;
 		:CASE Upper(sLanguage) == "JSCRIPT";
 			sLanguage := "JS";
+		:EXITCASE;
+		:CASE Upper(sLanguage) == "SERVERLOG";
+			sLanguage := "SERVERLOG";
 		:EXITCASE;
 	:ENDCASE;
 	:DECLARE oItem;

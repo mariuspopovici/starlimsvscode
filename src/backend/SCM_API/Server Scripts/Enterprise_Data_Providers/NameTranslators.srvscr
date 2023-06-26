@@ -196,19 +196,19 @@ an sql statement and an Id.
 Returns the Data source GUID for the script identified by CatName and ScriptName
 ----------------------------------------------------------------------------------;
 :PROCEDURE GetDataSourceId;
-:PARAMETERS CatName, ScriptName;
-	:DECLARE strCatName, strScriptName;
+:PARAMETERS CatName, DSName;
+	:DECLARE strCatName, strDSName;
 	:DECLARE strSql, arSql, sysLayerId;
 	
 	sysLayerId := GetSystemLayerId();
 	strCatName := Upper(CatName);
-	strScriptName := Upper(ScriptName);
+	strDSName := Upper(DSName);
 	
-	strSql := "SELECT d.SCRIPTID 
+	strSql := "SELECT d.DATASOURCEID
 				FROM LIMSDATASOURCES d, LIMSDATASOURCECATEGORIES c
 				WHERE d.CATEGORYID = c.CATEGORYID
-					AND c.CATNAME = ?strCatName?
-					AND d.SCRIPTNAME = ?strScriptName?
+				AND c.CATNAME = ?strCatName?
+				AND d.DSNAME = ?strDSName?
 				order by
 					case
 						when d.LAYERID <= ?sysLayerId? then ?sysLayerId? - d.LAYERID

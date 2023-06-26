@@ -35,9 +35,11 @@ Features:
 - Edit local copies and compare changes with remote version
 - Check in changes to a server
 - Execute remote scripts and view execution return values.
+- View and clear user logs
 
 To Do:
 
+- Ability to add, delete and move scripts
 - Edit form resources
 - Edit HTML forms visually
 

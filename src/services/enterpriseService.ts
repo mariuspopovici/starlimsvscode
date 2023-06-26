@@ -20,7 +20,7 @@ export class EnterpriseService implements Enterprise {
    */
   constructor(config: vscode.WorkspaceConfiguration) {
     this.config = config;
-    this.baseUrl = this.CleanUrl(config.url);
+    this.baseUrl = this.cleanUrl(config.url);
   }
 
   /** 
@@ -29,7 +29,7 @@ export class EnterpriseService implements Enterprise {
    */
   async runScript(uri: string) {
     const url = `${this.baseUrl}/SCM_API.RunScript.lims`;
-    const headers = new Headers(this.GetAPIHeaders());
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "POST",
       headers,
@@ -64,7 +64,7 @@ export class EnterpriseService implements Enterprise {
   public async getEnterpriseItem(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
-    const headers = new Headers(this.GetAPIHeaders());
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
       headers,
@@ -97,7 +97,7 @@ export class EnterpriseService implements Enterprise {
   public async getEnterpriseItemCode(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
-    const headers = new Headers(this.GetAPIHeaders());
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
       headers,
@@ -133,7 +133,7 @@ export class EnterpriseService implements Enterprise {
   public async CheckOut(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.CheckOut.lims?${params}`;
-    const headers = new Headers(this.GetAPIHeaders());
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
       headers,
@@ -171,7 +171,7 @@ export class EnterpriseService implements Enterprise {
     }
     const params = new URLSearchParams([["URI", uri], ["Reason", reason]]);
     const url = `${this.baseUrl}/SCM_API.CheckIn.lims?${params}`;
-    const headers = new Headers(this.GetAPIHeaders());
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
       headers,
@@ -223,7 +223,7 @@ export class EnterpriseService implements Enterprise {
         await fs.writeFile(localFilePath, item.code, {
           encoding: "utf8",
         });
-        
+
         if (returnCode) {
           return item.code;
         }
@@ -247,7 +247,7 @@ export class EnterpriseService implements Enterprise {
     // uncomment all occurences of '#include'
     code = code.replace(/^\/\/#include/gm, "#include");
     const url = `${this.baseUrl}/SCM_API.SaveCode.lims`;
-    const headers = new Headers(this.GetAPIHeaders());
+    const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "POST",
       headers,
@@ -277,7 +277,7 @@ export class EnterpriseService implements Enterprise {
    * Get API headers for HTTP calls to STARLIMS.
    * @returns an array of string arrays with header name and value.
    */
-  private GetAPIHeaders(): string[][] {
+  private getAPIHeaders(): string[][] {
     return [
       ["STARLIMSUser", this.config.user],
       ["STARLIMSPass", this.config.password],
@@ -290,11 +290,55 @@ export class EnterpriseService implements Enterprise {
    * Cleans up the configured app URL by removing unnecessary things suchs as extra / characters.
    * @param url the STARLIMS app URL
    * @returns the base URL for REST API calls */
-  private CleanUrl(url: string) {
+  private cleanUrl(url: string) {
     let newUrl = url.endsWith("/") ? url.slice(0, -1) : url;
     if (newUrl.endsWith(".lims")) {
       newUrl = newUrl.slice(0, newUrl.lastIndexOf("/"));
     }
     return newUrl;
+  }
+
+  /**
+   * Clear log file of selected user
+   * @param uri the URI of the log file item.
+   * @returns true if the log file was cleared successfully, false otherwise
+   */
+  public async clearLog(uri: string) {
+    const user = uri.split("/")[2];
+    const url = `${this.baseUrl}/SCM_API.ClearLog.lims?User=${user}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers,
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } =
+        await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Log file cleared successfully.");
+
+        // close log file if it is open (check by file name)
+        const logFileName = `${user}.log`;
+        const logFile = vscode.workspace.textDocuments.find(
+          (doc) => doc.fileName.endsWith(logFileName)
+        );
+        if (logFile) {
+          await vscode.window.showTextDocument(logFile);
+          await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+        }
+
+        return true;
+      } else {
+        vscode.window.showErrorMessage("Could not clear log file.");
+        console.error(data);
+        return false;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not clear log file.");
+      console.error(e);
+      return false;
+    }
   }
 }

@@ -130,6 +130,11 @@ sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
 		:ENDIF;
 		oResult:language := "JSON";
 	:EXITCASE;
+	
+	:CASE oEnterpriseItem:Type == "SERVERLOG";
+		oResult:code := DoProc("Enterprise_Data_Providers.EnterpriseUtilsProvider.GetServerLog", {sItemName});
+		oResult:language := "LOG";
+	:EXITCASE;
 :ENDCASE; 
 
 :IF Empty(oResult:language);

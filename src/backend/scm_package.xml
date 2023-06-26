@@ -66,6 +66,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>318A1AF2-1CE8-4001-8F32-48E7F2E8B68F</ItemID>
+          <ItemName>ClearLog</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
@@ -151,6 +163,7 @@
       </ItemFlag>
     </Language>
   </LanguageCollection>
+  <RequiredPackageCollection />
   <OverwriteCodeBehind>true</OverwriteCodeBehind>
   <ImportGlobalResources>true</ImportGlobalResources>
   <CompareTables>false</CompareTables>

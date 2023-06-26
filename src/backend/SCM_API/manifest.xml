@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>495790E8-70F1-41D1-B39C-D77683F7B5DF</ItemID>
+  <ItemID>65E1F8BC-4913-4C73-A130-5B6095039004</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-06-23T15:13:36.2929453+02:00</PackageDate>
+  <PackageDate>2023-06-26T11:59:00.9644453+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -63,6 +63,19 @@
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\CheckOut.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>318A1AF2-1CE8-4001-8F32-48E7F2E8B68F</ItemID>
+          <ItemName>ClearLog</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\ClearLog.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -161,6 +174,7 @@
       </ItemFlag>
     </Language>
   </LanguageCollection>
+  <RequiredPackageCollection />
   <OverwriteCodeBehind>true</OverwriteCodeBehind>
   <ImportGlobalResources>true</ImportGlobalResources>
   <CompareTables>false</CompareTables>
