@@ -33,11 +33,8 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 :DECLARE oEnterpriseItem, sItemID;
 oEnterpriseItem := oUtils:ParseURI(sURI);
 
-:DECLARE oDataSet, sDataSet, sItemName, nRowNo, sUserLang;
+:DECLARE oDataSet, sDataSet, sItemName, nRowNo;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
-
-
-sUserLang := GetSetting("DEFAULTLANGUAGE");
 
 :BEGINCASE;	
 	:CASE oEnterpriseItem:Type == "SS";
@@ -57,12 +54,14 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 		sDataSet := DoProc("Enterprise_Data_Providers.ClientScriptProvider.GetById", {sItemID});
 		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		oResult:code := DoProc("Enterprise_Data_Providers.ClientScriptProvider.GetCode", {sItemID});
+		oResult:language := "JS";
 	:EXITCASE;
 	:CASE oEnterpriseItem:Type == "APPCS";
 		sItemID := oEnterpriseItem:AppName + "." + sItemName;
 		sDataSet := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.GetById", {sItemID});
 		oDataSet := DoProc( "Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		oResult:code := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.GetCode", {sItemID});
+		oResult:language := "JS";
 	:EXITCASE;
 	:CASE oEnterpriseItem:Type == "DS";
 		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
@@ -86,7 +85,7 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 		:ELSE;
 			nRowNo := 0;
 		:ENDIF;
-		oResult:code := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]}));
+		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
 		oResult:language := "XML";
 	:EXITCASE;
 	:CASE oEnterpriseItem:Type == "HTMLFORMCODE" .OR. oEnterpriseItem:Type == "XFDFORMCODE";
@@ -115,9 +114,10 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 		:ENDIF;
 		
 		:DECLARE sProgramaticResourceXML, oResourceDS, sResourceID;
-		sProgramaticResourceXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {
-			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"], sUserLang
-		})); 
+		sProgramaticResourceXML := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocumentResources", {
+			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"],
+			NIL, "Y"
+		}); 
 
 		oResourceDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sProgramaticResourceXML});
 		oResult:code := "[]";
@@ -156,24 +156,3 @@ Response:StatusCode := 200;
 oResponse:success := .T.;
 oResponse:data := oResult;
 :RETURN oResponse;
-
-:PROCEDURE _ExtractName;
-:PARAMETERS oRow, sItemType;
-	:DECLARE sName;
-	:BEGINCASE;	
-		:CASE sItemType == "SS" .OR. sItemType == "APPSS" .OR. sItemType == "CS" .OR. sItemType == "APPCS";
-			sName := oRow["SCRIPTNAME"];
-		:EXITCASE;
-		:CASE sItemType == "DS" .OR. sItemType == "APPDS";
-			sName := oRow["DSNAME"];
-		:EXITCASE;
-		:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "XFDFORMXML";
-			sName := oRow["FORMNAME"];
-		:EXITCASE;
-		:CASE sItemType == "HTMLFORMCODE" .OR. sItemType == "XFDFORMCODE";
-			sName := oRow["FORMNAME"] + "_Codebehind";
-		:EXITCASE;
-	:ENDCASE; 
-	
-	:RETURN sName;
-:ENDPROC;

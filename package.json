@@ -45,10 +45,6 @@
     },
     "commands": [
       {
-        "command": "STARLIMS.GetLocal",
-        "title": "STARLIMS - Edit Document"
-      },
-      {
         "command": "STARLIMS.Refresh",
         "title": "Refresh Explorer"
       },
@@ -62,23 +58,27 @@
       },
       {
         "command": "STARLIMS.Connect",
-        "title": "STARLIMS - Connect"
+        "title": "Connect to STARLIMS"
       },
       {
         "command": "STARLIMS.Compare",
-        "title": "STARLIMS - Compare with Remote Version"
+        "title": "Compare with Remote Version"
       },
       {
         "command": "STARLIMS.RunScript",
-        "title": "STARLIMS - Run Script"
+        "title": "Run Script"
       },
       {
         "command": "STARLIMS.Save",
-        "title": "STARLIMS - Save Script"
+        "title": "Save Script"
       },
       {
         "command": "STARLIMS.ClearLog",
         "title": "Clear Log"
+      },
+      {
+        "command": "STARLIMS.selectEnterpriseItem",
+        "title": "Refresh Log"
       }
     ],
     "menus": {
@@ -104,7 +104,7 @@
           "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
         },
         {
-          "command": "STARLIMS.ClearLog",
+          "command": "STARLIMS.selectEnterpriseItem",
           "when": "view == STARLIMS && viewItem == SERVERLOG"
         }
       ],
@@ -136,6 +136,10 @@
         {
           "command": "STARLIMS.Save",
           "when": "!editorReadonly && editorLangId != 'log'"
+        },
+        {
+          "command": "STARLIMS.selectEnterpriseItem",
+          "when": "!editorReadonly && editorLangId == 'log'"
         }
       ]
     },
