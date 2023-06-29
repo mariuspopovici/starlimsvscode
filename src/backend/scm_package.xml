@@ -35,7 +35,7 @@
     <ServerScriptCategory>
       <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>200</LayerId>
+      <LayerId>300</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
