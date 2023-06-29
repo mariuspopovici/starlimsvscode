@@ -18,11 +18,8 @@ export async function activate(context: vscode.ExtensionContext) {
   let reloadConfig = false;
 
   // get the root path of the workspace
-  const rootPath =
-    vscode.workspace.workspaceFolders &&
-    vscode.workspace.workspaceFolders.length > 0
-      ? vscode.workspace.workspaceFolders[0].uri.fsPath
-      : undefined;
+  const rootPath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0 ?
+    vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
   // ensure a workspace folder is open
   if (!rootPath) {
@@ -123,6 +120,12 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.selectEnterpriseItem",
     async (item: TreeEnterpriseItem) => {
+      // check if item is TreeEnterpriseItem
+      if (!(item instanceof TreeEnterpriseItem)) {
+        // if not, get the item from the tree data provider
+        item = enterpriseProvider.getTreeItemForDocument(item) as TreeEnterpriseItem;
+      }
+
       // open leaf nodes only
       if (item.collapsibleState !== vscode.TreeItemCollapsibleState.None) {
         return;
@@ -133,21 +136,41 @@ export async function activate(context: vscode.ExtensionContext) {
         (doc) => doc.uri.fsPath === item.filePath
       );
       if (openDocument) {
-        await vscode.window.showTextDocument(openDocument);
-        return;
+        // reload document, if it is a log file
+        if (openDocument.uri.toString().endsWith(".log")) {
+
+          // get the remote URI
+          const remoteUri = enterpriseService.getEnterpriseItemUri(item.uri, rootPath);
+
+          // update local copy
+          await enterpriseService.getLocalCopy(remoteUri, rootPath);
+
+          // show the document
+          await vscode.window.showTextDocument(openDocument);
+
+          // scroll to bottom of document
+          enterpriseService.scrollToBottom();
+        }
+        else {
+          // other file types, just show the document
+          await vscode.window.showTextDocument(openDocument);
+        }
       }
+      else {
+        // get local copy of the item
+        const localFilePath = await enterpriseService.getLocalCopy(item.uri, rootPath);
 
-      // get local copy of the item
-      const localFilePath = await enterpriseService.getLocalCopy(
-        item.uri,
-        rootPath
-      );
+        // open the file locally
+        if (localFilePath) {
+          item.filePath = localFilePath;
+          let localUri: vscode.Uri = vscode.Uri.file(localFilePath);
+          await vscode.window.showTextDocument(localUri, { preview: false });
 
-      // open the file locally
-      if (localFilePath) {
-        item.filePath = localFilePath;
-        let uri: vscode.Uri = vscode.Uri.file(localFilePath);
-        vscode.window.showTextDocument(uri);
+          // scroll to bottom of log files
+          if (localUri.toString().endsWith(".log")) {
+            enterpriseService.scrollToBottom();
+          }
+        }
       }
     }
   );
@@ -157,7 +180,8 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.window.registerFileDecorationProvider(fileDecorationProvider);
 
   // this command activates the extension
-  vscode.commands.registerCommand("STARLIMS.Connect", () => {});
+  vscode.commands.registerCommand(
+    "STARLIMS.Connect", () => { });
 
   // registers the GetLocal command handler
   vscode.commands.registerCommand(
@@ -166,9 +190,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // get local copy of the item
       const localFilePath = await enterpriseService.getLocalCopy(
         item.uri ||
-          (item.path
-            ? item.path.slice(0, item.path.lastIndexOf("."))
-            : undefined),
+        (item.path
+          ? item.path.slice(0, item.path.lastIndexOf("."))
+          : undefined),
         rootPath
       );
       if (localFilePath) {
@@ -268,7 +292,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Refresh",
     async (item: TreeEnterpriseItem) => {
-      await enterpriseProvider.refresh();
+      enterpriseProvider.refresh();
     }
   );
 
@@ -309,9 +333,8 @@ export async function activate(context: vscode.ExtensionContext) {
       enterpriseService.clearLog(item.uri);
     });
 
-
   vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

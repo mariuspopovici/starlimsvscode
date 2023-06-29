@@ -165,6 +165,7 @@ bFolder := .T.;
 	
 	:CASE oEnterpriseItem:Type == "DSCATEGORY";
 		sOutType := "DS";
+		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.DataSourceProvider.GetList", {oEnterpriseItem:Name});
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;

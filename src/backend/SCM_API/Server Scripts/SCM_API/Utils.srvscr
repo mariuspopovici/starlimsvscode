@@ -1,28 +1,13 @@
 /********************************************************************************
-Description.. :	
-
-Parameters... :	- 
-
-Returns...... :	- 
-
-Author....... :	MARIUS
+Description.. :	Utility functions
+Author....... :	MARIUS, DC
 Date......... : 2018-11-02
-********************************************************************************
-_______________________________________________________________________________
-
-Ticket #..... :	
-Modification. : 
-Author....... :	
-Date......... :	
-_______________________________________________________________________________
-********************************************************************************/;
+*******************************************************************************/;
 :CLASS Utils;
 
 :PROCEDURE TranslateFileTypeToItemType;
 :PARAMETERS sFileType;
-
 :DECLARE sItemType;
-
 	:BEGINCASE;
 		:CASE sFileType == "SS";
 			sItemType := "ServerScript";
@@ -238,4 +223,170 @@ _______________________________________________________________________________
 	:ELSE;
 		:RETURN {};
 	:ENDIF;
+:ENDPROC;
+
+:PROCEDURE GetItemGUID;
+:PARAMETERS sItemName, sItemType;
+:DECLARE sGUID, aItemName;
+aItemName := BuildArray(sItemName,, ".");
+:BEGINCASE;
+	:CASE sItemType == "SS".OR. sItemType == "APPSS";
+        sGUID := Me:GetServerScriptId(aItemName[1], aItemName[2]);
+	:EXITCASE;
+	:CASE sItemType == "CS" .OR. sItemType == "APPCS";
+        sGUID := Me:GetClientScriptId(aItemName[1], aItemName[2]);
+	:EXITCASE;
+	:CASE sItemType == "DS" .OR. sItemType == "APPDS";
+        sGUID := Me:GetDataSourceId(aItemName[1], aItemName[2]);
+	:EXITCASE;
+	:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE";
+		sGUID := Me:GetFormId(aItemName[1], aItemName[2], "HTML");
+	:EXITCASE;
+    :CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE";
+        sGUID := Me:GetFormId(aItemName[1], aItemName[2], "XFD");
+    :EXITCASE;
+:ENDCASE;
+:RETURN sGUID;
+:ENDPROC;
+
+/* -------------------------------------------------------------------
+Returns the Form GUID for the form identified by AppName and FormName
+----------------------------------------------------------------------;
+:PROCEDURE GetFormId;
+:PARAMETERS sAppName, sFormName, sFormType;
+:DEFAULT sFormType, 'XFD';
+	:DECLARE sSQL, aReturn, sSysLayerId;
+	
+	sSysLayerId := GetSystemLayerId();
+	sAppName := Upper(sAppName);
+	sFormName := Upper(sFormName);
+	
+	sSQL := "SELECT f.FORMID 
+				FROM LIMSXFDFORMS f, LIMSAPPLICATIONS
+				WHERE f.APPID = LIMSAPPLICATIONS.APPID
+					AND LIMSAPPLICATIONS.APPNAME = ?sAppName?
+					AND f.FORMNAME = ?sFormName?
+					AND FORMTYPE = ?sFormType?
+				order by
+					case
+						when f.LAYERID <= ?sSysLayerId? then ?sSysLayerId? - f.LAYERID
+						else f.LAYERID
+					end";
+
+	aReturn := SqlExecute(sSQL, "DICTIONARY");
+	
+	:IF Len(aReturn) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN aReturn[1, 1];
+:ENDPROC;
+
+/* -------------------------------------------------------------------------------
+Returns the Client script GUID for the script identified by CatName and ScriptName
+----------------------------------------------------------------------------------;
+:PROCEDURE GetClientScriptId;
+:PARAMETERS sCatName, sScriptName;
+	:DECLARE sSQL, aReturn, sSysLayerId;
+	
+	sSysLayerId := GetSystemLayerId();
+	sCatName := Upper(sCatName);
+	sScriptName := Upper(sScriptName);
+	
+	sSQL := "SELECT s.SCRIPTID 
+				FROM LIMSCLIENTSCRIPTS s, LIMSCLIENTSCRIPTCATEGORIES
+				WHERE s.CATEGORYID = LIMSCLIENTSCRIPTCATEGORIES.CATEGORYID
+					AND LIMSCLIENTSCRIPTCATEGORIES.CATNAME = ?sCatName?
+					AND s.SCRIPTNAME = ?sScriptName?
+				order by
+					case
+						when s.LAYERID <= ?sSysLayerId? then ?sSysLayerId? - s.LAYERID
+						else s.LAYERID
+					end";
+
+	aReturn := SqlExecute(sSQL, "DICTIONARY");
+	
+	:IF Len(aReturn) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN aReturn[1, 1];
+:ENDPROC;
+
+/* -------------------------------------------------------------------------------
+Returns the Server script GUID for the script identified by CatName and ScriptName
+----------------------------------------------------------------------------------;
+:PROCEDURE GetServerScriptId;
+:PARAMETERS sCatName, sScriptName;
+	:DECLARE sSQL, aReturn, sSysLayerId;
+	sSysLayerId := GetSystemLayerId();	
+	sCatName := Upper(sCatName);
+	sScriptName := Upper(sScriptName);
+	
+	sSQL := "SELECT s.SCRIPTID 
+				FROM LIMSSERVERSCRIPTS s, LIMSSERVERSCRIPTCATEGORIES
+				WHERE s.CATEGORYID = LIMSSERVERSCRIPTCATEGORIES.CATEGORYID
+					AND LIMSSERVERSCRIPTCATEGORIES.CATNAME = ?sCatName?
+					AND s.SCRIPTNAME = ?sScriptName?
+				order by
+					case
+						when s.LAYERID <= ?sSysLayerId? then ?sSysLayerId? - s.LAYERID
+						else s.LAYERID
+					end";
+
+	aReturn := SqlExecute(sSQL, "DICTIONARY");
+	
+	:IF Len(aReturn) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN aReturn[1, 1];
+:ENDPROC;
+
+/* ------------------------------------------------------------------
+Private function used by other functions in this module.
+Returns the name of an entity in cat.name format based on
+an sql statement and an Id.
+------------------------------------------------------------------;
+:PROCEDURE GetEntityName;
+:PARAMETERS sId, sSqlStatement;
+	:DECLARE aReturn;
+	aReturn := SqlExecute(sSqlStatement, "DICTIONARY");
+
+	:IF Len(aReturn) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN aReturn[1, 1] + "." + aReturn[1, 2];
+:ENDPROC;
+
+/* -------------------------------------------------------------------------------
+Returns the Data source GUID for the script identified by CatName and ScriptName
+----------------------------------------------------------------------------------;
+:PROCEDURE GetDataSourceId;
+:PARAMETERS sCatName, sDSName;
+	:DECLARE sSQL, aReturn, sSysLayerId;
+
+	sSysLayerId := GetSystemLayerId();
+	sCatName := Upper(sCatName);
+	sDSName := Upper(sDSName);
+	
+	sSQL := "SELECT d.DATASOURCEID
+				FROM LIMSDATASOURCES d, LIMSDATASOURCECATEGORIES c
+				WHERE d.CATEGORYID = c.CATEGORYID
+				AND c.CATNAME = ?sCatName?
+				AND d.DSNAME = ?sDSName?
+				order by
+					case
+						when d.LAYERID <= ?sSysLayerId? then ?sSysLayerId? - d.LAYERID
+						else d.LAYERID
+					end";
+
+	aReturn := SqlExecute(sSQL, "DICTIONARY");
+	
+	:IF Len(aReturn) = 0;
+		:RETURN "";
+	:ENDIF;
+
+	:RETURN aReturn[1, 1];
 :ENDPROC;

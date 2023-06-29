@@ -3,8 +3,6 @@ Package Date: 2023-06-26 11:59:00
 
 Exported languages: English.
 
-Server Script Category: Enterprise_Data_Providers
-	- NameTranslators
 Server Script Category: SCM_API
 	- CheckIn
 	- CheckOut

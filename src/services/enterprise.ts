@@ -9,4 +9,6 @@ export interface Enterprise {
   saveEnterpriseItemCode(uri: string, code: string): any;
   runScript(uri: string): any;
   clearLog(uri: string): any;
+  getEnterpriseItemUri(uri: string, rootPath: string): any;
+  scrollToBottom(): any;
 }
