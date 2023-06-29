@@ -25,6 +25,27 @@ export class EnterpriseTreeDataProvider
     this._onDidChangeTreeData.fire(null);
   }
 
+  /** Search the enterprise tree for an item by its name and select it in the tree view
+   * @param name The name of the item to search for
+   * @param root The root of the tree to search in
+   * @returns The item if found, otherwise undefined
+   */
+  async searchEnterpriseTree(name: string, root: TreeEnterpriseItem): Promise<TreeEnterpriseItem | undefined> {
+    let children = await this.getChildren(root);
+    for (let i = 0; i < children.length; i++) {
+      if (children[i].label === name) {
+        return children[i];
+      }
+      if (children[i].collapsibleState === vscode.TreeItemCollapsibleState.Collapsed) {
+        let item = await this.searchEnterpriseTree(name, children[i]);
+        if (item) {
+          return item;
+        }
+      }
+    }
+    return undefined;
+  }
+
   /**
    *  Returns the children of the given element or root if no element is passed.
    * @param element The element to return the children for.
@@ -155,6 +176,16 @@ export class EnterpriseTreeDataProvider
     );
     enterpriseItem.iconPath = new vscode.ThemeIcon("file-code");
     return enterpriseItem;
+  }
+
+  /**
+   * Search for tree item by its name
+   * @param name The name of the tree item to search for
+   * @returns The tree item for the document
+   */
+  async getTreeItemByName(name: string): Promise<TreeEnterpriseItem | undefined> {
+    const enterpriseItems: TreeEnterpriseItem[] = await this.getChildren();
+    return enterpriseItems.find((item) => item.label === name);
   }
 }
 

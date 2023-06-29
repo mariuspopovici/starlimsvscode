@@ -75,7 +75,7 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 	:CASE sType == "DS";
 		sItemName := sCategory + "." + sItemName;
         sItemID := oUtils:GetItemGUID(sItemName, sType);
-        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "DataSource", sLang});
+        DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "DataSourceScript", sLang});
 	:EXITCASE;
 	:CASE sType == "APPDS";
 		sItemName := sCategory + "." + sItemName;

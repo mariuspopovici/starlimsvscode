@@ -3,10 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { EnterpriseFileDecorationProvider } from "./providers/enterpriseFileDecorationProvider";
-import {
-  EnterpriseTreeDataProvider,
-  TreeEnterpriseItem,
-} from "./providers/enterpriseTreeDataProvider";
+import { EnterpriseTreeDataProvider, TreeEnterpriseItem } from "./providers/enterpriseTreeDataProvider";
 import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 
