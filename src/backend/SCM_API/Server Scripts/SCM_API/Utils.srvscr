@@ -147,7 +147,11 @@ Date......... : 2018-11-02
 					:IF sFormCodeType == "XML";
 						oEnterpriseItem:Type := "HTMLFORMXML";
 					:ELSE;
-						oEnterpriseItem:Type := "HTMLFORMCODE";
+						:IF sFormCodeType == "Guide";
+							oEnterpriseItem:Type := "HTMLFORMGUIDE";
+						:ELSE;
+							oEnterpriseItem:Type := "HTMLFORMCODE";
+						:ENDIF;
 					:ENDIF;
 				:EXITCASE;
 				:CASE sSubCategory == "XFDForms";
