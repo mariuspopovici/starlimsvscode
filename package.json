@@ -88,10 +88,6 @@
           "when": "view == STARLIMS"
         },
         {
-          "command": "STARLIMS.GetLocal",
-          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
-        },
-        {
           "command": "STARLIMS.RunScript",
           "when": "view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS"
         },
@@ -124,10 +120,6 @@
         {
           "command": "STARLIMS.Compare",
           "when": "!editorReadonly && editorLangId != 'log'"
-        },
-        {
-          "command": "STARLIMS.GetLocal",
-          "when": "editorReadonly"
         },
         {
           "command": "STARLIMS.RunScript",
