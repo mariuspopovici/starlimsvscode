@@ -239,7 +239,7 @@ aItemName := BuildArray(sItemName,, ".");
 	:CASE sItemType == "DS" .OR. sItemType == "APPDS";
         sGUID := Me:GetDataSourceId(aItemName[1], aItemName[2]);
 	:EXITCASE;
-	:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE";
+	:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE" .OR. sItemType == "HTMLFORMGUIDE";
 		sGUID := Me:GetFormId(aItemName[1], aItemName[2], "HTML");
 	:EXITCASE;
     :CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE";
