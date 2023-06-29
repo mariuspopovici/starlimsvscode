@@ -44,9 +44,7 @@ export class EnterpriseTreeDataProvider
         item.name,
         item.language,
         item.uri,
-        item.isFolder
-          ? vscode.TreeItemCollapsibleState.Collapsed
-          : vscode.TreeItemCollapsibleState.None
+        item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
       );
       enterpriseTreeItem.command = {
         command: "STARLIMS.selectEnterpriseItem",
@@ -69,7 +67,7 @@ export class EnterpriseTreeDataProvider
    * Returns the parent of the given element or undefined if no element is passed.
    * @param element The element to return the parent for.
    * @returns The parent of the given element or undefined if no element is passed.
-  */   
+  */
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     return item;
   }
@@ -133,6 +131,30 @@ export class EnterpriseTreeDataProvider
           return new vscode.ThemeIcon("file-code");
       }
     }
+  }
+
+  /**
+   * Get corresponding tree item from open document
+   * @param document The document to get the tree item for
+   * @returns The tree item for the document
+   */
+  getTreeItemForDocument(
+    document: any
+  ): TreeEnterpriseItem {
+    const filePath = document.fsPath;
+    const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+    const enterpriseUri = "starlims:///" + filePath.replace(/\\/g, "/") + "/";
+    const enterpriseItem = new TreeEnterpriseItem(
+      EnterpriseItemType.Application,
+      fileName,
+      "en",
+      enterpriseUri,
+      vscode.TreeItemCollapsibleState.None,
+      undefined,
+      filePath
+    );
+    enterpriseItem.iconPath = new vscode.ThemeIcon("file-code");
+    return enterpriseItem;
   }
 }
 

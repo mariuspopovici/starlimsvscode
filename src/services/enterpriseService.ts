@@ -174,7 +174,7 @@ export class EnterpriseService implements Enterprise {
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
-      headers,
+      headers
     };
 
     try {
@@ -221,7 +221,7 @@ export class EnterpriseService implements Enterprise {
         item.code = item.code.replace(/^#include/gm, "//#include");
 
         await fs.writeFile(localFilePath, item.code, {
-          encoding: "utf8",
+          encoding: "utf8"
         });
 
         if (returnCode) {
@@ -339,6 +339,41 @@ export class EnterpriseService implements Enterprise {
       vscode.window.showErrorMessage("Could not clear log file.");
       console.error(e);
       return false;
+    }
+  }
+
+  /**
+   * Get the uri of an enterprise item by its file path
+   * @param filePath the file path of the enterprise item
+   * @returns the uri of the enterprise item
+   */
+  public getEnterpriseItemUri(filePath: string, rootPath: string): string {
+    // remove leading 'starlims:///' from file path
+    var filePath = filePath.replace(/^starlims:\/\/\//, "");
+
+    // replace backslashes with forward slashes on root path
+    rootPath = rootPath.replace(/\\/g, "/");
+
+    // remove trailing slash from file path
+    filePath = filePath.replace(/\/$/, "");
+
+    // remove file extension
+    filePath = filePath.replace(/\.[^/.]+$/, "");
+
+    // remove workspace folder path from file path
+    filePath = filePath.replace(rootPath, "");
+    return filePath;
+  }
+
+  /**
+   * Scroll to the bottom of the active text editor
+   */
+  public async scrollToBottom() {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const position = editor.document.lineAt(editor.document.lineCount - 1).range.end;
+      editor.selection = new vscode.Selection(position, position);
+      editor.revealRange(new vscode.Range(position, position));
     }
   }
 }
