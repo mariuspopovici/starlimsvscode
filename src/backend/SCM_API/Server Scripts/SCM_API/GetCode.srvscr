@@ -33,7 +33,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 :DECLARE oEnterpriseItem, sItemID;
 oEnterpriseItem := oUtils:ParseURI(sURI);
 
-:DECLARE oDataSet, sDataSet, sItemName, nRowNo;
+:DECLARE oDataSet, sDataSet, sItemName, nRowNo, sUserLang;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
 
 :BEGINCASE;	
@@ -85,7 +85,7 @@ sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
 		:ELSE;
 			nRowNo := 0;
 		:ENDIF;
-		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
+		oResult:code := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]}));
 		oResult:language := "XML";
 	:EXITCASE;
 	:CASE oEnterpriseItem:Type == "HTMLFORMCODE" .OR. oEnterpriseItem:Type == "XFDFORMCODE";
@@ -114,10 +114,9 @@ sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
 		:ENDIF;
 		
 		:DECLARE sProgramaticResourceXML, oResourceDS, sResourceID;
-		sProgramaticResourceXML := DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocumentResources", {
-			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"],
-			NIL, "Y"
-		}); 
+		sProgramaticResourceXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {
+			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"], sUserLang
+		})); 
 
 		oResourceDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sProgramaticResourceXML});
 		oResult:code := "[]";
