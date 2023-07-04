@@ -16,72 +16,94 @@ export class EnterpriseTreeDataProvider
     this._onDidChangeTreeData.event;
 
   private service: Enterprise;
+  private dataMode: string = "LOAD";
+  private treeItems: TreeEnterpriseItem[] = [];
 
   constructor(enterpriseService: Enterprise) {
     this.service = enterpriseService;
   }
 
   refresh(): void {
+    this.dataMode = "LOAD";
     this._onDidChangeTreeData.fire(null);
   }
 
-  /** Search the enterprise tree for an item by its name and select it in the tree view
-   * @param name The name of the item to search for
-   * @param root The root of the tree to search in
-   * @returns The item if found, otherwise undefined
-   */
-  async searchEnterpriseTree(name: string, root: TreeEnterpriseItem): Promise<TreeEnterpriseItem | undefined> {
-    let children = await this.getChildren(root);
-    for (let i = 0; i < children.length; i++) {
-      if (children[i].label === name) {
-        return children[i];
-      }
-      if (children[i].collapsibleState === vscode.TreeItemCollapsibleState.Collapsed) {
-        let item = await this.searchEnterpriseTree(name, children[i]);
-        if (item) {
-          return item;
-        }
-      }
-    }
-    return undefined;
+  clear(): void {
+    this.dataMode = "CLEAR";
+    this._onDidChangeTreeData.fire(null);
+  }
+
+  /** Search for items in the tree.
+   * @param searchText The text to search for.
+   * @returns The items that match the search text.
+   * */
+  async search(searchText: string): Promise<void> {
+    this.dataMode = "SEARCH";
+    this.treeItems = await this.service.searchForItems(searchText);
+    this._onDidChangeTreeData.fire(null);
+    //this.dataMode = "LOAD";
   }
 
   /**
-   *  Returns the children of the given element or root if no element is passed.
+   *  Returns the children of the given element.
    * @param element The element to return the children for.
-   * @returns The children of the given element or root if no element is passed.
+   * @returns The children of the given element.
    */
   public async getChildren(element?: TreeEnterpriseItem): Promise<TreeEnterpriseItem[]> {
-    var enterpriseTreeItems: TreeEnterpriseItem[] = [];
+    var returnItems: TreeEnterpriseItem[] = [];
+    let treeItems: TreeEnterpriseItem[] | undefined;
+
+    // if no element is passed, start from root
     var uri: string = element ? element.uri : "";
+   
+    // add mode - get all enterprise items
+    if(this.dataMode === "LOAD") {
+      treeItems = await this.service.getEnterpriseItems(uri);
+    }
+    // clear mode - clear the tree
+    else if(this.dataMode === "CLEAR") {
+      this.treeItems = [];
+      return this.treeItems;
+    }
+    // search mode - search for items
+    else if(this.dataMode === "SEARCH") {
+      if(this.treeItems.length === 0) {
+        throw new Error("No items found!");
+      }
+      treeItems = this.treeItems;
+    }
+    if(treeItems === undefined) {
+      throw new Error("No items found!");
+    }
 
-    let enterpriseItems: TreeEnterpriseItem[] =
-      await this.service.getEnterpriseItem(uri);
-
+    // loop through the items and create new tree items
     const _this = this;
-    enterpriseItems.forEach(function (item: any) {
-      let enterpriseTreeItem = new TreeEnterpriseItem(
+    treeItems.forEach(function (item: any) {
+      // create new tree item
+      let newItem = new TreeEnterpriseItem(
         item.type,
         item.name,
         item.language,
         item.uri,
         item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
       );
-      enterpriseTreeItem.command = {
+
+      // set the command to run when the item is clicked
+      newItem.command = {
         command: "STARLIMS.selectEnterpriseItem",
         title: "Select Node",
-        arguments: [enterpriseTreeItem],
+        arguments: [newItem]
       };
-      enterpriseTreeItem.contextValue = item.type;
-      enterpriseTreeItem.iconPath = _this.getItemIcon(item);
-      enterpriseTreeItem.label = item.checkedOutBy
-        ? `${enterpriseTreeItem.label} (Checked out by ${item.checkedOutBy})`
-        : enterpriseTreeItem.label;
-      enterpriseTreeItem.resourceUri = _this.getItemResource(item);
-      enterpriseTreeItems.push(enterpriseTreeItem);
+      
+      newItem.contextValue = item.type;
+      newItem.iconPath = _this.getItemIcon(item);
+      newItem.label = item.checkedOutBy? `${newItem.label} (Checked out by ${item.checkedOutBy})` : newItem.label;
+      newItem.resourceUri = _this.getItemResource(item);
+      returnItems.push(newItem);
     });
 
-    return enterpriseTreeItems;
+    //this.treeItems = newTreeItems;
+    return returnItems;
   }
 
   /**
@@ -104,15 +126,11 @@ export class EnterpriseTreeDataProvider
     if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByMe");
       // change the color of the item
-      item.color = new vscode.ThemeColor(
-        "gitDecoration.modifiedResourceForeground"
-      );
+      item.color = new vscode.ThemeColor("gitDecoration.modifiedResourceForeground");
     } else if (item.checkedOutBy) {
       resourceUri = vscode.Uri.parse("starlims:/checkedOutByOtherUser");
       // change the color of the item
-      item.color = new vscode.ThemeColor(
-        "gitDecoration.untrackedResourceForeground"
-      );
+      item.color = new vscode.ThemeColor("gitDecoration.untrackedResourceForeground");
     }
     return resourceUri;
   }

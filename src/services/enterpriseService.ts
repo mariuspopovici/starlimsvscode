@@ -57,17 +57,17 @@ export class EnterpriseService implements Enterprise {
   }
 
   /** 
-   * Gets a descriptor of the STARLIMS Enterprise code item referenced by the specified URI.
+   * Gets all enterprise items below the specified URI.
    * @param uri the URI of the remote STARLIMS code item.
    * @returns A descriptor object with the following properties: name, type, uri, language, isFolder
    */
-  public async getEnterpriseItem(uri: string) {
+  public async getEnterpriseItems(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
-      headers,
+      headers
     };
 
     try {
@@ -374,6 +374,37 @@ export class EnterpriseService implements Enterprise {
       const position = editor.document.lineAt(editor.document.lineCount - 1).range.end;
       editor.selection = new vscode.Selection(position, position);
       editor.revealRange(new vscode.Range(position, position));
+    }
+  }
+
+  /**
+   * Search enterprise item by its name and open the first match
+   * @param itemName the name of the enterprise item
+   * @returns the uri of the enterprise item
+   */
+  public async searchForItems(itemName: string): Promise<any>  {
+    const url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } =
+        await response.json();
+      if (success) {
+        return data.items;
+      } else {
+        vscode.window.showErrorMessage("Item not found.");
+        console.error(data);
+        return [];
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Item not found.");
+      console.error(e);
+      return [];
     }
   }
 }

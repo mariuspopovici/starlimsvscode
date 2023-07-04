@@ -103,6 +103,10 @@ export async function activate(context: vscode.ExtensionContext) {
   const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
   vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
 
+  // register a decoration provider for the STARLIMS enterprise tree
+  const fileDecorationProvider = new EnterpriseFileDecorationProvider();
+  vscode.window.registerFileDecorationProvider(fileDecorationProvider);
+
   // execute the STARLIMS.Save command when a document is saved
   vscode.workspace.onDidSaveTextDocument(
     async (document: vscode.TextDocument) => {
@@ -113,7 +117,11 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // hook into tree events for loading code items
+  // this command activates the extension
+  vscode.commands.registerCommand(
+    "STARLIMS.Connect", () => {});
+
+  // register the Select Enterprise Item command
   vscode.commands.registerCommand(
     "STARLIMS.selectEnterpriseItem",
     async (item: TreeEnterpriseItem) => {
@@ -172,15 +180,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // register a decoration provider for the STARLIMS enterprise tree
-  const fileDecorationProvider = new EnterpriseFileDecorationProvider();
-  vscode.window.registerFileDecorationProvider(fileDecorationProvider);
-
-  // this command activates the extension
-  vscode.commands.registerCommand(
-    "STARLIMS.Connect", () => { });
-
-  // registers the GetLocal command handler
+  // register the GetLocal command handler
   vscode.commands.registerCommand(
     "STARLIMS.GetLocal",
     async (item: TreeEnterpriseItem | any) => {
@@ -199,7 +199,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // registers the RunScript command handler
+  // register the RunScript command handler
   vscode.commands.registerCommand(
     "STARLIMS.RunScript",
     async (item: TreeEnterpriseItem | any) => {
@@ -223,7 +223,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // registers the remote compare command
+  // register the remote compare command
   vscode.commands.registerCommand(
     "STARLIMS.Compare",
     async (uri: vscode.Uri) => {
@@ -253,7 +253,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // registers the checkout command
+  // register the checkout command
   vscode.commands.registerCommand(
     "STARLIMS.Checkout",
     async (item: TreeEnterpriseItem) => {
@@ -268,7 +268,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // registers the check in command
+  // register the check in command
   vscode.commands.registerCommand(
     "STARLIMS.Checkin",
     async (item: TreeEnterpriseItem) => {
@@ -285,7 +285,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // registers the refresh command
+  // register the refresh command
   vscode.commands.registerCommand(
     "STARLIMS.Refresh",
     async (item: TreeEnterpriseItem) => {
@@ -293,6 +293,13 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the showTreeView command
+  vscode.commands.registerCommand(
+    "STARLIMS.ShowTreeView",
+    async (item: TreeEnterpriseItem) => {
+      enterpriseProvider.refresh();
+    }
+  );
   // register the save file command
   vscode.commands.registerCommand(
     "STARLIMS.Save",
@@ -328,7 +335,23 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
       enterpriseService.clearLog(item.uri);
-    });
+    }
+  );
+
+  // register the search command
+  vscode.commands.registerCommand("STARLIMS.Search",
+    async (item: TreeEnterpriseItem) => {
+      // ask for search text
+      const itemName = await vscode.window.showInputBox({
+        prompt: "Enter search text",
+        ignoreFocusOut: true
+      });
+      if (!itemName) {
+        return;
+      }
+     await enterpriseProvider.search(itemName);
+    }
+  );
 
   vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
 }

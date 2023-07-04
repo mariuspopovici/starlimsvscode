@@ -79,9 +79,39 @@
       {
         "command": "STARLIMS.selectEnterpriseItem",
         "title": "Refresh Log"
+      },
+      {
+        "command": "STARLIMS.Search",
+        "title": "Search for items...",
+        "icon": {
+          "dark": "resources/dark/search.svg",
+          "light": "resources/light/search.svg"
+        }
+      },
+      {
+        "command": "STARLIMS.ShowTreeView",
+        "title": "Show/Refresh Tree View",
+        "icon": {
+          "dark": "resources/dark/treeview.svg",
+          "light": "resources/light/treeview.svg"
+        }
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "STARLIMS.ShowTreeView",
+          "when": "view == STARLIMS",
+          "group": "navigation",
+          "alt": "Tree View"
+        },
+        {
+          "command": "STARLIMS.Search",
+          "when": "view == STARLIMS",
+          "group": "navigation",
+          "alt": "Search"
+        }
+      ],
       "view/item/context": [
         {
           "command": "STARLIMS.Refresh",
