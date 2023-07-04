@@ -123,6 +123,19 @@
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ServerScript>
+          <ServerScript>
+          <ItemID>21B76144-2A16-4372-B767-A5B47753CD0E</ItemID>
+          <ItemName>Search</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\Search.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
       </ServerScriptCollection>
     </ServerScriptCategory>
   </ServerScriptCategoryCollection>

@@ -12,5 +12,6 @@ Server Script Category: SCM_API
 	- RunScript
 	- SaveCode
 	- Utils
+	- Search
 
 
