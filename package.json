@@ -70,7 +70,7 @@
       },
       {
         "command": "STARLIMS.Save",
-        "title": "Save Script"
+        "title": "Save File"
       },
       {
         "command": "STARLIMS.ClearLog",
@@ -95,6 +95,10 @@
           "dark": "resources/dark/treeview.svg",
           "light": "resources/light/treeview.svg"
         }
+      },
+      {
+        "command": "STARLIMS.OpenForm",
+        "title": "Open Form"
       }
     ],
     "menus": {
@@ -102,14 +106,12 @@
         {
           "command": "STARLIMS.ShowTreeView",
           "when": "view == STARLIMS",
-          "group": "navigation",
-          "alt": "Tree View"
+          "group": "navigation"
         },
         {
           "command": "STARLIMS.Search",
           "when": "view == STARLIMS",
-          "group": "navigation",
-          "alt": "Search"
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -132,6 +134,10 @@
         {
           "command": "STARLIMS.selectEnterpriseItem",
           "when": "view == STARLIMS && viewItem == SERVERLOG"
+        },
+        {
+          "command": "STARLIMS.OpenForm",
+          "when": "view == STARLIMS && viewItem == HTMLFORMXML"
         }
       ],
       "explorer/context": [
@@ -140,28 +146,34 @@
           "when": "view != STARLIMS"
         },
         {
-          "command": "STARLIMS.Checkout"
+          "command": "STARLIMS.Checkout",
+          "when": "view == STARLIMS"
         },
         {
-          "command": "STARLIMS.Checkin"
+          "command": "STARLIMS.Checkin",
+          "when": "view == STARLIMS"
         }
       ],
       "editor/context": [
         {
           "command": "STARLIMS.Compare",
-          "when": "!editorReadonly && editorLangId != 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "editorLangId == 'SSL'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL'"
         },
         {
           "command": "STARLIMS.Save",
-          "when": "!editorReadonly && editorLangId != 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
-          "when": "!editorReadonly && editorLangId == 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
+        },
+        {
+          "command": "STARLIMS.ClearLog",
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
         }
       ]
     },
@@ -184,6 +196,11 @@
             "type": "string",
             "default": "",
             "description": "STARLIMS User Password"
+          },
+          "STARLIMS.rootPath": {
+            "type": "string",
+            "default": "",
+            "description": "Root path for temporary STARLIMS files. For example: C:\\STARLIMS\\. SLVSCODE will be appended to this path."
           }
         }
       }
@@ -202,6 +219,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
+    "@types/jsdom": "^21.1.1",
     "@types/mocha": "^9.1.0",
     "@types/node": "^14.18.12",
     "@types/node-fetch": "^2.6.4",
@@ -218,6 +236,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "jsdom": "^22.1.0",
     "node-fetch": "^2.6.7"
   }
 }

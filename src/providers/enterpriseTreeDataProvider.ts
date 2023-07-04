@@ -85,10 +85,13 @@ export class EnterpriseTreeDataProvider
         item.name,
         item.language,
         item.uri,
-        item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
+        item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
+        item.command,
+        item.filePath,
+        item.guid
       );
 
-      // set the command to run when the item is clicked
+      // set the command to run when the item is being clicked
       newItem.command = {
         command: "STARLIMS.selectEnterpriseItem",
         title: "Select Node",
@@ -183,6 +186,7 @@ export class EnterpriseTreeDataProvider
     const filePath = document.fsPath;
     const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
     const enterpriseUri = "starlims:///" + filePath.replace(/\\/g, "/") + "/";
+    const guid = document.guid;
     const enterpriseItem = new TreeEnterpriseItem(
       EnterpriseItemType.Application,
       fileName,
@@ -190,7 +194,8 @@ export class EnterpriseTreeDataProvider
       enterpriseUri,
       vscode.TreeItemCollapsibleState.None,
       undefined,
-      filePath
+      filePath,
+      guid
     );
     enterpriseItem.iconPath = new vscode.ThemeIcon("file-code");
     return enterpriseItem;
@@ -216,6 +221,7 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   uri: string;
   filePath: string | undefined;
   checkedOutBy: string | undefined;
+  guid: string | undefined;
 
   constructor(
     type: EnterpriseItemType,
@@ -224,7 +230,8 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
     uri: string,
     collapsibleState: vscode.TreeItemCollapsibleState,
     command?: vscode.Command,
-    filePath?: string
+    filePath?: string,
+    guid?: string
   ) {
     super(label, collapsibleState);
     this.type = type;
@@ -232,6 +239,7 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
     this.command = command;
     this.uri = uri;
     this.filePath = filePath;
+    this.guid = guid;
   }
 }
 

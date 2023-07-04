@@ -400,6 +400,10 @@ components:
           type: boolean
           example: false
           description: Set to `true` when item is a category / folder type such as an Application, Application Category, Script Category etc.
+        guid:
+          type: string
+          example: 12345678-1234-1234-1234-123456789012
+          description: The item GUID, only set for HTML forms so far.
   responses:
     OK:
       description: Operation ran successfully.

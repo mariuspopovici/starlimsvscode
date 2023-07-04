@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { Enterprise } from "./enterprise";
+import jsdom from "jsdom";
 
 /** 
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
@@ -382,7 +383,7 @@ export class EnterpriseService implements Enterprise {
    * @param itemName the name of the enterprise item
    * @returns the uri of the enterprise item
    */
-  public async searchForItems(itemName: string): Promise<any>  {
+  public async searchForItems(itemName: string): Promise<any> {
     const url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
