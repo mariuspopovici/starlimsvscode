@@ -314,6 +314,7 @@ export async function activate(context: vscode.ExtensionContext) {
         var localUri = editor.document.uri;
         if (localUri) {
           let remotePath = localUri.path.slice(rootPath.length);
+          console.log("Opening file: " + remotePath);
           enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
         }
       }
