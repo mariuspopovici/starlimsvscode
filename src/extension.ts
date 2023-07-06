@@ -307,7 +307,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Save",
     async (item: TreeEnterpriseItem) => {
-      var rootPath: string = config.get("rootPath") + "\\SLVSCODE\\".toString();
+      var rootPath: string = config.get("rootPath") + "\\SLVSCODE".toString();
       const editor = vscode.window.activeTextEditor;
 
       if (editor && rootPath) {
