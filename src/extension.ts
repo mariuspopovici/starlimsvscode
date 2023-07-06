@@ -209,10 +209,9 @@ export async function activate(context: vscode.ExtensionContext) {
       const uri = item.path
         ? item.path.slice(0, item.path.lastIndexOf("."))
         : undefined;
-      if (vscode.workspace.workspaceFolders !== undefined) {
-        const workspaceFolderPath =
-          vscode.workspace.workspaceFolders[0].uri.path;
-        let remotePath = uri.slice(workspaceFolderPath.length);
+      if (config.has("rootPath")) {
+        const rootPath: string = `${config.get("rootPath")}\\SLVSCODE`;
+        let remotePath = uri.slice(rootPath.length);
         let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
         outputChannel.appendLine(
           `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
@@ -241,10 +240,9 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       if (localUri) {
-        if (vscode.workspace.workspaceFolders !== undefined) {
-          const workspaceFolderPath =
-            vscode.workspace.workspaceFolders[0].uri.path;
-          let remotePath = localUri.path.slice(workspaceFolderPath.length);
+        if (config.has("rootPath")) {
+          const rootPath: string = `${config.get("rootPath")}\\SLVSCODE`;
+          let remotePath = localUri.path.slice(rootPath.length);
           let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
           vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
         } else {
