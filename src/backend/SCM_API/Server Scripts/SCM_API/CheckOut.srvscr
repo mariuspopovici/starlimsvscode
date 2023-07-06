@@ -70,7 +70,6 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 	:CASE sType == "APPDS";
 		sItemName := sAppName + "." + sItemName;
         sItemID := oUtils:GetItemGUID(sItemName, sType);
-		usrmes(sItemID);
         DoProc("Enterprise_Data_Providers.CheckOutProvider.CheckOutItem", {sItemID, "AppDataSourceScript", sLang});
 	:EXITCASE;
 	:CASE sType == "HTMLFORMXML" .OR. sType == "HTMLFORMCODE";
