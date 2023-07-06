@@ -15,6 +15,31 @@ security:
   - starlims-password: []
 
 paths:
+  /SCM_API.Search.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.Search.lims` endpoint searches code items matching the provided item name search string
+      operationId: Search
+      parameters:
+        - in: query
+          name: itemName
+          schema:
+            type: string
+          description: The search string used to find code items
+          example: getFolders
+          required: true
+      responses:
+        "200":
+          description: The search operation response (success status and error or search results).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /SCM_API.ClearLog.lims:
     get:
       tags:
@@ -247,6 +272,40 @@ components:
           type: boolean
         Result:
           type: string
+    SearchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items: 
+                $ref: "#/components/schemas/SearchItem"
+    SearchItem:
+      type: object
+      properties:
+        name:
+          type: string
+          example: /Applications/ClientRelations/CLIENT_PROJECT/DataSources/GetFolders.sql
+        type:
+          type: string
+          example: APPDS
+        checkedOutBy:
+          type: string
+          example: SYSADM
+        language:
+          type: string
+          example: SQL
+        isFolder: 
+          type: boolean
+          example: false
+        guid:
+          type: string
+          example: A8C3D515-48A6-E040-AC7A-8617E5DE0FC7
     ClearLogResponse:
       type: object
       properties:
