@@ -1,6 +1,5 @@
 /******************************************************************************
-Description.. :	Search for items and return all matches.
-                Applies currently to scripts only (not XML forms).
+Description.. :	Search for items and return all matches
 Author....... :	DC
 Date......... : 2023-06-29
 *******************************************************************************/;
@@ -24,7 +23,12 @@ oResponse := CreateUDObject({
 sSQL :=
 "select 
 f.DISPLAYTEXT as name,
-'CodeBehind' as type,
+case f.FORMTYPE
+	when 'XFD' then 'XFDFORMCODE'
+	when 'HTML' then 'HTMLFORMCODE'
+	when 'PHONE' then 'PHONEFORMCODE'
+	when 'TABLET' then 'TABLETFORMCODE'
+end as type,
 case f.FORMTYPE
 	when 'XFD' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/CodeBehind/' + f.DISPLAYTEXT
 	when 'HTML' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/CodeBehind/' + f.DISPLAYTEXT
@@ -33,7 +37,8 @@ case f.FORMTYPE
 end as uri,
 f.CHECKEDOUTBY as checkedOutBy,
 'JS' as language,
-'N' as isFolder
+'N' as isFolder,
+f.FORMID as guid
 from LIMSXFDFORMS f
 join LIMSAPPLICATIONS a on a.APPID = f.APPID
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
@@ -42,12 +47,53 @@ where f.FORMNAME like '%" + limsstring(searchStr) + "%'
 union
 
 select
+f.DISPLAYTEXT as name,
+case f.FORMTYPE
+	when 'XFD' then 'XFDFORMXML'
+	when 'HTML' then 'HTMLFORMXML'
+	when 'PHONE' then 'PHONEFORMXML'
+	when 'TABLET' then 'TABLETFORMXML'
+end as type,
+case f.FORMTYPE
+	when 'XFD' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/XML/' + f.DISPLAYTEXT
+	when 'HTML' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/XML/' + f.DISPLAYTEXT
+	when 'PHONE' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/PhoneForms/XML/' + f.DISPLAYTEXT
+	when 'TABLET' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/TabletForms/XML/' + f.DISPLAYTEXT
+end as uri,
+f.CHECKEDOUTBY as checkedOutBy,
+'XML' as language,
+'N' as isFolder,
+f.FORMID as guid
+from LIMSXFDFORMS f
+join LIMSAPPLICATIONS a on a.APPID = f.APPID
+join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+where f.FORMNAME like '%" + limsstring(searchStr) + "%'
+
+union
+
+select
+f.DISPLAYTEXT as name,
+'HTMLFORMGUIDE' as type,
+'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/Guide/' + f.DISPLAYTEXT as uri,
+f.CHECKEDOUTBY as checkedOutBy,
+'JSON' as language,
+'N' as isFolder,
+f.FORMID as guid
+from LIMSXFDFORMS f
+join LIMSAPPLICATIONS a on a.APPID = f.APPID
+join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+where f.FORMNAME like '%" + limsstring(searchStr) + "%'
+and f.FORMTYPE = 'HTML'
+
+union
+select
 s.DISPLAYTEXT as name, 
-'AppServerScript' as type,
+'APPSS' as type,
 '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ServerScripts/' + s.DISPLAYTEXT as URI,
 s.CHECKEDOUTBY as checkedOutBy,
 s.SCRIPTLANGUAGE as language,
-'N' as isFolder
+'N' as isFolder,
+s.SCRIPTID as guid
 from LIMSAPPLICATIONS a
 join LIMSAPPSERVERSCRIPTS aps on aps.APPID = a.APPID
 join LIMSSERVERSCRIPTS s on s.SCRIPTID = aps.SCRIPTID
@@ -58,11 +104,12 @@ union
 
 select
 s.DISPLAYTEXT as name,
-'AppClientScript' as type,
+'APPCS' as type,
 '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ClientScripts/' + s.DISPLAYTEXT as uri,
 s.CHECKEDOUTBY as checkedOutBy,
 s.SCRIPTLANGUAGE as language,
-'N' as isFolder
+'N' as isFolder,
+s.SCRIPTID as guid
 from LIMSAPPLICATIONS a
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 join LIMSAPPCLIENTSCRIPTS apc on apc.APPID = a.APPID
@@ -73,11 +120,12 @@ union
 
 select
 s.DISPLAYTEXT as name, 
-'AppDataSource' as type,
+'APPDS' as type,
 '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/DataSources/' + s.DISPLAYTEXT as uri,
 s.CHECKEDOUTBY as checkedOutBy,
 s.SCRIPTLANGUAGE as language,
-'N' as isFolder
+'N' as isFolder,
+s.DATASOURCEID as guid
 from LIMSAPPLICATIONS a
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 join LIMSAPPDATASOURCES aps on aps.APPID = a.APPID
@@ -88,11 +136,12 @@ union
 
 select
 s.DISPLAYTEXT as name,
-'ServerScript' as type,
+'SS' as type,
 '/ServerScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
 s.CHECKEDOUTBY as checkedOutBy,
 s.SCRIPTLANGUAGE as language,
-'N' as isFolder
+'N' as isFolder,
+s.SCRIPTID as guid
 from LIMSSERVERSCRIPTCATEGORIES c
 join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
 where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
@@ -101,11 +150,12 @@ union
 
 select
 s.DISPLAYTEXT as name,
-'DataSource' as type,
+'DS' as type,
 '/DataSources/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
 s.CHECKEDOUTBY as checkedOutBy,
 s.SCRIPTLANGUAGE as language,
-'N' as isFolder
+'N' as isFolder,
+s.DATASOURCEID as guid
 from LIMSDATASOURCECATEGORIES c
 join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
 where s.DSNAME like '%" + limsstring(searchStr) + "%'
@@ -114,11 +164,12 @@ union
 
 select
 s.DISPLAYTEXT as name,
-'ClientScript' as type,
+'CS' as type,
 '/ClientScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
 s.CHECKEDOUTBY as checkedOutBy,
 s.SCRIPTLANGUAGE as language,
-'N' as isFolder
+'N' as isFolder,
+s.SCRIPTID as guid
 from LIMSCLIENTSCRIPTCATEGORIES c
 join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
 where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
@@ -145,7 +196,8 @@ aResultItems := {};
 		{"uri", aItems[i][3]},
 		{"checkedOutBy", aItems[i][4]},
 		{"language", sLanguage},
-		{"isFolder", .F.}
+		{"isFolder", .F.},
+		{"guid", aItems[i][7]}
 	}));
 	AAdd(aResultItems, oItem);
 :NEXT;

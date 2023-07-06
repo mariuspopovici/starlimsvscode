@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>65E1F8BC-4913-4C73-A130-5B6095039004</ItemID>
+  <ItemID>B8310F89-23CE-4AE1-9AA1-E95C13739DAA</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-06-26T11:59:00.9644453+02:00</PackageDate>
+  <PackageDate>2023-07-06T12:58:31.9740945+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -13,7 +13,7 @@
     <ServerScriptCategory>
       <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>300</LayerId>
+      <LayerId>200</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
@@ -111,25 +111,25 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
-          <ItemName>Utils</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\Utils.srvscr</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ServerScript>
-          <ServerScript>
           <ItemID>21B76144-2A16-4372-B767-A5B47753CD0E</ItemID>
           <ItemName>Search</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\Search.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
+          <ItemName>Utils</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\Utils.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>

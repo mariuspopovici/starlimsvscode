@@ -121,15 +121,15 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS"
+          "when": "view == STARLIMS && (viewItem == SS || view == STARLIMS && viewItem == DS || viewItem == APPSS || viewItem == APPDS)"
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+          "when": "view == STARLIMS && viewItem != SERVERLOG"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+          "when": "view == STARLIMS && viewItem != SERVERLOG"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
