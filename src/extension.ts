@@ -77,7 +77,6 @@ export async function activate(context: vscode.ExtensionContext) {
     if (newRootPath) {
       await config.update("rootPath", rootPath, false);
       reloadConfig = true;
-      rootPath = newRootPath + "\\SLVSCODE\\";
     } else {
       vscode.window.showErrorMessage(
         "Please configure STARLIMS root path in extension settings."
@@ -85,6 +84,8 @@ export async function activate(context: vscode.ExtensionContext) {
       return;
     }
   }
+
+  rootPath = rootPath + "\\SLVSCODE\\";
 
   // reload the configuration if it was updated
   if (reloadConfig) {
@@ -306,68 +307,63 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Save",
     async (item: TreeEnterpriseItem) => {
+      var rootPath: string = config.get("rootPath") + "\\SLVSCODE\\".toString();
       const editor = vscode.window.activeTextEditor;
-      if (editor) {
+
+      if (editor && rootPath) {
         var localUri = editor.document.uri;
         if (localUri) {
-          if (vscode.workspace.workspaceFolders !== undefined) {
-            const workspaceFolderPath =
-              vscode.workspace.workspaceFolders[0].uri.path;
-            let remotePath = localUri.path.slice(workspaceFolderPath.length);
-            enterpriseService.saveEnterpriseItemCode(
-              remotePath,
-              editor.document.getText()
-            );
-          }
+          let remotePath = localUri.path.slice(rootPath.length);
+          enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
         }
       }
     }
   );
 
-  // register the clear log command
-  vscode.commands.registerCommand("STARLIMS.ClearLog",
-    async (item: TreeEnterpriseItem) => {
-      // ask for confirmation
-      const confirm = await vscode.window.showWarningMessage(
-        `Are you sure you want to clear the log for ${item.label}?`,
-        { modal: true },
-        "Yes"
-      );
-      if (confirm !== "Yes") {
-        return;
-      }
-      enterpriseService.clearLog(item.uri);
+// register the clear log command
+vscode.commands.registerCommand("STARLIMS.ClearLog",
+  async (item: TreeEnterpriseItem) => {
+    // ask for confirmation
+    const confirm = await vscode.window.showWarningMessage(
+      `Are you sure you want to clear the log for ${item.label}?`,
+      { modal: true },
+      "Yes"
+    );
+    if (confirm !== "Yes") {
+      return;
     }
-  );
+    enterpriseService.clearLog(item.uri);
+  }
+);
 
-  // register the search command
-  vscode.commands.registerCommand("STARLIMS.Search",
-    async (item: TreeEnterpriseItem) => {
-      // ask for search text
-      const itemName = await vscode.window.showInputBox({
-        prompt: "Enter search text",
-        ignoreFocusOut: true
-      });
-      if (!itemName) {
-        return;
-      }
-      await enterpriseProvider.search(itemName);
+// register the search command
+vscode.commands.registerCommand("STARLIMS.Search",
+  async (item: TreeEnterpriseItem) => {
+    // ask for search text
+    const itemName = await vscode.window.showInputBox({
+      prompt: "Enter search text",
+      ignoreFocusOut: true
+    });
+    if (!itemName) {
+      return;
     }
-  );
+    await enterpriseProvider.search(itemName);
+  }
+);
 
-  // register the open form command
-  vscode.commands.registerCommand("STARLIMS.OpenForm",
-    async (item: TreeEnterpriseItem) => {
-      if (item.guid === undefined) {
-        return;
-      }
-      // open form in default browser
-      const formUrl = `${config.url}starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
-      vscode.env.openExternal(vscode.Uri.parse(formUrl));
+// register the open form command
+vscode.commands.registerCommand("STARLIMS.OpenForm",
+  async (item: TreeEnterpriseItem) => {
+    if (item.guid === undefined) {
+      return;
     }
-  );
+    // open form in default browser
+    const formUrl = `${config.url}starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
+    vscode.env.openExternal(vscode.Uri.parse(formUrl));
+  }
+);
 
-  vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
+vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
 }
 
 // this method is called when your extension is deactivated
