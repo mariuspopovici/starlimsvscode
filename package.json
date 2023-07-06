@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.3",
+  "version": "1.2.8",
   "publisher": "Marius Popovici, Christoph Döllinger",
   "keywords": [
     "STARLIMS",
@@ -70,7 +70,7 @@
       },
       {
         "command": "STARLIMS.Save",
-        "title": "Save Script"
+        "title": "Save File"
       },
       {
         "command": "STARLIMS.ClearLog",
@@ -79,9 +79,41 @@
       {
         "command": "STARLIMS.selectEnterpriseItem",
         "title": "Refresh Log"
+      },
+      {
+        "command": "STARLIMS.Search",
+        "title": "Search for items...",
+        "icon": {
+          "dark": "resources/dark/search.svg",
+          "light": "resources/light/search.svg"
+        }
+      },
+      {
+        "command": "STARLIMS.ShowTreeView",
+        "title": "Show/Refresh Tree View",
+        "icon": {
+          "dark": "resources/dark/treeview.svg",
+          "light": "resources/light/treeview.svg"
+        }
+      },
+      {
+        "command": "STARLIMS.OpenForm",
+        "title": "Open Form"
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "STARLIMS.ShowTreeView",
+          "when": "view == STARLIMS",
+          "group": "navigation"
+        },
+        {
+          "command": "STARLIMS.Search",
+          "when": "view == STARLIMS",
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "STARLIMS.Refresh",
@@ -89,19 +121,23 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS"
+          "when": "view == STARLIMS && (viewItem == SS || view == STARLIMS && viewItem == DS || viewItem == APPSS || viewItem == APPDS)"
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+          "when": "view == STARLIMS && viewItem != SERVERLOG"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS && viewItem == HTMLFORMCODE || view == STARLIMS && viewItem == HTMLFORMXML || view == STARLIMS && viewItem == XFDFORMCODE || view == STARLIMS && viewItem == XFDFORMXML || view == STARLIMS && viewItem == SS || view == STARLIMS && viewItem == DS || view == STARLIMS && viewItem == CS || view == STARLIMS && viewItem == APPSS || view == STARLIMS && viewItem == APPDS || view == STARLIMS && viewItem == APPCS || view == STARLIMS && viewItem == HTMLFORMGUIDE"
+          "when": "view == STARLIMS && viewItem != SERVERLOG"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
           "when": "view == STARLIMS && viewItem == SERVERLOG"
+        },
+        {
+          "command": "STARLIMS.OpenForm",
+          "when": "view == STARLIMS && viewItem == HTMLFORMXML"
         }
       ],
       "explorer/context": [
@@ -110,28 +146,34 @@
           "when": "view != STARLIMS"
         },
         {
-          "command": "STARLIMS.Checkout"
+          "command": "STARLIMS.Checkout",
+          "when": "view == STARLIMS"
         },
         {
-          "command": "STARLIMS.Checkin"
+          "command": "STARLIMS.Checkin",
+          "when": "view == STARLIMS"
         }
       ],
       "editor/context": [
         {
           "command": "STARLIMS.Compare",
-          "when": "!editorReadonly && editorLangId != 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "editorLangId == 'SSL'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL'"
         },
         {
           "command": "STARLIMS.Save",
-          "when": "!editorReadonly && editorLangId != 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
-          "when": "!editorReadonly && editorLangId == 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
+        },
+        {
+          "command": "STARLIMS.ClearLog",
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
         }
       ]
     },
@@ -154,6 +196,11 @@
             "type": "string",
             "default": "",
             "description": "STARLIMS User Password"
+          },
+          "STARLIMS.rootPath": {
+            "type": "string",
+            "default": "",
+            "description": "Root path for temporary STARLIMS files. For example: C:\\STARLIMS\\. SLVSCODE will be appended to this path."
           }
         }
       }
@@ -172,6 +219,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
+    "@types/jsdom": "^21.1.1",
     "@types/mocha": "^9.1.0",
     "@types/node": "^14.18.12",
     "@types/node-fetch": "^2.6.4",
@@ -188,6 +236,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "jsdom": "^22.1.0",
     "node-fetch": "^2.6.7"
   }
 }

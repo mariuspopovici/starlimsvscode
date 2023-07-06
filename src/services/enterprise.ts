@@ -2,7 +2,7 @@
  * Defines the interface for STARLIMS enterprise services.
  */
 export interface Enterprise {
-  getEnterpriseItem(uri: string): any;
+  getEnterpriseItems(uri: string): any;
   getEnterpriseItemCode(uri: string): any;
   getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean): Promise<string | null>;
   getConfig(): any;
@@ -11,4 +11,5 @@ export interface Enterprise {
   clearLog(uri: string): any;
   getEnterpriseItemUri(uri: string, rootPath: string): any;
   scrollToBottom(): any;
+  searchForItems(searchText: string): any;
 }

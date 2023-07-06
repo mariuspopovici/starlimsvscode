@@ -10,32 +10,9 @@
   <OverwriteLayer>false</OverwriteLayer>
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>CFB0DA44-50D0-E546-9084-2962BEB4EC33</ItemID>
-      <ItemName>Enterprise_Data_Providers</ItemName>
-      <LayerId>300</LayerId>
-      <ItemDescription />
-      <IsMandatory>false</IsMandatory>
-      <ItemBehaviour>merge</ItemBehaviour>
-      <ItemIsSystem>N</ItemIsSystem>
-      <ServerScriptCollection>
-        <ServerScript>
-          <ItemID>455E83C1-933F-B949-8006-D77902629B98</ItemID>
-          <ItemName>NameTranslators</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>Enterprise_Data_Providers</ItemCategory>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ServerScript>
-      </ServerScriptCollection>
-    </ServerScriptCategory>
-    <ServerScriptCategory>
       <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>300</LayerId>
+      <LayerId>200</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
@@ -116,6 +93,18 @@
         <ServerScript>
           <ItemID>DA13B299-C2B1-4DE1-B8A8-3F3EBF35131A</ItemID>
           <ItemName>SaveCode</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>21B76144-2A16-4372-B767-A5B47753CD0E</ItemID>
+          <ItemName>Search</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
