@@ -3,9 +3,13 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { EnterpriseFileDecorationProvider } from "./providers/enterpriseFileDecorationProvider";
-import { EnterpriseTreeDataProvider, TreeEnterpriseItem } from "./providers/enterpriseTreeDataProvider";
+import {
+  EnterpriseTreeDataProvider,
+  TreeEnterpriseItem,
+} from "./providers/enterpriseTreeDataProvider";
 import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
+import path = require("path");
 
 export async function activate(context: vscode.ExtensionContext) {
   let config = vscode.workspace.getConfiguration("STARLIMS");
@@ -38,7 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
     user = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
       prompt: "Enter STARLIMS Username",
-      ignoreFocusOut: true
+      ignoreFocusOut: true,
     });
     if (user) {
       await config.update("user", user.toUpperCase(), false);
@@ -55,7 +59,7 @@ export async function activate(context: vscode.ExtensionContext) {
       title: "Configure STARLIMS",
       prompt: `Enter Password for STARLIMS User '${user}'`,
       password: true,
-      ignoreFocusOut: true
+      ignoreFocusOut: true,
     });
     if (password) {
       await config.update("password", password, false);
@@ -72,10 +76,10 @@ export async function activate(context: vscode.ExtensionContext) {
     let newRootPath = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
       prompt: "Enter STARLIMS Root Path",
-      ignoreFocusOut: true
+      ignoreFocusOut: true,
     });
     if (newRootPath) {
-      await config.update("rootPath", rootPath, false);
+      await config.update("rootPath", newRootPath, false);
       reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
@@ -85,7 +89,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  rootPath = rootPath + "\\SLVSCODE\\";
+  rootPath = path.join(config.get("rootPath") as string, "SLVSCODE");
 
   // reload the configuration if it was updated
   if (reloadConfig) {
@@ -102,7 +106,10 @@ export async function activate(context: vscode.ExtensionContext) {
   const enterpriseTextContentProvider =
     new EnterpriseTextDocumentContentProvider(enterpriseService);
   context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider("starlims", enterpriseTextContentProvider)
+    vscode.workspace.registerTextDocumentContentProvider(
+      "starlims",
+      enterpriseTextContentProvider
+    )
   );
 
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
@@ -124,8 +131,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // this command activates the extension
-  vscode.commands.registerCommand(
-    "STARLIMS.Connect", () => { });
+  vscode.commands.registerCommand("STARLIMS.Connect", () => {});
 
   // register the selectEnterpriseItem command
   vscode.commands.registerCommand(
@@ -134,7 +140,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // check if item is TreeEnterpriseItem
       if (!(item instanceof TreeEnterpriseItem)) {
         // if not, get the item from the tree data provider
-        item = enterpriseProvider.getTreeItemForDocument(item) as TreeEnterpriseItem;
+        item = enterpriseProvider.getTreeItemForDocument(
+          item
+        ) as TreeEnterpriseItem;
       }
 
       // open leaf nodes only
@@ -149,9 +157,11 @@ export async function activate(context: vscode.ExtensionContext) {
       if (openDocument) {
         // reload document, if it is a log file
         if (openDocument.uri.toString().endsWith(".log")) {
-
           // get the remote URI
-          const remoteUri = enterpriseService.getEnterpriseItemUri(item.uri, rootPath!);
+          const remoteUri = enterpriseService.getEnterpriseItemUri(
+            item.uri,
+            rootPath!
+          );
 
           // update local copy
           await enterpriseService.getLocalCopy(remoteUri, rootPath!);
@@ -161,15 +171,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
           // scroll to bottom of document
           enterpriseService.scrollToBottom();
-        }
-        else {
+        } else {
           // other file types, just show the document
           await vscode.window.showTextDocument(openDocument);
         }
-      }
-      else {
+      } else {
         // get local copy of the item
-        const localFilePath = await enterpriseService.getLocalCopy(item.uri, rootPath!);
+        const localFilePath = await enterpriseService.getLocalCopy(
+          item.uri,
+          rootPath!
+        );
 
         // open the file locally
         if (localFilePath) {
@@ -192,7 +203,10 @@ export async function activate(context: vscode.ExtensionContext) {
     async (item: TreeEnterpriseItem | any) => {
       // get local copy of the item
       const localFilePath = await enterpriseService.getLocalCopy(
-        item.uri || (item.path ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined),
+        item.uri ||
+          (item.path
+            ? item.path.slice(0, item.path.lastIndexOf("."))
+            : undefined),
         rootPath!
       );
       if (localFilePath) {
@@ -210,7 +224,10 @@ export async function activate(context: vscode.ExtensionContext) {
         ? item.path.slice(0, item.path.lastIndexOf("."))
         : undefined;
       if (config.has("rootPath")) {
-        const rootPath: string = `${config.get("rootPath")}\\SLVSCODE`;
+        const rootPath: string = path.join(
+          config.get("rootPath") as string,
+          "SLVSCODE"
+        );
         let remotePath = uri.slice(rootPath.length);
         let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
         outputChannel.appendLine(
@@ -241,7 +258,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
       if (localUri) {
         if (config.has("rootPath")) {
-          const rootPath: string = `${config.get("rootPath")}\\SLVSCODE`;
+          const rootPath: string = path.join(
+            config.get("rootPath") as string,
+            "SLVSCODE"
+          );
           let remotePath = localUri.path.slice(rootPath.length);
           let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
           vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
@@ -273,10 +293,11 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Checkin",
     async (item: TreeEnterpriseItem) => {
-      let checkinReason: string = (await vscode.window.showInputBox({
-        prompt: "Enter checkin reason",
-        ignoreFocusOut: true,
-      })) || "Checked in from VSCode";
+      let checkinReason: string =
+        (await vscode.window.showInputBox({
+          prompt: "Enter checkin reason",
+          ignoreFocusOut: true,
+        })) || "Checked in from VSCode";
 
       let bSuccess = await enterpriseService.CheckIn(item.uri, checkinReason);
       if (bSuccess) {
@@ -305,7 +326,10 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Save",
     async (item: TreeEnterpriseItem) => {
-      var rootPath: string = config.get("rootPath") + "\\SLVSCODE".toString();
+      const rootPath: string = path.join(
+        config.get("rootPath") as string,
+        "SLVSCODE"
+      );
       const editor = vscode.window.activeTextEditor;
 
       if (editor && rootPath) {
@@ -313,57 +337,67 @@ export async function activate(context: vscode.ExtensionContext) {
         if (localUri) {
           let remotePath = localUri.path.slice(rootPath.length);
           console.log("Opening file: " + remotePath);
-          enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
+          enterpriseService.saveEnterpriseItemCode(
+            remotePath,
+            editor.document.getText()
+          );
         }
       }
     }
   );
 
-// register the clear log command
-vscode.commands.registerCommand("STARLIMS.ClearLog",
-  async (item: TreeEnterpriseItem) => {
-    // ask for confirmation
-    const confirm = await vscode.window.showWarningMessage(
-      `Are you sure you want to clear the log for ${item.label}?`,
-      { modal: true },
-      "Yes"
-    );
-    if (confirm !== "Yes") {
-      return;
+  // register the clear log command
+  vscode.commands.registerCommand(
+    "STARLIMS.ClearLog",
+    async (item: TreeEnterpriseItem) => {
+      // ask for confirmation
+      const confirm = await vscode.window.showWarningMessage(
+        `Are you sure you want to clear the log for ${item.label}?`,
+        { modal: true },
+        "Yes"
+      );
+      if (confirm !== "Yes") {
+        return;
+      }
+      enterpriseService.clearLog(item.uri);
     }
-    enterpriseService.clearLog(item.uri);
-  }
-);
+  );
 
-// register the search command
-vscode.commands.registerCommand("STARLIMS.Search",
-  async (item: TreeEnterpriseItem) => {
-    // ask for search text
-    const itemName = await vscode.window.showInputBox({
-      prompt: "Enter search text",
-      ignoreFocusOut: true
-    });
-    if (!itemName) {
-      return;
+  // register the search command
+  vscode.commands.registerCommand(
+    "STARLIMS.Search",
+    async (item: TreeEnterpriseItem) => {
+      // ask for search text
+      const itemName = await vscode.window.showInputBox({
+        prompt: "Enter search text",
+        ignoreFocusOut: true,
+      });
+      if (!itemName) {
+        return;
+      }
+      await enterpriseProvider.search(itemName);
     }
-    await enterpriseProvider.search(itemName);
-  }
-);
+  );
 
-// register the open form command
-vscode.commands.registerCommand("STARLIMS.OpenForm",
-  async (item: TreeEnterpriseItem) => {
-    if (item.guid === undefined) {
-      return;
+  // register the open form command
+  vscode.commands.registerCommand(
+    "STARLIMS.OpenForm",
+    async (item: TreeEnterpriseItem) => {
+      if (item.guid === undefined) {
+        return;
+      }
+      // open form in default browser
+      const formUrl = `${
+        config.url
+      }starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
+      vscode.env.openExternal(vscode.Uri.parse(formUrl));
     }
-    // open form in default browser
-    const formUrl = `${config.url}starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
-    vscode.env.openExternal(vscode.Uri.parse(formUrl));
-  }
-);
+  );
 
-vscode.window.showInformationMessage(`Connected to STARLIMS on ${config.url}.`);
+  vscode.window.showInformationMessage(
+    `Connected to STARLIMS on ${config.url}.`
+  );
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
