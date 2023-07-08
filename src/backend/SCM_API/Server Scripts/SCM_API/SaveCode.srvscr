@@ -44,6 +44,8 @@ String := "";
 :ENDIF;
 
 /* check for code;
+:DECLARE sCode;
+sCode := "";
 :IF !Empty(oPayload) .AND. oPayload:IsProperty("Code");
     sCode := oPayload:Code;
 :ELSE;
@@ -123,8 +125,9 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 		sItemName := sAppName + "." + sItemName;
 		sItemID := oUtils:GetItemGUID(sItemName, sType);
 		:TRY;
-			DoProc("SaveGuideScript", {sItemId, sCode});
+			DoProc("SaveGuideScript", {sItemId, sCode, sLang});
 		:CATCH;
+			:DECLARE Error;
 			Error := GetLastSSLError();
 			UsrMes("ERROR", Error:FullDescription);
 			:IF Error:Code = 3574;
@@ -145,9 +148,10 @@ oResponse:data := "Done";
 :RETURN oResponse;
 
 :PROCEDURE SaveGuideScript;
-:PARAMETERS sItemId, sCode;
+:PARAMETERS sItemId, sCode, sLang;
+:DEFAULT sLang, GetSetting("DEFAULTLANGUAGE");
 
-	:DECLARE sResourcesXML, oResourcesDS, nIterator, sKey, sValue, bFound;
+	:DECLARE sResourcesXML, oResourcesDS, nIterator, sKey, bFound;
 	sResourcesXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {sItemID, sLang}));
 	oResourcesDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResourcesXML});
 	bFound := .F.;
