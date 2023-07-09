@@ -46,6 +46,8 @@ function main() {
   // a given toolkit component can be imported and used to type cast a reference
   // to the element (i.e. the `as Button` syntax)
   setVSCodeMessageListener();
+
+  // request data
   vscode.postMessage({ command: "requestDataSourceResultsData" });
 }
 
@@ -54,11 +56,16 @@ function setVSCodeMessageListener() {
     const command = event.data.command;
     const data = JSON.parse(event.data.payload);
 
+    // handle messages
     switch (command) {
       case "receiveDataSourceResultData":
+        // load fresh data in the data grid
         const grid = document.getElementById("data-source-grid") as DataGrid;
         const title = document.getElementById("title") as HTMLElement;
-        title.innerHTML = event.data.name;
+
+        if (title) {
+          title.innerHTML = event.data.name;
+        }
 
         if (grid) {
           const [columns, ...rows] = data;
@@ -69,15 +76,16 @@ function setVSCodeMessageListener() {
                 value: row[colIndex] === null ? "NULL" : row[colIndex],
               });
             });
+
+            // set grid column widths
             //TODO: replace 150px below with max-content when this is fixed: https://github.com/microsoft/vscode-webview-ui-toolkit/issues/473
             grid.setAttribute(
               "grid-template-columns",
               columns.map(() => `150px`).join(` `)
             );
+
             return rowObject;
           });
-
-          debugger;
         }
         break;
     }

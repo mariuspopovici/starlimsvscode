@@ -426,7 +426,7 @@ export async function activate(context: vscode.ExtensionContext) {
       );
       const result = await enterpriseService.runScript(remoteUri);
       if (result) {
-        outputChannel.appendLine(result);
+        outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
         outputChannel.show();
         DataViewPanel.render(context.extensionUri, {
           name: remoteUri.toString(),

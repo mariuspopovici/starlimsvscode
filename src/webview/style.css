@@ -9,7 +9,7 @@ body {
   align-items: center;
 }
 
-.results-grid {
+section {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -17,8 +17,11 @@ body {
   margin-bottom: 20px;
   width: 90%;
   overflow-x: scroll;
+  justify-content: flex-start;
+  margin: 1rem;
+  padding: 1rem;
 }
 
-.results-grid > p {
-  margin-bottom: 0.5rem;
+h1 {
+  font-size: 1.5em;
 }
