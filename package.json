@@ -169,11 +169,11 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL' && !(resourcePath =~ /DataSources/)"
         },
         {
           "command": "STARLIMS.RunDataSource",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SLSQL'"
+          "when": "resourceDirname =~ /SLVSCODE/ && (editorLangId == 'SLSQL' || (editorLangId == 'SSL' && resourcePath =~ /DataSources/))"
         },
         {
           "command": "STARLIMS.Save",
