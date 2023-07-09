@@ -10,6 +10,7 @@ import {
 import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 import path = require("path");
+import { DataViewPanel } from "./panels/DataViewPanel";
 
 export async function activate(context: vscode.ExtensionContext) {
   let config = vscode.workspace.getConfiguration("STARLIMS");
@@ -220,24 +221,30 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.RunScript",
     async (item: TreeEnterpriseItem | any) => {
-      const uri = item.path
-        ? item.path.slice(0, item.path.lastIndexOf("."))
-        : undefined;
-      if (config.has("rootPath")) {
-        const rootPath: string = path.join(
-          config.get("rootPath") as string,
-          "SLVSCODE"
-        );
-        let remotePath = uri.slice(rootPath.length);
-        let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
-        outputChannel.appendLine(
-          `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
-        );
-        const result = await enterpriseService.runScript(remoteUri.toString());
-        if (result) {
-          outputChannel.appendLine(result);
-          outputChannel.show();
+      let remoteUri: string = "";
+      if (item instanceof TreeEnterpriseItem) {
+        remoteUri = item.uri;
+      } else {
+        const uri = item.path
+          ? item.path.slice(0, item.path.lastIndexOf("."))
+          : undefined;
+        if (config.has("rootPath")) {
+          const rootPath: string = path.join(
+            config.get("rootPath") as string,
+            "SLVSCODE"
+          );
+          let remotePath = uri.slice(rootPath.length);
+          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
         }
+      }
+
+      outputChannel.appendLine(
+        `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
+      );
+      const result = await enterpriseService.runScript(remoteUri.toString());
+      if (result) {
+        outputChannel.appendLine(result);
+        outputChannel.show();
       }
     }
   );
@@ -391,6 +398,41 @@ export async function activate(context: vscode.ExtensionContext) {
         config.url
       }starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
       vscode.env.openExternal(vscode.Uri.parse(formUrl));
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.RunDataSource",
+    async (item: TreeEnterpriseItem | any) => {
+      let remoteUri: string = "";
+      if (item instanceof TreeEnterpriseItem) {
+        remoteUri = item.uri;
+      } else {
+        const uri = item.path
+          ? item.path.slice(0, item.path.lastIndexOf("."))
+          : undefined;
+        if (config.has("rootPath")) {
+          const rootPath: string = path.join(
+            config.get("rootPath") as string,
+            "SLVSCODE"
+          );
+          let remotePath = uri.slice(rootPath.length);
+          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
+        }
+      }
+
+      outputChannel.appendLine(
+        `${new Date().toLocaleString()} Executing remote data source at URI: ${remoteUri}`
+      );
+      const result = await enterpriseService.runScript(remoteUri);
+      if (result) {
+        outputChannel.appendLine(result);
+        outputChannel.show();
+        DataViewPanel.render(context.extensionUri, {
+          name: remoteUri.toString(),
+          data: result,
+        });
+      }
     }
   );
 
