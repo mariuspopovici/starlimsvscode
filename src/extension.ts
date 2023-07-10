@@ -12,6 +12,8 @@ import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTex
 import path = require("path");
 import { DataViewPanel } from "./panels/DataViewPanel";
 
+const SLVSCODE_FOLDER = "SLVSCODE";
+
 export async function activate(context: vscode.ExtensionContext) {
   let config = vscode.workspace.getConfiguration("STARLIMS");
   let user: string | undefined = config.get("user");
@@ -90,7 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  rootPath = path.join(config.get("rootPath") as string, "SLVSCODE");
+  rootPath = path.join(config.get("rootPath") as string, SLVSCODE_FOLDER);
 
   // reload the configuration if it was updated
   if (reloadConfig) {
@@ -231,9 +233,10 @@ export async function activate(context: vscode.ExtensionContext) {
         if (config.has("rootPath")) {
           const rootPath: string = path.join(
             config.get("rootPath") as string,
-            "SLVSCODE"
+            SLVSCODE_FOLDER
           );
-          let remotePath = uri.slice(rootPath.length);
+          
+          let remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
           remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
         }
       }
@@ -267,7 +270,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (config.has("rootPath")) {
           const rootPath: string = path.join(
             config.get("rootPath") as string,
-            "SLVSCODE"
+            SLVSCODE_FOLDER
           );
           let remotePath = localUri.path.slice(rootPath.length);
           let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
@@ -335,7 +338,7 @@ export async function activate(context: vscode.ExtensionContext) {
     async (item: TreeEnterpriseItem) => {
       const rootPath: string = path.join(
         config.get("rootPath") as string,
-        "SLVSCODE"
+        SLVSCODE_FOLDER
       );
       const editor = vscode.window.activeTextEditor;
 
@@ -414,9 +417,9 @@ export async function activate(context: vscode.ExtensionContext) {
         if (config.has("rootPath")) {
           const rootPath: string = path.join(
             config.get("rootPath") as string,
-            "SLVSCODE"
+            SLVSCODE_FOLDER
           );
-          let remotePath = uri.slice(rootPath.length);
+          let remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
           remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
         }
       }
