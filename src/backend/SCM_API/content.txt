@@ -1,12 +1,14 @@
 Package Name: SCM_API
-Package Date: 2023-07-06 12:58:31
+Package Date: 2023-07-10 14:35:24
 
 Exported languages: English.
 
 Server Script Category: SCM_API
+	- Add
 	- CheckIn
 	- CheckOut
 	- ClearLog
+	- Delete
 	- GetCode
 	- GetEnterpriseItems
 	- RunScript

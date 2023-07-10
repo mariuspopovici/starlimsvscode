@@ -19,6 +19,18 @@
       <ItemIsSystem>N</ItemIsSystem>
       <ServerScriptCollection>
         <ServerScript>
+          <ItemID>7E22EE13-31C9-481A-911A-9E8DB1DABB35</ItemID>
+          <ItemName>Add</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>F165D253-C777-4D9B-944D-57CFC4A606D1</ItemID>
           <ItemName>CheckIn</ItemName>
           <LayerId>300</LayerId>
@@ -45,6 +57,18 @@
         <ServerScript>
           <ItemID>318A1AF2-1CE8-4001-8F32-48E7F2E8B68F</ItemID>
           <ItemName>ClearLog</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>7445A3F4-6415-43EF-9AB8-AEB977A6500C</ItemID>
+          <ItemName>Delete</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>

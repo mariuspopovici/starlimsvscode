@@ -55,27 +55,27 @@ export class EnterpriseTreeDataProvider
 
     // if no element is passed, start from root
     var uri: string = element ? element.uri : "";
-   
+
     // add mode - get all enterprise items
-    if(this.dataMode === "LOAD") {
+    if (this.dataMode === "LOAD") {
       treeItems = await this.service.getEnterpriseItems(uri);
     }
     // clear mode - clear the tree
-    else if(this.dataMode === "CLEAR") {
+    else if (this.dataMode === "CLEAR") {
       this.treeItems = [];
       return this.treeItems;
     }
     // search mode - search for items
-    else if(this.dataMode === "SEARCH") {
-      if(this.treeItems.length === 0) {
+    else if (this.dataMode === "SEARCH") {
+      if (this.treeItems.length === 0) {
         throw new Error("No items found!");
       }
       treeItems = this.treeItems;
     }
-    if(treeItems === undefined) {
+    if (treeItems === undefined) {
       throw new Error("No items found!");
     }
-
+  
     // loop through the items and create new tree items
     const _this = this;
     treeItems.forEach(function (item: any) {
@@ -97,15 +97,17 @@ export class EnterpriseTreeDataProvider
         title: "Select Node",
         arguments: [newItem]
       };
-      
+
       newItem.contextValue = item.type;
       newItem.iconPath = _this.getItemIcon(item);
-      newItem.label = item.checkedOutBy? `${newItem.label} (Checked out by ${item.checkedOutBy})` : newItem.label;
+      newItem.label = item.checkedOutBy ? `${newItem.label} (Checked out by ${item.checkedOutBy})` : newItem.label;
       newItem.resourceUri = _this.getItemResource(item);
       returnItems.push(newItem);
     });
+    
+    // save the tree items for getTreeItemByUri method
+    this.treeItems = returnItems;
 
-    //this.treeItems = newTreeItems;
     return returnItems;
   }
 
@@ -119,11 +121,57 @@ export class EnterpriseTreeDataProvider
   }
 
   /**
+   * Get corresponding tree item from open document
+   * @param document The document to get the tree item for
+   * @returns The tree item for the document
+   */
+  getTreeItemForDocument(
+    document: any
+  ): TreeEnterpriseItem {
+    const filePath = document.fsPath;
+    const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+    const enterpriseUri = "starlims:///" + filePath.replace(/\\/g, "/") + "/";
+    const guid = document.guid;
+    const enterpriseItem = new TreeEnterpriseItem(
+      EnterpriseItemType.Application,
+      fileName,
+      "en",
+      enterpriseUri,
+      vscode.TreeItemCollapsibleState.None,
+      undefined,
+      filePath,
+      guid
+    );
+    enterpriseItem.iconPath = new vscode.ThemeIcon("file-code");
+    return enterpriseItem;
+  }
+
+  /**
+   * Search for tree item by its name and return first match
+   * @param name The name of the tree item to search for
+   * @returns The tree item for the document
+   */
+  async getTreeItemByName(name: string): Promise<TreeEnterpriseItem | undefined> {
+    const enterpriseItems: TreeEnterpriseItem[] = this.treeItems;
+    return enterpriseItems.find((item) => item.label === name);
+  }
+
+  /**
+   * Search for tree item by its uri and return first match
+   * @param uri The uri of the tree item to search for
+   * @returns The tree item for the document
+   */
+  async getTreeItemByUri(uri: string): Promise<TreeEnterpriseItem | undefined> {
+    const enterpriseItems: TreeEnterpriseItem[] = this.treeItems;
+    return enterpriseItems.find((item) => item.uri === uri);
+  }
+
+  /**
    *  Returns a URI for the item if it is checked out by the current user.
    * @param item The item to check
    * @returns A URI for the item if it is checked out by the current user, otherwise undefined.
    */
-  private getItemResource(item: any): vscode.Uri | undefined {
+private getItemResource(item: any): vscode.Uri | undefined {
     const config = this.service.getConfig();
     let resourceUri = undefined;
     if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
@@ -173,42 +221,6 @@ export class EnterpriseTreeDataProvider
           return new vscode.ThemeIcon("file-code");
       }
     }
-  }
-
-  /**
-   * Get corresponding tree item from open document
-   * @param document The document to get the tree item for
-   * @returns The tree item for the document
-   */
-  getTreeItemForDocument(
-    document: any
-  ): TreeEnterpriseItem {
-    const filePath = document.fsPath;
-    const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
-    const enterpriseUri = "starlims:///" + filePath.replace(/\\/g, "/") + "/";
-    const guid = document.guid;
-    const enterpriseItem = new TreeEnterpriseItem(
-      EnterpriseItemType.Application,
-      fileName,
-      "en",
-      enterpriseUri,
-      vscode.TreeItemCollapsibleState.None,
-      undefined,
-      filePath,
-      guid
-    );
-    enterpriseItem.iconPath = new vscode.ThemeIcon("file-code");
-    return enterpriseItem;
-  }
-
-  /**
-   * Search for tree item by its name
-   * @param name The name of the tree item to search for
-   * @returns The tree item for the document
-   */
-  async getTreeItemByName(name: string): Promise<TreeEnterpriseItem | undefined> {
-    const enterpriseItems: TreeEnterpriseItem[] = await this.getChildren();
-    return enterpriseItems.find((item) => item.label === name);
   }
 }
 
@@ -265,5 +277,5 @@ export enum EnterpriseItemType {
   HTMLFormGuide = "HTMLFORMGUIDE",
   PhoneForm = "PHONEFORM",
   TabletForm = "TABLETFORM",
-  ServerLog = "SERVERLOGCAT"
+  ServerLog = "SERVERLOG"
 }

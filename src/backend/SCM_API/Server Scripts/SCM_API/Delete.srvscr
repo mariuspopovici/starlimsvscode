@@ -1,0 +1,142 @@
+/******************************************************************************
+Description.. :	Delete enterprise item
+Author....... :	DC
+Date......... : 2023-07-10
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult, oPayload;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:ContentType := "application/problem+json";
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := "URI parameter is missing.";
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils; 
+oUtils := CreateUDObject("SCM_API.Utils", {});
+
+:DECLARE oEnterpriseItem, sItemName, sItemType, sAppName, sCategory;
+oEnterpriseItem := oUtils:ParseURI(sURI);
+
+sItemName := oEnterpriseItem:Name;
+sItemType := oEnterpriseItem:Type;
+sAppName  := oEnterpriseItem:AppName;
+sCategory := oEnterpriseItem:Category;
+
+/*usrmes({sItemName, sItemType, sAppName, sCategory});
+
+/* don't allow to delete document types;
+:IF sItemName == "ServerScripts" .OR. sItemName == "HTMLForms" .OR. sItemName == "XFDForms" .OR. 
+	sItemName == "ServerScripts" .OR. sItemName == "ClientScripts" .OR. sItemName == "DataSources";
+	Response:ContentType := "application/problem+json";
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := "Cannot delete application document types.";
+	:RETURN oResponse;
+:ENDIF;
+
+:TRY;
+	:BEGINCASE;
+		:CASE sItemType == "APPCAT";
+            sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.AppCategProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "APP";
+            sItemName := sCategory + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.AppProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "HTMLFORMXML";
+			sItemName := sAppName + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.FormProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "XFDFORMXML";
+			sItemName := sAppName + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.FormProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "APPSS";
+			sItemName := sAppName + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "APPDS";
+			sItemName := sAppName + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.AppDataSourceProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "APPCS";
+			sItemName := sAppName + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "SSCAT";
+            sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "SS";
+            sItemName := sCategory + "." + sItemName;
+            sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "DSCAT";
+			sItemID := oUtils:GetItemGUID(sCategory, "DSCAT");
+			DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "DS";
+            sItemName := sCategory + "." + sItemName;
+            sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.DataSourceProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "CSCAT";
+            sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Delete", {sItemID});
+		:EXITCASE;
+
+		:CASE sItemType == "CS";
+            sItemName := sCategory + "." + sItemName;
+            sItemID := oUtils:GetItemGUID(sItemName, sItemType);
+			DoProc("Enterprise_Data_Providers.ClientScriptProvider.Delete", {sItemID});
+		:EXITCASE;
+	:ENDCASE;
+	:CATCH;
+		:DECLARE sError;
+		sError := GetLastSSLError():FullDescription;
+		UsrMes("ERROR:", sError);
+		Response:ContentType := "application/problem+json";
+		Response:StatusCode := 500;
+		oResponse:success := .F.;
+		oResponse:data := "Could not delete item.";
+		:RETURN oResponse;
+	:FINALLY;
+		Response:ContentType := "application/json";
+		Response:StatusCode := 200;
+		oResponse:data := "Item deleted successfully.";
+		oResult:success := .T.;
+		oResult:data := oResponse;
+:ENDTRY;
+
+:RETURN oResult;

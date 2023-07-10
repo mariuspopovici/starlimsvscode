@@ -3,10 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { EnterpriseFileDecorationProvider } from "./providers/enterpriseFileDecorationProvider";
-import {
-  EnterpriseTreeDataProvider,
-  TreeEnterpriseItem,
-} from "./providers/enterpriseTreeDataProvider";
+import { EnterpriseItemType, EnterpriseTreeDataProvider, TreeEnterpriseItem } from "./providers/enterpriseTreeDataProvider";
 import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 import path = require("path");
@@ -21,6 +18,7 @@ export async function activate(context: vscode.ExtensionContext) {
   let url: string | undefined = config.get("url");
   let rootPath: string | undefined = config.get("rootPath");
   let reloadConfig = false;
+  let selectedItem: TreeEnterpriseItem | undefined;
 
   // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
@@ -148,6 +146,9 @@ export async function activate(context: vscode.ExtensionContext) {
         ) as TreeEnterpriseItem;
       }
 
+      // set the selected item
+      selectedItem = item;
+
       // open leaf nodes only
       if (item.collapsibleState !== vscode.TreeItemCollapsibleState.None) {
         return;
@@ -155,7 +156,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // check if the item is already open, switch the tab if it is
       const openDocument = vscode.workspace.textDocuments.find(
-        (doc) => doc.uri.fsPath === item.filePath
+        (doc) => doc.uri.fsPath.toLowerCase() === item.filePath?.toLowerCase()
       );
       if (openDocument) {
         // reload document, if it is a log file
@@ -345,20 +346,16 @@ export async function activate(context: vscode.ExtensionContext) {
       if (editor && rootPath) {
         var localUri = editor.document.uri;
         if (localUri) {
-          let remotePath = localUri.path.slice(rootPath.length);
-          console.log("Opening file: " + remotePath);
-          enterpriseService.saveEnterpriseItemCode(
-            remotePath,
-            editor.document.getText()
-          );
+          let remotePath = localUri.path.slice(rootPath.length + 1);
+          console.log("Saving remote file: " + remotePath);
+          enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
         }
       }
     }
   );
 
   // register the clear log command
-  vscode.commands.registerCommand(
-    "STARLIMS.ClearLog",
+  vscode.commands.registerCommand("STARLIMS.ClearLog",
     async (item: TreeEnterpriseItem) => {
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
@@ -374,13 +371,12 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // register the search command
-  vscode.commands.registerCommand(
-    "STARLIMS.Search",
+  vscode.commands.registerCommand("STARLIMS.Search",
     async (item: TreeEnterpriseItem) => {
       // ask for search text
       const itemName = await vscode.window.showInputBox({
         prompt: "Enter search text",
-        ignoreFocusOut: true,
+        ignoreFocusOut: true
       });
       if (!itemName) {
         return;
@@ -390,21 +386,245 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // register the open form command
-  vscode.commands.registerCommand(
-    "STARLIMS.OpenForm",
+  vscode.commands.registerCommand("STARLIMS.OpenForm",
     async (item: TreeEnterpriseItem) => {
       if (item.guid === undefined) {
         return;
       }
       // open form in default browser
-      const formUrl = `${
-        config.url
-      }starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
+      const formUrl = `${config.url}starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
       vscode.env.openExternal(vscode.Uri.parse(formUrl));
     }
   );
 
-  vscode.commands.registerCommand(
+  // register the add item command
+  vscode.commands.registerCommand("STARLIMS.Add",
+    async (item: TreeEnterpriseItem) => {
+      // check if a folder has been selected
+      if (selectedItem === undefined) {
+        vscode.window.showErrorMessage("Please select a folder to add the item to.");
+        return;
+      }
+
+      // get item type from uri
+      let aUri = selectedItem.uri.split("/");
+
+      // last part of the uri should be the item type
+      let root = aUri[1];
+      let categoryName = aUri.length > 2 ? aUri[2] : "N/A";
+      let appName = aUri.length > 3 ? aUri[3] : "N/A";
+      let selectedItemType = aUri.length > 0 ? aUri[aUri.length - 1] : "N/A";
+      let itemType;
+      let itemTypeName;
+      let itemLanguage;
+
+      // check if the item type is valid
+      if (root === "Applications") {
+        // add application category
+        if (categoryName === "N/A") {
+          itemType = "APPCATEGORY";
+          itemTypeName = "Application Category";
+          itemLanguage = "N/A";
+        }
+        // add application to category
+        else if (appName === "N/A") {
+          itemType = "APP";
+          itemTypeName = "Application";
+          itemLanguage = "N/A";
+        }
+        // add item to application
+        else {
+          // check if the selected item is a valid folder
+          if (!["XFDForms", "HTMLForms", "ServerScripts", "ClientScripts", "DataSources"].includes(selectedItemType)) {
+            vscode.window.showErrorMessage("Cannot add item here! Please select a valid folder to add the item to.");
+            return;
+          }
+
+          switch (selectedItemType) {
+            case "HTMLForms":
+              itemType = "HTMLFORMXML";
+              itemTypeName = "HTML Form";
+              itemLanguage = "XML";
+              break;
+
+            case "XFDForms":
+              itemType = "XFDFORMXML";
+              itemTypeName = "XFD Form";
+              itemLanguage = "XML";
+              break;
+
+            case "ServerScripts":
+              itemType = "APPSS";
+              itemTypeName = "App Server Script";
+              itemLanguage = "SSL";
+              break;
+
+            case "ClientScripts":
+              itemType = "APPCS";
+              itemTypeName = "App Client Script";
+              itemLanguage = "JS";
+              break;
+
+            case "DataSources":
+              itemType = "APPDS";
+              itemTypeName = "App Data Source";
+
+              // ask for data source language
+              itemLanguage = await vscode.window.showQuickPick(
+                ["SSL", "SQL"],
+                {
+                  placeHolder: "Select Data Source language",
+                  ignoreFocusOut: true
+                }
+              );
+              break;
+          }
+        }
+      }
+      // add global script item
+      else {
+        if (aUri.length > 3) {
+          vscode.window.showErrorMessage("Please select a valid folder to add the item to.");
+          return;
+        }
+
+        appName = "N/A";
+
+        switch (root) {
+          case "ServerScripts":
+            if (root === selectedItemType) {
+              itemType = "SSCAT";
+              itemTypeName = "Server Script Category";
+              itemLanguage = "N/A";
+            }
+            else {
+              itemType = "SS";
+              itemTypeName = "Server Script";
+              itemLanguage = "SSL";
+            }
+            break;
+
+          case "ClientScripts":
+            if (root === selectedItemType) {
+              itemType = "CSCAT";
+              itemTypeName = "Client Script Category";
+              itemLanguage = "N/A";
+            }
+            else {
+              itemType = "CS";
+              itemTypeName = "Client Script";
+              itemLanguage = "JS";
+            }
+            break;
+
+          case "DataSources":
+            if (root === selectedItemType) {
+              itemType = "DSCAT";
+              itemTypeName = "Data Source Category";
+              itemLanguage = "N/A";
+              categoryName = "Data Sources";
+            }
+            else {
+              itemType = "DS";
+              itemTypeName = "Data Source";
+              categoryName = selectedItemType;
+
+              // ask for data source language
+              itemLanguage = await vscode.window.showQuickPick(
+                ["SSL", "SQL"],
+                {
+                  placeHolder: "Select Data Source language",
+                  ignoreFocusOut: true
+                });
+            }
+            break;
+
+          default:
+            return;
+        }
+      }
+
+      // abort if no language defined
+      if (!itemLanguage) {
+        return;
+      }
+
+      // ask for item name
+      const itemName = await vscode.window.showInputBox({
+        prompt: `Enter name for new ${itemTypeName}`,
+        ignoreFocusOut: true
+      });
+
+      // abort if mandatory arguments are missing
+      if (!itemName || !itemType || !itemLanguage || !categoryName || !appName) {
+        return;
+      }
+
+      // create the item
+      var sReturn = await enterpriseService.addItem(itemName, itemType, itemLanguage, categoryName, appName);
+      
+      if (sReturn.length > 0) {
+        enterpriseProvider.refresh();
+
+        // wait for the tree to refresh
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // open newly created item (works only if section is expanded)
+        var sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
+        var newItem = await enterpriseProvider.getTreeItemByUri(sUri);
+        if(newItem !== undefined) {
+          vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
+        }
+      }
+    }
+  );
+
+  // register the delete item command
+  vscode.commands.registerCommand("STARLIMS.Delete",
+    async (item: TreeEnterpriseItem) => {
+      if (selectedItem === undefined) {
+        vscode.window.showErrorMessage("Please select an item to delete.");
+        return;
+      }
+      if(selectedItem.type === EnterpriseItemType.EnterpriseCategory) {
+        vscode.window.showErrorMessage("Enterprise Categories cannot be deleted.");
+        return;
+      }
+      if(selectedItem.type === EnterpriseItemType.ServerLog) {
+        vscode.window.showErrorMessage("Server Logs cannot be deleted.");
+        return;
+      }
+
+      // ask for confirmation
+      const confirm = await vscode.window.showWarningMessage(
+        `Are you sure you want to delete ${selectedItem.label}?`,
+        { modal: true },
+        "Yes"
+      );
+      if (confirm !== "Yes") {
+        return;
+      }
+
+      // delete the item
+      var bSuccess = await enterpriseService.deleteItem(selectedItem.uri);
+      if (bSuccess) {
+        // close open document
+        const openDocument = vscode.workspace.textDocuments.find(
+            (doc) => selectedItem !== undefined && doc.uri.fsPath.toLowerCase() === selectedItem.filePath?.toLowerCase()
+        );
+        if (openDocument) {
+          vscode.window.showTextDocument(openDocument).then(() => {
+            vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+          });
+        }
+        selectedItem = undefined;
+        enterpriseProvider.refresh();
+      }
+    }
+  );
+  
+  // show connection message
+    vscode.commands.registerCommand(
     "STARLIMS.RunDataSource",
     async (item: TreeEnterpriseItem | any) => {
       let remoteUri: string = "";
