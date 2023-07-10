@@ -1,0 +1,189 @@
+/******************************************************************************
+Description.. :	Add new enterprise item
+Author....... :	DC
+Date......... : 2023-07-07
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult, oPayload;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:TRY;
+	:DECLARE sRequestAsFile;
+	sRequestAsFile := Request:SaveInputStream();
+	oPayload := FromJSON(ReadText(sRequestAsFile));
+	FileSupport(sRequestAsFile, "DELETE");
+:CATCH;
+	UsrMes("ERROR:", GetLastSSLError():FullDescription);
+	Response:ContentType := "application/problem+json";
+	Response:StatusCode := 500;
+	oResponse:success := .F.;
+	oResponse:data := "Could not deserialize request body.";
+	:RETURN oResponse;
+:ENDTRY;
+
+:IF Empty(oPayload);
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := "No payload found!";
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+/* get parameters;
+:DECLARE sItemName, sItemType, sScriptLang, sFormLang, sCategory, sAppName;
+:IF oPayload:IsProperty("ItemName");
+	sItemName := oPayload:ItemName;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "ItemName");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:IF oPayload:IsProperty("ItemType");
+	sItemType := oPayload:ItemType;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "ItemType");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:IF oPayload:IsProperty("Language");
+	sScriptLang := oPayload:Language;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "Language");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:IF oPayload:IsProperty("Category");
+	sCategory := oPayload:Category;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "Category");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:IF oPayload:IsProperty("AppName");
+	sAppName := oPayload:AppName;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "AppName");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+sFormLang := GetSetting("DEFAULTLANGUAGE");
+usrmes({sAppName, sCategory, sScriptLang, sItemType});
+
+:DECLARE oUtils, sCategoryID, sAppID;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+:TRY;
+	:BEGINCASE;
+		:CASE sItemType == "APPCAT";
+			DoProc("Enterprise_Data_Providers.AppCategProvider.Add", {sItemName});
+		:EXITCASE;
+
+		:CASE sItemType == "APP";
+			sCategoryID := oUtils:GetItemGUID(sCategory, "APPCAT");
+			DoProc("Enterprise_Data_Providers.AppProvider.Add", {sCategoryID, sItemName, ""});
+		:EXITCASE;
+
+		:CASE sItemType == "HTMLFORMXML";
+			sAppName := sCategory + "." + sAppName;
+			sAppID := oUtils:GetItemGUID(sAppName, "APP");
+			DoProc("Enterprise_Data_Providers.FormProvider.Add", {sAppID, sItemName, "", "Y", "HTML"});
+		:EXITCASE;
+
+		:CASE sItemType == "XFDFORMXML";
+			sAppName := sCategory + "." + sAppName;
+			sAppID := oUtils:GetItemGUID(sAppName, "APP");
+			DoProc("Enterprise_Data_Providers.FormProvider.Add", {sAppID, sItemName, "", "Y", "XFD"});
+		:EXITCASE;
+
+		:CASE sItemType == "APPSS";
+			sAppName := sCategory + "." + sAppName;
+			sAppID := oUtils:GetItemGUID(sAppName, "APP");
+			sScriptLang := "SSL";
+			DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Add", {sAppID, sItemName, "", sScriptLang});
+		:EXITCASE;
+
+		:CASE sItemType == "APPDS";
+			sAppName := sCategory + "." + sAppName;
+			sAppID := oUtils:GetItemGUID(sAppName, "APP");
+			DoProc("Enterprise_Data_Providers.AppDataSourceProvider.Add", {sAppID, sItemName, "", sScriptLang});
+		:EXITCASE;
+
+		:CASE sItemType == "APPCS";
+			sAppName := sCategory + "." + sAppName;
+			sAppID := oUtils:GetItemGUID(sAppName, "APP");
+			sScriptLang := "JS";
+			DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Add", {sAppID, sItemName, "", sScriptLang});
+		:EXITCASE;
+
+		:CASE sItemType == "SSCAT";
+			DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Add", {sItemName});
+		:EXITCASE;
+
+		:CASE sItemType == "SS";
+			sCategoryID := oUtils:GetItemGUID(sCategory, "SSCAT");
+			sScriptLang := "SSL";
+			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
+		:EXITCASE;
+
+		:CASE sItemType == "DSCAT";
+			DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Add", {sItemName});
+		:EXITCASE;
+
+		:CASE sItemType == "DS";
+			sCategoryID := oUtils:GetItemGUID(sCategory, "DSCAT");
+			DoProc("Enterprise_Data_Providers.DataSourceProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
+		:EXITCASE;
+
+		:CASE sItemType == "CSCAT";
+			DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Add", {sItemName});
+		:EXITCASE;
+
+		:CASE sItemType == "CS";
+			sCategoryID := oUtils:GetItemGUID(sCategory, "CSCAT");
+			sScriptLang := "SSL";			
+			DoProc("Enterprise_Data_Providers.ClientScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
+		:EXITCASE;
+	:ENDCASE;
+	:CATCH;
+		:DECLARE sError;
+		sError := GetLastSSLError():FullDescription;
+		UsrMes("ERROR:", sError);
+		Response:ContentType := "application/problem+json";
+		Response:StatusCode := 500;
+		oResponse:success := .F.;
+
+		:IF At("SQL-02601", sError) > 0;
+			oResponse:data := "An item with the same name already exists.";
+		:ELSE;
+			oResponse:data := "Could not add new item.";
+		:ENDIF;
+		:RETURN oResponse;
+	:FINALLY;
+		Response:ContentType := "application/json";
+		Response:StatusCode := 200;
+		oResponse:data := "Item added successfully.";
+		oResult:success := .T.;
+		oResult:data := oResponse;
+:ENDTRY;
+
+:RETURN oResult;

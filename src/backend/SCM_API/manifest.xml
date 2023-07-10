@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>B8310F89-23CE-4AE1-9AA1-E95C13739DAA</ItemID>
+  <ItemID>B8107DF2-5D13-4DA2-A0AF-B16F2D641DA5</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-07-06T12:58:31.9740945+02:00</PackageDate>
+  <PackageDate>2023-07-10T14:35:24.197102+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -19,6 +19,19 @@
       <ItemBehaviour>merge</ItemBehaviour>
       <ItemIsSystem>N</ItemIsSystem>
       <ServerScriptCollection>
+        <ServerScript>
+          <ItemID>7E22EE13-31C9-481A-911A-9E8DB1DABB35</ItemID>
+          <ItemName>Add</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\Add.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
         <ServerScript>
           <ItemID>F165D253-C777-4D9B-944D-57CFC4A606D1</ItemID>
           <ItemName>CheckIn</ItemName>
@@ -52,6 +65,19 @@
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\ClearLog.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>7445A3F4-6415-43EF-9AB8-AEB977A6500C</ItemID>
+          <ItemName>Delete</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\Delete.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
