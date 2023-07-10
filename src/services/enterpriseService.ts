@@ -24,6 +24,45 @@ export class EnterpriseService implements Enterprise {
     this.baseUrl = this.cleanUrl(config.url);
   }
 
+  /**
+   * Add a new enterprise item to the specified folder
+   * @param itemName the name of the new item
+   * @param itemType the type of the new item
+   * @param language the language of the new item
+   */
+  async addItem(itemName: string, itemType: string, language: string, categoryName: string, appName: string)
+  {
+    const url = `${this.baseUrl}/SCM_API.Add.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        ItemName: itemName,
+        ItemType: itemType,
+        Language: language,
+        Category: categoryName,
+        AppName: appName
+      })
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Item added successfully.");
+      }
+      else {
+        vscode.window.showErrorMessage(data);
+      }
+      return data instanceof Object ? JSON.stringify(data) : data;
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
+      console.error(e);
+      return;
+    }
+  }
+
   /** 
    * Execute script remotely.
    * @param uri the URI of the remote script.
@@ -379,7 +418,7 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
-   * Search enterprise item by its name and open the first match
+   * Search enterprise items by its names
    * @param itemName the name of the enterprise item
    * @returns the uri of the enterprise item
    */
@@ -406,6 +445,38 @@ export class EnterpriseService implements Enterprise {
       vscode.window.showErrorMessage("Item not found.");
       console.error(e);
       return [];
+    }
+  }
+
+  /**
+   * Delete enterprise item
+   * @param uri the URI of the enterprise item
+   * @returns true if the item was deleted successfully, false otherwise
+   */
+  public async deleteItem(uri: string) {
+    const url = `${this.baseUrl}/SCM_API.Delete.lims?URI=${uri}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } =
+        await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Item deleted successfully.");
+        return true;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
+        return false;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not delete item.");
+      console.error(e);
+      return false;
     }
   }
 }

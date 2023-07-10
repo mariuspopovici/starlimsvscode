@@ -82,7 +82,7 @@
       },
       {
         "command": "STARLIMS.Search",
-        "title": "Search for items...",
+        "title": "Search for Items...",
         "icon": {
           "dark": "resources/dark/search.svg",
           "light": "resources/light/search.svg"
@@ -99,6 +99,22 @@
       {
         "command": "STARLIMS.OpenForm",
         "title": "Open Form"
+      },
+      {
+        "command": "STARLIMS.Add",
+        "title": "Add new...",
+        "icon": {
+          "dark": "resources/dark/add.svg",
+          "light": "resources/light/add.svg"
+        }
+      },
+      {
+        "command": "STARLIMS.Delete",
+        "title": "Delete",
+        "icon": {
+          "dark": "resources/dark/delete.svg",
+          "light": "resources/light/delete.svg"
+        }
       }
     ],
     "menus": {
@@ -110,6 +126,16 @@
         },
         {
           "command": "STARLIMS.Search",
+          "when": "view == STARLIMS",
+          "group": "navigation"
+        },
+        {
+          "command": "STARLIMS.Add",
+          "when": "view == STARLIMS",
+          "group": "navigation"
+        },
+        {
+          "command": "STARLIMS.Delete",
           "when": "view == STARLIMS",
           "group": "navigation"
         }
@@ -125,11 +151,11 @@
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS && viewItem != SERVERLOG"
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS && viewItem != SERVERLOG"
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
@@ -138,6 +164,14 @@
         {
           "command": "STARLIMS.OpenForm",
           "when": "view == STARLIMS && viewItem == HTMLFORMXML"
+        },
+        {
+          "command": "STARLIMS.Delete",
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY"
+        },
+        {
+          "command": "STARLIMS.Add",
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != APP"
         }
       ],
       "explorer/context": [
