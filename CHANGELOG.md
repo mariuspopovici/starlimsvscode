@@ -63,9 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.6] - 2023-07-08
 - add view and clear log files
 
-## [1.2.7] - 2023-07-06
+## [1.2.7] - 2023-07-08
 - fixed path issues
 
-## [1.2.8] - 2023-07-06
+## [1.2.8] - 2023-07-10
 - add new items
 - delete existing items
