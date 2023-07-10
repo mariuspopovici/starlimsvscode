@@ -125,7 +125,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidSaveTextDocument(
     async (document: vscode.TextDocument) => {
       // check if the document is in the configured workspace
-      if (rootPath && document.uri.fsPath.startsWith(rootPath)) {
+      if (rootPath && document.uri.fsPath.toLowerCase().startsWith(rootPath.toLowerCase())) {
         vscode.commands.executeCommand("STARLIMS.Save", document.uri);
       }
     }
@@ -225,19 +225,19 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.RunScript",
     async (item: TreeEnterpriseItem | any) => {
       let remoteUri: string = "";
-      if (item instanceof TreeEnterpriseItem) {
+      
+      // commands can originate from the enterprise tree or from an open editor window
+      const isTreeCommand = item instanceof TreeEnterpriseItem;
+
+      if (isTreeCommand) {
         remoteUri = item.uri;
       } else {
+        // command originates from a document context menu
         const uri = item.path
           ? item.path.slice(0, item.path.lastIndexOf("."))
           : undefined;
         if (config.has("rootPath")) {
-          const rootPath: string = path.join(
-            config.get("rootPath") as string,
-            SLVSCODE_FOLDER
-          );
-          
-          let remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
           remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
         }
       }
@@ -245,6 +245,7 @@ export async function activate(context: vscode.ExtensionContext) {
       outputChannel.appendLine(
         `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
       );
+      
       const result = await enterpriseService.runScript(remoteUri.toString());
       if (result) {
         outputChannel.appendLine(result);
@@ -347,7 +348,6 @@ export async function activate(context: vscode.ExtensionContext) {
         var localUri = editor.document.uri;
         if (localUri) {
           let remotePath = localUri.path.slice(rootPath.length + 1);
-          console.log("Saving remote file: " + remotePath);
           enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
         }
       }
@@ -628,18 +628,18 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.RunDataSource",
     async (item: TreeEnterpriseItem | any) => {
       let remoteUri: string = "";
-      if (item instanceof TreeEnterpriseItem) {
+      // commands can originate from the enterprise tree or from an open editor window
+      const isTreeCommand = item instanceof TreeEnterpriseItem;
+      
+      if (isTreeCommand) {
         remoteUri = item.uri;
       } else {
+        // command originates from a document context menu
         const uri = item.path
           ? item.path.slice(0, item.path.lastIndexOf("."))
           : undefined;
         if (config.has("rootPath")) {
-          const rootPath: string = path.join(
-            config.get("rootPath") as string,
-            SLVSCODE_FOLDER
-          );
-          let remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
           remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
         }
       }
@@ -647,6 +647,7 @@ export async function activate(context: vscode.ExtensionContext) {
       outputChannel.appendLine(
         `${new Date().toLocaleString()} Executing remote data source at URI: ${remoteUri}`
       );
+      
       const result = await enterpriseService.runScript(remoteUri);
       if (result) {
         outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
