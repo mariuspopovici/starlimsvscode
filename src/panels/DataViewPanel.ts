@@ -84,12 +84,11 @@ export class DataViewPanel {
     webview: vscode.Webview,
     extensionUri: vscode.Uri
   ) {
-    // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
-
     const nonce = getNonce();
     const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
     const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
 
+    // TIP: Install the es6-string-html VS Code extension to enable code highlighting below
     const html = /*html*/ `
       <!DOCTYPE html>
       <html lang="en">
@@ -102,9 +101,8 @@ export class DataViewPanel {
         </head>
         <body>
           <h1 id="title"></h1>
-          <section class="results-grid">
-            <vscode-data-grid id="data-source-grid" 
-            generate-header="sticky" aria-label="Sticky Header" aria-label="Data Source Results"></vscode-data-grid>
+          <section>
+            <vscode-data-grid id="data-source-grid" generate-header="sticky" aria-label="Data Source Results"></vscode-data-grid>
           </section>
           
           <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
@@ -128,15 +126,13 @@ export class DataViewPanel {
         const data = message.data;
         switch (command) {
           case "requestDataSourceResultsData":
-            // Code that should run in response to the hello message command
+            // the webview controller (main.ts) sends a requestDataSourceResultsData message after initializing
+            // we send it the data using a receiveDataSourceResultsData message
             webview.postMessage({
               command: "receiveDataSourceResultData",
               payload: this._data,
               name: this._name,
             });
-            break;
-          case "hello":
-            vscode.window.showInformationMessage(data);
             break;
         }
       },
