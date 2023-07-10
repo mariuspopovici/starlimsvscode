@@ -35,6 +35,7 @@ Features:
 - Edit local copies and compare changes with remote version
 - Check in changes to a server
 - Execute remote scripts and view execution return values.
+- Execute data sources and render data source execution results in a grid view
 - View and clear user logs
 
 To Do:

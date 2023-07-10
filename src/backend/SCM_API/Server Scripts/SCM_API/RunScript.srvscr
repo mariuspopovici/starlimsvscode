@@ -24,12 +24,12 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDTRY;
 
-:DECLARE sURI, aParams, String;
+:DECLARE sURI, aParams, String, sOutputType;
 String := "";
 
 :IF !Empty(oPayload) .AND. oPayload:IsProperty("URI");
 	:DECLARE oUtils;
-    sURI := oPayload:URI;
+  sURI := oPayload:URI;
 	oUtils := CreateUDObject("SCM_API.Utils", {});
 	:DECLARE oEnterpriseItem;
 	oEnterpriseItem := oUtils:ParseURI(sURI);
@@ -41,15 +41,26 @@ String := "";
 :ENDIF;
 
 :IF !Empty(oPayload) .AND. oPayload:IsProperty("Parameters");
-    aParams := oPayload:Parameters;
+	aParams := oPayload:Parameters;
 	:IF LimsTypeEx(aParams) != "ARRAY";
 		Response:StatusCode := 400;
-    	oResponse:success := .F.;
+    oResponse:success := .F.;
 		oResponse:data := "Parameters must be an array";
 		:RETURN oResponse;
 	:ENDIF;
 :ELSE;
     aParams := {};
+:ENDIF;
+
+sOutputType := "ARRAY";
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("Parameters");
+	sOutputType := Upper(oPayload:OutputType);
+	:IF .NOT. AScanExact({"SQL", "ARRAY", "XML", "JSON"}, sOutputType) > 0;
+		Response:StatusCode := 400;
+    oResponse:success := .F.;
+		oResponse:data := "Invalid output type. Must be one of: SQL, ARRAY, XML, JSON.";
+		:RETURN oResponse;
+	:ENDIF;
 :ENDIF;
 
 :DECLARE sScript;
@@ -65,11 +76,11 @@ String := "";
 		:EXITCASE;
 		:CASE oEnterpriseItem:Type == "DS";
 			sScript := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;
-			oResult := RunDS(sScript);
+			oResult := DoProc("RunDataSource", {sScript});
 		:EXITCASE;
 		:CASE oEnterpriseItem:Type == "APPDS";
 			sScript := oEnterpriseItem:AppName + "." + oEnterpriseItem:Name;
-			oResult := RunDS(sScript);
+			oResult := DoProc("RunDataSource", {sScript});
 		:EXITCASE;
 		:OTHERWISE;
 			oResponse:success := .F.;
@@ -90,3 +101,37 @@ oResponse:data := oResult;
 Response:StatusCode := 200;
 
 :RETURN oResponse;
+
+:PROCEDURE RunDataSource;
+:PARAMETERS sDataSourceName, sOutputType;
+:DEFAULT sDataSourceName, "";
+:DEFAULT sOutputType, "ARRAY";
+	
+	sOutputType := Upper(sOutputType);
+	:DECLARE oOutput;
+	
+	:BEGINCASE;
+		:CASE sOutputType == "XML";
+			oResult := RunDS(sDataSourceName,, "XML"); 
+		:EXITCASE;
+		:CASE sOutputType == "ARRAY";
+			:DECLARE sXML, oDataSet, aHeader;
+			sXML := RunDS(sDataSourceName,, "XML"); 
+			oDataSet := DoProc("Enterprise_Server.DataSetSupport.DSFromString", {sXML});
+			
+			aHeader := ArrayNew(oDataSet:Tables[0]:Columns:Count);
+			:FOR i:=0 :TO oDataSet:Tables[0]:Columns:Count-1;
+				aHeader[i+1] := oDataSet:Tables[0]:Columns[i]:ColumnName;
+			:NEXT;
+			oResult := ArrayCalc({aHeader}, "MERGE", DoProc("Enterprise_Server.DataSetSupport.DSToArray", {oDataSet}));
+		:EXITCASE;
+		:CASE sOutputType == "JSON";
+			:DECLARE sXML, oDataSet;
+			sXML := RunDS(sDataSourceName,, "XML"); 
+			oDataSet := DoProc("Enterprise_Server.DataSetSupport.DSFromString", {sXML});
+			oResult := ToJson(oDataSet);
+		:EXITCASE;
+	:ENDCASE;
+	
+	:RETURN oResult;
+:ENDPROC;
