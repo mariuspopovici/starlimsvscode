@@ -77,13 +77,17 @@ Replaced request-promise with node-fetch.
 Implemented a TextDocumentContentProvider for viewing STARLIMS code and refactored API to implement a URI based approach for referencing code items.
 
 ## 1.1.1
-
-Bug fixes.
-Added Get Local Version to remote version editor window context menu
-Activation of extension when executing a compare command
-Showing remote checkout status in explorer tree
+- Bug fixes
+- Added Get Local Version to remote version editor window context menu
+- Activation of extension when executing a compare command
+- Showing remote checkout status in explorer tree
 
 ## 1.2.0
-
+New features:
 - Automatically export items to local workspace.
-- Added the ability to check in/out items.
+- Check in/out items
+- View/clear user logs
+- Add/delete new items and categories
+- Search for items
+- Run HTML forms in browser
+- Integrated SSL-Lang theme
