@@ -4,7 +4,7 @@ tags:
 info:
   title: STARLIMS VSCode Extension API
   version: "1.2.0"
-  description: VSCode Extension API services.
+  description: STARLIMS VSCode Extension API services.
   contact:
     name: API Support
     email: marius@popovici.net
@@ -15,6 +15,63 @@ security:
   - starlims-password: []
 
 paths:
+  /SCM.API.Add.lims:
+    post:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.Add.lims` endpoint adds a new code item to the dictionary.
+      operationId: Add
+      requestBody:
+        description: Add item request object.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddItemRequest"
+        required: true
+      responses:
+        "200":
+          description: The add operation response (success status and error or success message).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM.API.Delete.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.Delete.lims` endpoint deletes an item from the dictionary.
+      operationId: Delete
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the code item to delete.
+          example: /Applications/TestApplications/MyApp/ServerScripts/Script1
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: The operation response (success status and error or success message).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /SCM_API.Search.lims:
     get:
       tags:
@@ -347,6 +404,15 @@ components:
           type: string
           example: null
           description: Empty if successful or an error message otherwise.
+    DeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          example: null
+          description: Empty if successful or an error message otherwise.
     CheckOutResponse:
       type: object
       properties:
@@ -356,6 +422,55 @@ components:
           type: string
           example: null
           description: Empty if successful or an error message otherwise.
+    AddItemRequest:
+      type: object
+      required:
+        - ItemName, ItemType, Language, Category, AppName
+      properties:
+        ItemName:
+          description: The item name e.g. the server script name
+          type: string
+          example: NewScript
+        ItemType:
+          description: The type of code item (application category, application, application server scritpt, etc.)
+          type: string
+          enum:
+            - APPCAT
+            - APP
+            - APPSS
+            - HTMLFORMXML
+            - XFDFORMXML
+            - APPDS
+            - SSCAT
+            - SS
+            - DSCAT
+            - CSCAT
+            - DS
+            - CS
+          example: APPSS
+        Language:
+          description: The code item language e.g. STARLIMS Scripting Language or JavaScript
+          type: string
+          enum:
+            - SSL
+            - JS
+          example: SSL
+        Category:
+          type: string
+          description: Code item category name
+          example: ClinicalApplications
+        AppName: 
+          type: string
+          description: Application name
+          example: ClinicalLogin
+    AddItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          description: A success confirmation message or an error description.
     RunScriptRequest:
       required:
         - URI
