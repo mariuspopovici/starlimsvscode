@@ -1,0 +1,49 @@
+{
+  "comments": {
+    "blockComment": ["/*", ";"],
+    "lineComment": "/*"
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "autoClosingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["\"", "\""],
+    ["'", "'"]
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["\"", "\""],
+    ["'", "'"]
+  ],
+  "folding":
+  {
+    "offSide": false,
+    "markers": {
+      "start": "^\\s*(\\/\\*\\s?region).*$",
+      "end": "^\\s*(\\/\\*endregion;).*$"
+    },
+    "indentation": "spaces",
+    "openByDefault": false
+  },
+  "onEnterRules": [
+    {
+      "beforeText": "^\\s*(:FOR|:WHILE|:PROCEDURE|:IF|:BEGINCASE|:CASE|:TRY|:CATCH|:FINALLY|:REGION).*$",
+      "action": {
+        "indent": "indent"
+      }
+    },
+    {
+      "beforeText": "^\\s*(:ENDCASE|:END|:NEXT|:ENDWHILE|:ENDPROCEDURE|:ENDIF|:ENDTRY|:ENDREGION).*$",
+      "action": {
+        "indent": "outdent"
+      }
+    }
+  ]
+}

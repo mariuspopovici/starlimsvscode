@@ -1,0 +1,61 @@
+{
+  ":FOR loop for array": {
+    "prefix": ":FOR",
+    "body": [
+      ":FOR ${1:i}:=${2:1} :TO Len(${3:arr});",
+      "\t${4:/*put loop instructions here;}",
+      ":NEXT;"
+    ],
+    "description": "simple counter loop to iterate over an array"
+  },
+  ":WHILE loop": {
+    "prefix": ":WHILE",
+    "body": [
+      ":WHILE ${1:condition};",
+      "\t${4:/*put loop instructions here;}",
+      ":ENDWHILE;"
+    ],
+    "description": "simple while loop to iterate over an array"
+  },
+  ":PROCEDURE statement": {
+    "prefix": ":PROC",
+    "body": [
+      ":PROCEDURE ${1:procedureName};",
+      "\t:PARAMETERS ${2:parameterList};",
+      "\t${3:/*put procedure body here;}",
+      ":ENDPROC;"
+    ],
+    "description": "Defining a procedure"
+  },
+  ":TRY :CATCH Block": {
+    "prefix": ":TRY",
+    "body": [
+      ":TRY;",
+      "\t${1:/*error checked statements here;}",
+      ":CATCH;",
+      "\t${2:/* error handling code here;}",
+      "\tUsrMes(\"ERROR\", GetLastSSLError():FullDescription);",
+      ":FINALLY;",
+      "\t${3:/* clean-up statements here;}",
+      ":ENDTRY;"
+    ],
+    "description": ":TRY :CATCH :FINALLY Block"
+  },
+  "Database Transaction Block": {
+    "prefix": "BeginLimsTransaction",
+    "body": [
+      ":DECLARE bCommit;",
+      "bCommit := .T.;",
+      ":TRY;",
+      "\tBeginLimsTransaction(\"DATABASE\");",
+      "\tRunSql(\"${1:SQL Statement}\", \"DATABASE\", {});",
+      ":CATCH;",
+      "\tbCommit := .F.;",
+      "\tUsrMes(\"ERROR\", GetLastSSLError():FullDescription);",
+      ":FINALLY;",
+      "\tEndLimsTransaction(\"DATABASE\", bCommit);",
+      ":ENDTRY;"
+    ],
+    "description": "Database Transaction Block"
+  }
+}

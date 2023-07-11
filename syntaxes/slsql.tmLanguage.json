@@ -1,0 +1,299 @@
+{
+	"version": "0.0.1",
+	"name": "SLSQL",
+	"scopeName": "source.slsql",
+	"patterns": [
+		{
+			"include": "#keywordsStorage"
+		},
+		{
+			"name": "string.quoted.double",
+			"begin": "\"",
+			"end": "\""
+		},
+		{
+			"name": "string.quoted.single",
+			"begin": "'",
+			"end": "'"
+		},
+		{
+			"match": "((?<!@)@)\\b(\\w+)\\b",
+			"name": "variable.parameter.sql"
+		},
+		{
+			"match": "(\\[)[^\\]]*(\\])",
+			"name": "text.bracketed"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.other.create.sql"
+				},
+				"2": {
+					"name": "keyword.other.sql"
+				},
+				"5": {
+					"name": "entity.name.function.sql"
+				}
+			},
+			"match": "(?i:^\\s*(create(?:\\s+or\\s+replace)?)\\s+(aggregate|conversion|database|domain|function|group|(unique\\s+)?index|language|operator class|operator|rule|schema|sequence|table|tablespace|trigger|type|user|view)\\s+)(['\"`]?)(\\w+)\\4",
+			"name": "meta.create.sql"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.other.create.sql"
+				},
+				"2": {
+					"name": "keyword.other.sql"
+				}
+			},
+			"match": "(?i:^\\s*(drop)\\s+(aggregate|conversion|database|domain|function|group|index|language|operator class|operator|rule|schema|sequence|table|tablespace|trigger|type|user|view))",
+			"name": "meta.drop.sql"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.other.create.sql"
+				},
+				"2": {
+					"name": "keyword.other.table.sql"
+				},
+				"3": {
+					"name": "entity.name.function.sql"
+				},
+				"4": {
+					"name": "keyword.other.cascade.sql"
+				}
+			},
+			"match": "(?i:\\s*(drop)\\s+(table)\\s+(\\w+)(\\s+cascade)?\\b)",
+			"name": "meta.drop.sql"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.other.create.sql"
+				},
+				"2": {
+					"name": "keyword.other.table.sql"
+				}
+			},
+			"match": "(?i:^\\s*(alter)\\s+(aggregate|conversion|database|domain|function|group|index|language|operator class|operator|proc(edure)?|rule|schema|sequence|table|tablespace|trigger|type|user|view)\\s+)",
+			"name": "meta.alter.sql"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "storage.type.sql"
+				},
+				"2": {
+					"name": "storage.type.sql"
+				},
+				"3": {
+					"name": "constant.numeric.sql"
+				},
+				"4": {
+					"name": "storage.type.sql"
+				},
+				"5": {
+					"name": "constant.numeric.sql"
+				},
+				"6": {
+					"name": "storage.type.sql"
+				},
+				"7": {
+					"name": "constant.numeric.sql"
+				},
+				"8": {
+					"name": "constant.numeric.sql"
+				},
+				"9": {
+					"name": "storage.type.sql"
+				},
+				"10": {
+					"name": "constant.numeric.sql"
+				},
+				"11": {
+					"name": "storage.type.sql"
+				},
+				"12": {
+					"name": "storage.type.sql"
+				},
+				"13": {
+					"name": "storage.type.sql"
+				},
+				"14": {
+					"name": "constant.numeric.sql"
+				},
+				"15": {
+					"name": "storage.type.sql"
+				}
+			},
+			"match": "(?xi)\\b(bigint|bigserial|bit|boolean|box|bytea|cidr|circle|date|double\\sprecision|inet|int|integer|line|lseg|macaddr|money|oid|path|point|polygon|real|serial|smallint|sysdate|text)\\b\n\n\t\t\t\t# numeric suffix, capture 2 + 3i\n\t\t\t\t|\\b(bit\\svarying|character\\s(?:varying)?|tinyint|var\\schar|float|interval)\\((\\d+)\\)\n\n\t\t\t\t# optional numeric suffix, capture 4 + 5i\n\t\t\t\t|\\b(char|number|varchar\\d?)\\b(?:\\((\\d+)\\))?\n\n\t\t\t\t# special case, capture 6 + 7i + 8i\n\t\t\t\t|\\b(numeric|decimal)\\b(?:\\((\\d+),(\\d+)\\))?\n\n\t\t\t\t# special case, captures 9, 10i, 11\n\t\t\t\t|\\b(times?)\\b(?:\\((\\d+)\\))?(\\swith(?:out)?\\stime\\szone\\b)?\n\n\t\t\t\t# special case, captures 12, 13, 14i, 15\n\t\t\t\t|\\b(timestamp)(?:(s|tz))?\\b(?:\\((\\d+)\\))?(\\s(with|without)\\stime\\szone\\b)?\n\n\t\t\t"
+		},
+		{
+			"match": "(?i:\\b((?:primary|foreign)\\s+key|references|on\\sdelete(\\s+cascade)?|nocheck|check|constraint|collate|default)\\b)",
+			"name": "storage.modifier.sql"
+		},
+		{
+			"match": "\\b\\d+\\b",
+			"name": "constant.numeric.sql"
+		},
+		{
+			"match": "(?i)\\b(?:FROM|JOIN|LEFT JOIN|RIGHT JOIN|INNER JOIN|OUTER JOIN)\\s+([a-zA-Z0-9_]+)\\s?(?!WHERE|JOIN|ON|LEFT|RIGHT|OUTER)([a-zA-Z0-9_']+)?",
+			"name": "keyword.other.sql",
+			"comment": "table name",
+			"captures": {
+				"1": {
+					"name": "keyword.table.sql"
+				},
+				"2": {
+					"name": "keyword.table.sql"
+				}
+			}
+		},
+		{
+			"match": "(?i)\\b(?:UPDATE|INTO|ALTER TABLE|MERGE INTO|DELETE FROM)\\s+([a-zA-Z0-9_]+)\\b",
+			"name": "keyword.other.sql",
+			"comment": "table name",
+			"captures": {
+				"1": {
+					"name": "keyword.table.sql"
+				}
+			}
+		},
+		{
+			"match": "(?i:\\b(on|off|((is\\s+)?not\\s+)?null)\\b)",
+			"name": "keyword.other.DDL.create.II.sql"
+		},
+		{
+			"match": "(?i)\\bAS\\b",
+			"name": "keyword.other.sql",
+			"captures": {
+				"1": {
+					"name": "keyword.other.alias.sql"
+				}
+			}
+		},
+		{
+			"match": "\\*",
+			"name": "keyword.operator.star.sql"
+		},
+		{
+			"match": "[!<>]?=|<>|<|>",
+			"name": "comparison.operator.sql"
+		},
+		{
+			"match": "-|\\+|/",
+			"name": "keyword.operator.math.sql"
+		},
+		{
+			"match": "\\|\\|",
+			"name": "keyword.operator.concatenator.sql"
+		},
+		{
+			"match": "(?i)\\b(abs|acos|asin|atan|atn2|ceiling|cos|cot|degrees|exp|floor|log|log10|pi|power|radians|rand|round|sign|sin|sqrt|square|tan)\\b\\s*\\(",
+			"captures": {
+				"1": {
+					"name": "support.function.mathematical.sql"
+				}
+			}
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "constant.other.database-name.sql"
+				},
+				"2": {
+					"name": "constant.other.field-name.sql"
+				}
+			},
+			"match": "(\\w+?)\\.(\\w+)"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#regexps"
+		},
+		{
+			"match": "(?i)\\b(ADD|ALL|ALTER|AND|ANY|AS|ASC|AUTHORIZATION|BACKUP|BEGIN|BETWEEN|BREAK|BROWSE|BULK|BY|CASCADE|CASE|CHECK|CHECKPOINT|CLOSE|CLUSTERED|COALESCE|COLLATE|COLUMN|COMMIT|COMPUTE|CONSTRAINT|CONTAINS|CONTAINSTABLE|CONTINUE|CONVERT|CREATE|CROSS|CURRENT|CURRENT_DATE|CURRENT_TIME|CURRENT_TIMESTAMP|CURRENT_USER|CURSOR|DATABASE|DBCC|DEALLOCATE|DECLARE|DEFAULT|DELETE|DENY|DESC|DISK|DISTINCT|DISTRIBUTED|DOUBLE|DROP|DUMP|ELSE|END|ERRLVL|ESCAPE|EXCEPT|EXEC|EXECUTE|EXISTS|EXIT|EXTERNAL|FETCH|FILE|FILLFACTOR|FOR|FOREIGN|FREETEXT|FREETEXTTABLE|FROM|FULL|FUNCTION|GOTO|GRANT|GROUP|HAVING|HOLDLOCK|IDENTITY|IDENTITY_INSERT|IDENTITYCOL|IF|IN|INDEX|INNER|INSERT|INTERSECT|INTO|IS|KEY|KILL|LIKE|LINENO|LOAD|MERGE|NATIONAL|NOCHECK|NONCLUSTERED|NOT|NULLIF|OF|OFF|OFFSETS|ON|OPEN|OPENDATASOURCE|OPENQUERY|OPENROWSET|OPENXML|OPTION|OR|ORDER|OUTER|OVER|PERCENT|PIVOT|PLAN|PRECISION|PRIMARY|PRINT|PROC|PROCEDURE|PUBLIC|RAISERROR|READ|READTEXT|RECONFIGURE|REFERENCES|REPLICATION|RESTORE|RESTRICT|RETURN|REVERT|REVOKE|RIGHT|ROLLBACK|ROWCOUNT|ROWGUIDCOL|RULE|SAVE|SCHEMA|SECURITYAUDIT|SELECT|SEMANTICKEYPHRASETABLE|SEMANTICSIMILARITYDETAILSTABLE|SEMANTICSIMILARITYTABLE|SESSION_USER|SET|SETUSER|SHUTDOWN|SOME|STATISTICS|SYSTEM_USER|TABLE|TABLESAMPLE|TEXTSIZE|THEN|TO|TOP|TRAN|TRANSACTION|TRIGGER|TRUNCATE|TRY_CONVERT|TSEQUAL|UNION|UNIQUE|UNPIVOT|UPDATETEXT|USE|USER|VALUES|VARYING|VIEW|WAITFOR|WHEN|WHERE|WHILE|WITH|WRITETEXT)\\b",
+			"name": "keyword.other.sql"
+		},
+		{
+			"name": "keyword.function.sql",
+			"match": "(?i)\\b(ABS|ACOS|APP_NAME|APPLOCK_MODE|APPLOCK_TEST|ASCII|ASIN|ATAN|ATN2|AVG|BINARY_CHECKSUM|CAST|CEILING|CHAR|CHARINDEX|CHECKSUM|CHECKSUM_AGG|COL_LENGTH|COL_NAME|COLUMNPROPERTY|COMPUTE|CONCAT|CONCAT_WS|CONTAINSTABLE|CONTEXT_INFO|COS|COT|COUNT|COUNT_BIG|DATALENGTH|DATEADD|DATEDIFF|DATENAME|DATEPART|DATESERIAL|DATEFROMPARTS|DATETIME2FROMPARTS|DATETIMEFROMPARTS|DATETIMEOFFSETFROMPARTS|DAY|DB_ID|DB_NAME|DECRYPTBYASYMKEY|DECRYPTBYCERT|DECRYPTBYKEY|DECRYPTBYKEYAUTOASYMKEY|DECRYPTBYKEYAUTOCERT|DECRYPTBYKEYAUTOKEY|DECRYPTBYKEYAUTOSYMKEY|DECRYPTBYPASSPHRASE|DECRYPTBYTAN|DECRYPTBYTANASYMKEY|DECRYPTBYTANCERT|DECRYPTBYTANKEY|DECRYPTBYTANSYMKEY|DECRYPTBYTESTKEY|DECRYPTBYTESTKEYASYMKEY|DECRYPTBYTESTKEYCERT|DECRYPTBYTESTKEYKEY|DECRYPTBYTESTKEYSYMKEY|DEGREES|DIFFERENCE|ENCRYPTBYASYMKEY|ENCRYPTBYCERT|ENCRYPTBYKEY|ENCRYPTBYPASSPHRASE|ENCRYPTBYTAN|ENCRYPTBYTANASYMKEY|ENCRYPTBYTANCERT|ENCRYPTBYTANKEY|ENCRYPTBYTANSYMKEY|ENCRYPTBYTESTKEY|ENCRYPTBYTESTKEYASYMKEY|ENCRYPTBYTESTKEYCERT|ENCRYPTBYTESTKEYKEY|ENCRYPTBYTESTKEYSYMKEY|EXP|EXP_|FILE_ID|FILE_IDEX|FILE_NAME|FILEGROUP_ID|FILEGROUP_NAME|FILEGROUPPROPERTY|FILEPROPERTY|FLOOR|FORMAT|FULLTEXTCATALOGPROPERTY|FULLTEXTSERVICEPROPERTY|GETANSINULL|GET_FILESTREAM_TRANSACTION_CONTEXT|GETACTIVITYID|GETANSINULL|GETDATE|GETUTCDATE|HOST_ID|HOST_NAME|IDENT_CURRENT|IDENT_INCR|IDENT_SEED|INDEXKEY_PROPERTY|INDEXPROPERTY|IS_MEMBER|IS_SRVROLEMEMBER|ISDATE|ISNULL|ISNUMERIC|LEFT|LEN|LOG|LOG10|LOWER|LTRIM|MAX|MIN)\\w*\\("
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.section.scope.begin.sql"
+				},
+				"2": {
+					"name": "punctuation.section.scope.end.sql"
+				}
+			},
+			"comment": "Allow for special ↩ behavior",
+			"match": "(\\()(\\))",
+			"name": "meta.block.sql"
+		}
+	],
+	"repository": {
+		"keywordsStorage": {
+			"patterns": [
+				{
+					"name": "keyword.control",
+					"match": ":(PUBLIC|DECLARE|CLASS|INHERIT|INCLUDE|PARAMETERS|PROCEDURE|ENDPROC|REGION|ENDREGION|BEGININLINECODE|ENDINLINECODE|ERROR)\\b"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"begin": "(^[ \\t]+)?(?=--)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.leading.sql"
+						}
+					},
+					"end": "(?!\\G)",
+					"patterns": [
+						{
+							"begin": "--",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.comment.sql"
+								}
+							},
+							"end": "\\n",
+							"name": "comment.line.double-dash.sql"
+						}
+					]
+				},
+				{
+					"begin": "(^[ \\t]+)?(?=#)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.leading.sql"
+						}
+					},
+					"end": "(?!\\G)",
+					"patterns": []
+				},
+				{
+					"begin": "/\\*",
+					"captures": {
+						"0": {
+							"name": "punctuation.definition.comment.sql"
+						}
+					},
+					"end": "\\*/",
+					"name": "comment.block.c"
+				}
+			]
+		}
+	}
+}
