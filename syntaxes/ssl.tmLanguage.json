@@ -1,0 +1,315 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Starlims Scripting Language",
+  "scopeName": "source.ssl",
+  "patterns": [
+    {
+      "include": "#keywordsControl"
+    },
+    {
+      "include": "#keywordsStorage"
+    },
+    {
+      "include": "#expression"
+    }
+  ],
+  "repository": {
+    "keywordsControl": {
+      "patterns": [
+        {
+          "name": "starlims.ssl.keyword.control",
+          "match": ":(BEGINCASE|CASE|ENDCASE|EXITCASE|OTHERWISE|IF|DEFAULT|REGION|ENDREGION|ENDIF|ELSE|LOOP|WHILE|ENDWHILE|FOR|NEXT|STEP|EXITFOR|RESUME|CASE|EXITCASE|RETURN|TRY|CATCH|FINALLY|ENDTRY|TO)\\b"
+        }
+      ]
+    },
+    "keywordsStorage": {
+      "patterns": [
+        {
+          "name": "starlims.ssl.keyword.storage",
+          "match": ":(PUBLIC|DECLARE|CLASS|INHERIT|INCLUDE|PARAMETERS|PROCEDURE|ENDPROC|REGION|ENDREGION|BEGININLINECODE|ENDINLINECODE|ERROR)\\b"
+        }
+      ]
+    },
+    "expression": {
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#embeddedSql"
+        },
+        {
+          "include": "#iif"
+        },
+        {
+          "include": "#blueFunctions"
+        },
+        {
+          "include": "#function"
+        },
+        {
+          "include": "#identifier_accessed"
+        },
+        {
+          "include": "#identifier"
+        },
+        {
+          "include": "#stringsDouble"
+        },
+        {
+          "include": "#stringsSingle"
+        },
+        {
+          "include": "#navigatorVars"
+        },
+        {
+          "include": "#identifier"
+        },
+        {
+          "include": "#operator"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "include": "#array"
+        },
+        {
+          "include": "#langConstants"
+        }
+      ]
+    },
+    "comment": {
+      "name": "comment.block.srvsrc",
+      "begin": "/\\*",
+      "end": ";"
+    },
+    "identifier": {
+      "patterns": [
+        {
+          "name": "variable",
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?!\\()"
+        }
+      ]
+    },
+    "identifier_accessed": {
+      "patterns": [
+        {
+          "name": "variable",
+          "begin": "\\b[a-zA-Z_][a-zA-Z0-9_]*(\\[)",
+          "end": "\\]",
+          "patterns": [
+            {
+              "include": "#expression"
+            },
+            {
+              "begin": ",",
+              "end": "(?=,)|(?=\\])",
+              "patterns": [
+                {
+                  "include": "#expression"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "blueFunctions": {
+      "name": "starlims.blue-function",
+      "begin": "(?i)\\b(DoProc|ExecFunction|ExecUdf|CreateUDObject|Branch|aadd|aeval|aevala|afill|alen|arraycalc|arraynew|ascan|ascanexact|buildarray|buildarray2|buildstring|buildstring2|BuildStringForIn|comparray|delarray|extractcol|PrepareArrayForIn|SortArray|ArrayToTVP|deleteinlinecode|endlimsoleconnect|getinlinecode|getregion|In64BitMode|Let|LimsCleanup|LimsNETConnect|LimsNETTypeOf|limsoleconnect|MakeNETObject|StationName|BeginLimsTransaction|DetectSqlInjections|EndLimsTransaction|GetConnectionByName|GetConnectionStrings|GetDataSet|GetDataSetEx|GetDataSetFromArray|GetDataSetFromArrayEx|GetDataSetWithSchemaFromSelect|GetDataSetXMLFromArray|GetDataSetXMLFromSelect|GetDBMSName|GetDBMSProviderName|GetDefaultConnection|GetLastSQLError|GetNETDataSet|GetNoLock|GetTables|GetTransactionsCount|IgnoreSqlErrors|IsDBConnected|IsInTransaction|IsTable|IsTableFld|LimsRecordsAffected|LimsSetCounter|LimsSqlConnect|LimsSqlDisconnect|LSearch|LSelect|LSelect1|LSelectC|RetrieveLong|ReturnLastSQLError|RunSQL|SetDefaultConnection|SetSqlTimeout|ShowSqlErrors|SQLExecute|SQLRemoveComments|TableFldLst|UpdLong|GetDSParameters|GetSSLDataset|RunDS|IsDefined|IsHex|LFromHex|LHex2Dec|LimsNETCast|LimsType|LimsTypeEx|LToHex|ClientEndOfDay|ClientStartOfDay|CMonth|CToD|DateAdd|DateDiff|DateDiffEx|DateFormat|DateFromNumbers|DateFromString|DateToString|Day|DOW|DOY|DToC|DToS|Hour|IsInvariantDate|JDay|LIMSDate|LimsGetDateFormat|LimsTime|MakeDateInvariant|MakeDateLocal|Minute|Month|NoOfDays|Now|Second|Seconds|ServerEndOfDay|ServerStartOfDay|ServerTimeZone|SetAmPm|StringToDate|Time|Today|UserTimeZone|ValidateDate|Year|SendFromOutbox|SendLimsEmail|SendOutlookReminder|SendToOutbox|ClearLastSSLError|FormatErrorMessage|FormatSqlErrorMessage|GetLastSSLError|RaiseError|CombineFiles|Directory|DosSupport|FileSupport|lDir|ReadBytesBase64|ReadText|WriteBytesBase64|WriteText|CheckOnFtp|CopyToFtp|DeleteDirOnFtp|DeleteFromFtp|GetDirFromFtp|GetFromFtp|MakeDirOnFtp|MoveInFtp|ReadFromFtp|RenameOnFtp|SendToFtp|WriteToFtp|MergeHtmlForm|Break|Compress|CreateGUID|CreateLocal|CreatePublic|CreateZip|Decompress|ErrorMes|ExtractZip|GetAppBaseFolder|GetAppWorkPathFolder|GetByName|GetExecutionTrace|GetFeaturesAndNumbers|GetFileVersion|GetForbiddenAppIDs|GetForbiddenDesignerAppIDs|GetInstallationKey|GetLicenseInfoAsText|GetLogsFolder|GetNumberOfInstrumentConnections|GetNumberOfNamedConcurrentUsers|GetNumberOfNamedUsers|GetPrinters|GetSetting|GetSettings|GetSystemLayerId|GetWebFolder|InBatchProcess|InfoMes|IsDemoLicense|IsFeatureAuthorized|IsFeatureBasedLicense|IsGuid|IsProductionModeOn|LCase|LKill|NetFrameworkVersion|Nothing|ResetApplication|ResetFeatures|SetByName|SqlTraceOff|SqlTraceOn|TryConnect|usrmes|bs|GetDecimalSep|GetDecimalSeparator|GetGroupSeparator|Integer|IsNumeric|LimsXOr|MatFunc|Max|Min|Rand|Round|RoundPoint5|Scient|SetDecimalSeparator|SetGroupSeparator|SigFig|Sqrt|StdRound|ToNumeric|ToScientific|Val|ValidateNumeric|LimsExec|lWait|PrmCount|RunApp|SubmitToBatch|SubmitToBatchEx|TraceOff|TraceOn|UndeclaredVars|LPrint|SetLocationOracle|SetLocationSQLServer|ConvertReport|ChkNewPassword|ChkPassword|DecryptData|EncryptData|GetUserData|HashData|LDAPAuth|LDAPAuthEX|SearchLDAPUser|SetUserData|SetUserPassword|VerifySignature|ValidateFieldData|ValidateData|ValidateDSParams|AllTrim|Asc|At|Chr|Empty|Left|Len|LimsAt|LimsString|LLower|Lower|LStr|LTransform|LTrim|MimeDecode|MimeEncode|Rat|Replace|Replicate|Right|Seval|Str|StringAdd|StringClean|StringCreate|StringGet|StringKill|StrSrch|StrTran|StrZero|SubStr|Trim|Upper|GetAllClientScripts|MergeGlobalResources|PrepareForm|PrepareFormClientScript|ProcessXfdFormForImport|SyncDesignResources|SyncProgramaticResourcesAddProperty|ExecInternal|GetInternal|GetInternalC|HasProperty|SetInternal|SetInternalC|AddToApplication|AddToSession|ClearSession|FromJson|GetFromApplication|GetFromSession|ToJson|UrlDecode|UrlEncodeGetClientScriptReferences|GetFormReferences|MergeXfd|FromXml|HtmlDecode|HtmlEncode|ToXml|XmlDomToUdObject)(\\()",
+      "end": "\\)",
+      "patterns": [
+        {
+          "include": "#expression"
+        },
+        {
+          "begin": ",",
+          "end": "(?=,)|(?=\\))",
+          "patterns": [
+            {
+              "include": "#expression"
+            }
+          ]
+        }
+      ]
+    },
+    "navigatorVars": {
+      "name": "starlims.navigator-variables",
+      "match": "(?i)(MYUSERNAME|STARLIMSDEPT|MYUSERROLE)"
+    },
+    "iif": {
+      "name": "starlims.blue-function",
+      "begin": "(?i)\\b(iif)(\\()",
+      "end": "\\)",
+      "patterns": [
+        {
+          "include": "#expression"
+        },
+        {
+          "begin": ",",
+          "end": "(?=,)|(?=\\))",
+          "patterns": [
+            {
+              "include": "#expression"
+            }
+          ]
+        }
+      ]
+    },
+    "iif_in_sql": {
+      "name": "starlims.blue-function",
+      "begin": "(?i)\\b(iif)(\\()",
+      "end": "\\)",
+      "beginCaptures": {
+        "1": { "name": "starlims.blue-function" }
+      },
+      "patterns": [
+        {
+          "include": "#expression"
+        },
+        {
+          "begin": ",",
+          "end": "(?=,)|(?=\\))",
+          "patterns": [
+            {
+              "include": "#expression_in_sql"
+            }
+          ]
+        }
+      ]
+    },
+    "function": {
+      "begin": "\\b(?!iif\\()[a-zA-Z_][a-zA-Z0-9_]*(\\()",
+      "end": "\\)",
+      "name": "entity.name.function",
+      "patterns": [
+        {
+          "include": "#expression"
+        },
+        {
+          "begin": ",",
+          "end": "(?=,)|(?=\\))",
+          "patterns": [
+            {
+              "include": "#expression"
+            }
+          ]
+        }
+      ]
+    },
+    "langConstants": {
+      "name": "constant.language",
+      "match": "\\.(t|T|f|F)\\."
+    },
+    "numbers": {
+      "name": "constant.numeric",
+      "match": "-?[0-9]+(\\.[0-9]*)?|(\\.[0-9]+)"
+    },
+    "operator": {
+      "name": "keyword.operator",
+      "match": "(\\.(and|AND|or|OR)\\.)|=|:=|>=?|<=?|\\+|\\-|==|!=|\\+(?![0-9])|\\-(?![0-9])"
+    },
+    "array": {
+      "begin": "\\{",
+      "end": "\\}",
+      "patterns": [
+        {
+          "include": "#expression"
+        }
+      ]
+    },
+    "stringsDouble": {
+      "name": "string.quoted.double",
+      "begin": "\"",
+      "end": "\""
+    },
+    "stringsSingle": {
+      "name": "string.quoted.single",
+      "begin": "'",
+      "end": "'"
+    },
+    "embeddedSql": {
+      "begin": "(?i)(GetDataSet|GetDataSetEx|SqlExecute|RunSql|LSearch|LSelect|SqlUtils:GetUDo)\\s*\\(\\s*",
+      "end": "\\)|,",
+      "name": "starlims.blue-function.sql",
+      "patterns": [
+        {
+          "include": "#expression_in_sql"
+        },
+        {
+          "begin": ",",
+          "end": "(?=,)|(?=\\))",
+          "patterns": [
+            {
+              "include": "#expression"
+        }
+          ]
+        }
+      ]
+      },
+    "expression_in_sql": {
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#embeddedSqlStringsDouble"
+        },
+        {
+          "include": "#embeddedSqlStringsSingle"
+        },
+        {
+          "include": "#embeddedSql"
+        },
+        {
+          "include": "#iif_in_sql"
+        },
+        {
+          "include": "#blueFunctions"
+        },
+        {
+          "include": "#function"
+        },
+        {
+          "include": "#identifier_accessed"
+        },
+        {
+          "include": "#identifier"
+        },
+        {
+          "include": "#operator"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "include": "#array"
+        },
+        {
+          "include": "#langConstants"
+        }
+      ]
+    },
+    "embeddedSqlStringsDouble": {
+      "name": "meta.embedded.block.sql",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "include": "source.sql"
+        }
+      ]
+    },
+    "embeddedSqlStringsSingle": {
+      "name": "meta.embedded.block.sql",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "include": "source.sql"
+        }
+      ]
+    }
+  }
+}
