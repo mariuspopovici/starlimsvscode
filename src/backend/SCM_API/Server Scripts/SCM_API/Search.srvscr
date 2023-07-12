@@ -3,7 +3,7 @@ Description.. :	Search for items and return all matches
 Author....... :	DC
 Date......... : 2023-06-29
 *******************************************************************************/;
-:DECLARE sSQL, searchStr, aItems, oResult, oUtils, bFolder;
+:DECLARE sSQL, searchStr, aItems, oResult, oUtils, bFolder, nLayerID;
 
 oUtils := CreateUDObject("SCM_API.Utils", {});
 oResponse := CreateUDObject({
@@ -19,6 +19,8 @@ oResponse := CreateUDObject({
 	oResponse:data := String:Format("Missing required parameter: {0}", "itemName");
 	:RETURN oResponse;
 :ENDIF;
+
+nLayerID := GetSystemLayerId();
 
 sSQL :=
 "select 
@@ -43,6 +45,7 @@ from LIMSXFDFORMS f
 join LIMSAPPLICATIONS a on a.APPID = f.APPID
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 where f.FORMNAME like '%" + limsstring(searchStr) + "%'
+and f.LAYERID = ?nLayerID?
 
 union
 
@@ -68,6 +71,7 @@ from LIMSXFDFORMS f
 join LIMSAPPLICATIONS a on a.APPID = f.APPID
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 where f.FORMNAME like '%" + limsstring(searchStr) + "%'
+and f.LAYERID = ?nLayerID?
 
 union
 
@@ -84,8 +88,10 @@ join LIMSAPPLICATIONS a on a.APPID = f.APPID
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 where f.FORMNAME like '%" + limsstring(searchStr) + "%'
 and f.FORMTYPE = 'HTML'
+and f.LAYERID = ?nLayerID?
 
 union
+
 select
 s.DISPLAYTEXT as name, 
 'APPSS' as type,
@@ -99,6 +105,7 @@ join LIMSAPPSERVERSCRIPTS aps on aps.APPID = a.APPID
 join LIMSSERVERSCRIPTS s on s.SCRIPTID = aps.SCRIPTID
 join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
+and s.LAYERID = ?nLayerID?
 
 union
 
@@ -115,6 +122,7 @@ join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 join LIMSAPPCLIENTSCRIPTS apc on apc.APPID = a.APPID
 join LIMSCLIENTSCRIPTS s on s.SCRIPTID = apc.SCRIPTID
 where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
+and s.LAYERID = ?nLayerID?
 
 union
 
@@ -131,6 +139,7 @@ join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 join LIMSAPPDATASOURCES aps on aps.APPID = a.APPID
 join LIMSDATASOURCES s on s.DATASOURCEID = aps.DATASOURCEID
 where s.DSNAME like '%" + limsstring(searchStr) + "%'
+and s.LAYERID = ?nLayerID?
 
 union
 
@@ -145,6 +154,7 @@ s.SCRIPTID as guid
 from LIMSSERVERSCRIPTCATEGORIES c
 join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
 where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
+and s.LAYERID = ?nLayerID?
 
 union
 
@@ -159,6 +169,7 @@ s.DATASOURCEID as guid
 from LIMSDATASOURCECATEGORIES c
 join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
 where s.DSNAME like '%" + limsstring(searchStr) + "%'
+and s.LAYERID = ?nLayerID?
 
 union
 
@@ -173,6 +184,7 @@ s.SCRIPTID as guid
 from LIMSCLIENTSCRIPTCATEGORIES c
 join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
 where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
+and s.LAYERID = ?nLayerID?
 
 order by 3";
 
