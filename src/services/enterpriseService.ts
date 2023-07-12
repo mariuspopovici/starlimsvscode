@@ -5,7 +5,8 @@ import * as vscode from "vscode";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { Enterprise } from "./enterprise";
-import jsdom from "jsdom";
+import { connectBridge } from "../utilities/bridge";
+import { cleanUrl } from "../utilities/miscUtils";
 
 /** 
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
@@ -14,6 +15,7 @@ import jsdom from "jsdom";
 export class EnterpriseService implements Enterprise {
   private config: any;
   private baseUrl: string;
+  private refreshSessionInterval : NodeJS.Timeout | undefined;
 
   /** 
    * Constructor
@@ -21,7 +23,7 @@ export class EnterpriseService implements Enterprise {
    */
   constructor(config: vscode.WorkspaceConfiguration) {
     this.config = config;
-    this.baseUrl = this.cleanUrl(config.url);
+    this.baseUrl = cleanUrl(config.url);
   }
 
   /**
@@ -326,18 +328,6 @@ export class EnterpriseService implements Enterprise {
     ];
   }
 
-  /** 
-   * Cleans up the configured app URL by removing unnecessary things suchs as extra / characters.
-   * @param url the STARLIMS app URL
-   * @returns the base URL for REST API calls */
-  private cleanUrl(url: string) {
-    let newUrl = url.endsWith("/") ? url.slice(0, -1) : url;
-    if (newUrl.endsWith(".lims")) {
-      newUrl = newUrl.slice(0, newUrl.lastIndexOf("/"));
-    }
-    return newUrl;
-  }
-
   /**
    * Clear log file of selected user
    * @param uri the URI of the log file item.
@@ -478,5 +468,113 @@ export class EnterpriseService implements Enterprise {
       console.error(e);
       return false;
     }
+  }
+
+  /**
+   * Launches an XFD form via the STARLIMS HTML bridge.
+   * 
+   * @param uri the URI of the enterprise item
+   * @returns the form return value
+   */
+  public async runXFDForm(uri: string) {
+
+    const isBridgeUp = this.connectStarlimsBridge();
+    if (!isBridgeUp) {
+      vscode.window.showErrorMessage("STARLIMS bridge is not running.");
+      return;
+    }
+
+    const sessionInfo = await this.getServerSessions();
+    if (!sessionInfo) {
+      return false;
+    }
+
+    // start a session refresh task otherwise the current session
+    // will expire in 2 minutes
+    
+    const uriComponents = uri.split("/").slice(-4);
+    const [appName,,, formName] = uriComponents;
+    const bridgeURL = `http://localhost:5468/xfdforms/${appName}/${formName}`;
+    const starlimsUrl = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`;
+    const bridgeRequestBody = {
+      "webAddress": starlimsUrl,
+      "aspnet-sessionid": sessionInfo.aspnetsessionid,
+      "starlims-sessionid": sessionInfo.starlimssessionid,
+      "langid": sessionInfo.langid,
+      "needsGUID": true,
+      "formParameters": []
+    };
+
+
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "POST",
+      headers,
+      body: JSON.stringify(bridgeRequestBody)
+    };
+
+    try {
+      const response = await fetch(bridgeURL, options);
+      await response.text();
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
+      console.error(e);
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Gets the STARLIMS application session IDs from server.
+   * 
+   * @returns object with ```aspnetsessionid``` and ```starlimssessionid```
+   */
+  private async getServerSessions() {
+    const url = `${this.baseUrl}/SCM_API.GetSessions.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
+        return null;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not delete item.");
+      console.error(e);
+      return null;
+    }
+  }
+
+  /**
+   * Attempts to connect to the STARLIMS bridge and starts a session refresh
+   * task if successful.
+   * 
+   * @returns ```true``` if the STARLIMS bridge is up and ```false``` otherwise
+   */
+  private async connectStarlimsBridge() {
+    if (this.refreshSessionInterval) {
+      clearInterval(this.refreshSessionInterval);
+    }
+
+    const result = await connectBridge();
+    if (result) {
+      const _this = this;
+      this.refreshSessionInterval = setInterval(() => {
+        console.log("Refreshing bridge session.");
+        _this.getServerSessions();
+      }, 90 * 1000);
+    }
+
+    return result;
   }
 }

@@ -46,26 +46,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2023-06-23
 
 ### Changed
+
 - Display the extension on the activity bar of vscode
 - Automatically copy selected files to local folder and open it
 
 ### Added
+
 - Check in/out items
 
 ## [1.2.4] - 2023-07-04
+
 - implemented a basic search functionality
 - open HTML forms in browser
 
 ## [1.2.5] - 2023-07-06
+
 - added root path to configuration
 - don't show starlimsvscode functions on files not in root path
 
 ## [1.2.6] - 2023-07-08
+
 - add view and clear log files
 
 ## [1.2.7] - 2023-07-08
+
 - fixed path issues
 
 ## [1.2.8] - 2023-07-10
+
 - add new items
 - delete existing items
+
+## [1.2.9] - 2023-07-12
+
+- run XFD forms via the STARLIMS bridge
