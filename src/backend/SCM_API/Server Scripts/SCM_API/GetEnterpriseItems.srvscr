@@ -117,8 +117,8 @@ bFolder := .T.;
 			sFormName := oEnterpriseItem:AppName + "." + oRow["FORMNAME"];
 			sGUID := oUtils:GetItemGUID(sFormName, "HTMLFORMXML");
 			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "HTMLFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], NIL});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Guide]", "HTMLFORMGUIDE", "JSON", sURI + "/Guide/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "HTMLFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Guide]", "HTMLFORMGUIDE", "JSON", sURI + "/Guide/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
 		:NEXT;
 	:EXITCASE;
 	
