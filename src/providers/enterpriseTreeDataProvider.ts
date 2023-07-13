@@ -101,6 +101,7 @@ export class EnterpriseTreeDataProvider
       newItem.contextValue = item.type;
       newItem.iconPath = _this.getItemIcon(item);
       newItem.label = item.checkedOutBy ? `${newItem.label} (Checked out by ${item.checkedOutBy})` : newItem.label;
+      newItem.checkedOutBy = item.checkedOutBy;
       newItem.resourceUri = _this.getItemResource(item);
       returnItems.push(newItem);
     });

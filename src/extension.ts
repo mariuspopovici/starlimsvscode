@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // this command activates the extension
-  vscode.commands.registerCommand("STARLIMS.Connect", () => {});
+  vscode.commands.registerCommand("STARLIMS.Connect", () => { });
 
   // register the selectEnterpriseItem command
   vscode.commands.registerCommand(
@@ -174,6 +174,8 @@ export async function activate(context: vscode.ExtensionContext) {
           // show the document
           await vscode.window.showTextDocument(openDocument);
 
+          setReadWrite(item);
+
           // scroll to bottom of document
           enterpriseService.scrollToBottom();
         } else {
@@ -187,11 +189,13 @@ export async function activate(context: vscode.ExtensionContext) {
           rootPath!
         );
 
-        // open the file locally
+        // open the item locally
         if (localFilePath) {
           item.filePath = localFilePath;
           let localUri: vscode.Uri = vscode.Uri.file(localFilePath);
           await vscode.window.showTextDocument(localUri, { preview: false });
+
+          setReadWrite(item);
 
           // scroll to bottom of log files
           if (localUri.toString().endsWith(".log")) {
@@ -209,24 +213,47 @@ export async function activate(context: vscode.ExtensionContext) {
       // get local copy of the item
       const localFilePath = await enterpriseService.getLocalCopy(
         item.uri ||
-          (item.path
-            ? item.path.slice(0, item.path.lastIndexOf("."))
-            : undefined),
+        (item.path
+          ? item.path.slice(0, item.path.lastIndexOf("."))
+          : undefined),
         rootPath!
       );
       if (localFilePath) {
         let uri: vscode.Uri = vscode.Uri.file(localFilePath);
-        vscode.window.showTextDocument(uri);
+        await vscode.window.showTextDocument(uri);
+        await setReadWrite(item);
       }
     }
   );
+
+  // set document to read only if item is not checked out and vice versa (requires vscode insiders)
+  async function setReadWrite(item: TreeEnterpriseItem) {
+    // check if the commands are available (VSCode version >= 1.79 (May 2023))
+    // see https://code.visualstudio.com/updates/v1_79#_readonly-mode
+    if (!(await vscode.commands.getCommands()).includes("workbench.action.files.setActiveEditorReadonlyInSession")) {
+      return;
+    }
+
+    // check if the item is checked out by the current user
+    if (item.checkedOutBy === user) {
+      vscode.commands.executeCommand(
+        "workbench.action.files.resetActiveEditorReadonlyInSession"
+      );
+    }
+    else {
+      vscode.commands.executeCommand(
+        "workbench.action.files.setActiveEditorReadonlyInSession"
+      );
+      vscode.window.showInformationMessage("Please check out the item to make changes.");
+    }
+  }
 
   // register the RunScript command handler
   vscode.commands.registerCommand(
     "STARLIMS.RunScript",
     async (item: TreeEnterpriseItem | any) => {
       let remoteUri: string = "";
-      
+
       // commands can originate from the enterprise tree or from an open editor window
       const isTreeCommand = item instanceof TreeEnterpriseItem;
 
@@ -246,7 +273,7 @@ export async function activate(context: vscode.ExtensionContext) {
       outputChannel.appendLine(
         `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
       );
-      
+
       const result = await enterpriseService.runScript(remoteUri.toString());
       if (result) {
         outputChannel.appendLine(result);
@@ -259,7 +286,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Compare",
     async (uri: vscode.Uri) => {
-      // command executed on the file tree
+      // command executed on the item tree
       let localUri = uri;
       if (!localUri) {
         // if not, compare with the open document
@@ -316,6 +343,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (bSuccess) {
         item.checkedOutBy = "";
         enterpriseProvider.refresh();
+        setReadWrite(item);
       }
     }
   );
@@ -582,7 +610,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // create the item
       var sReturn = await enterpriseService.addItem(itemName, itemType, itemLanguage, categoryName, appName);
-      
+
       if (sReturn.length > 0) {
         enterpriseProvider.refresh();
 
@@ -592,7 +620,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // open newly created item (works only if section is expanded)
         var sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
         var newItem = await enterpriseProvider.getTreeItemByUri(sUri);
-        if(newItem !== undefined) {
+        if (newItem !== undefined) {
           vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
         }
       }
@@ -606,11 +634,11 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage("Please select an item to delete.");
         return;
       }
-      if(selectedItem.type === EnterpriseItemType.EnterpriseCategory) {
+      if (selectedItem.type === EnterpriseItemType.EnterpriseCategory) {
         vscode.window.showErrorMessage("Enterprise Categories cannot be deleted.");
         return;
       }
-      if(selectedItem.type === EnterpriseItemType.ServerLog) {
+      if (selectedItem.type === EnterpriseItemType.ServerLog) {
         vscode.window.showErrorMessage("Server Logs cannot be deleted.");
         return;
       }
@@ -630,7 +658,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (bSuccess) {
         // close open document
         const openDocument = vscode.workspace.textDocuments.find(
-            (doc) => selectedItem !== undefined && doc.uri.fsPath.toLowerCase() === selectedItem.filePath?.toLowerCase()
+          (doc) => selectedItem !== undefined && doc.uri.fsPath.toLowerCase() === selectedItem.filePath?.toLowerCase()
         );
         if (openDocument) {
           vscode.window.showTextDocument(openDocument).then(() => {
@@ -642,7 +670,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }
   );
-  
+
   // show connection message
   vscode.commands.registerCommand(
     "STARLIMS.RunDataSource",
@@ -650,7 +678,7 @@ export async function activate(context: vscode.ExtensionContext) {
       let remoteUri: string = "";
       // commands can originate from the enterprise tree or from an open editor window
       const isTreeCommand = item instanceof TreeEnterpriseItem;
-      
+
       if (isTreeCommand) {
         remoteUri = item.uri;
       } else {
@@ -667,7 +695,7 @@ export async function activate(context: vscode.ExtensionContext) {
       outputChannel.appendLine(
         `${new Date().toLocaleString()} Executing remote data source at URI: ${remoteUri}`
       );
-      
+
       const result = await enterpriseService.runScript(remoteUri);
       if (result) {
         outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
@@ -685,7 +713,7 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.OpenXFDForm",
     async (item: TreeEnterpriseItem | any) => {
       let remoteUri: string = "";
-      
+
       // commands can originate from the enterprise tree or from an open editor window
       const isTreeCommand = item instanceof TreeEnterpriseItem;
 
@@ -705,7 +733,7 @@ export async function activate(context: vscode.ExtensionContext) {
       outputChannel.appendLine(
         `${new Date().toLocaleString()} Launching remote form at URI: ${remoteUri}`
       );
-      
+
       const result = await enterpriseService.runXFDForm(remoteUri.toString());
       if (result) {
         outputChannel.appendLine("Launched form successfully. Please wait while the STARLIMS HTML bridge completes the request.");
@@ -720,4 +748,4 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

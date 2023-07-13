@@ -478,7 +478,7 @@ export class EnterpriseService implements Enterprise {
    */
   public async runXFDForm(uri: string) {
 
-    const isBridgeUp = this.connectStarlimsBridge();
+    const isBridgeUp = await this.connectStarlimsBridge();
     if (!isBridgeUp) {
       vscode.window.showErrorMessage("STARLIMS bridge is not running.");
       return;
