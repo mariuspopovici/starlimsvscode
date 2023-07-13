@@ -688,6 +688,40 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the RunXFDForm command handler
+  vscode.commands.registerCommand(
+    "STARLIMS.OpenXFDForm",
+    async (item: TreeEnterpriseItem | any) => {
+      let remoteUri: string = "";
+
+      // commands can originate from the enterprise tree or from an open editor window
+      const isTreeCommand = item instanceof TreeEnterpriseItem;
+
+      if (isTreeCommand) {
+        remoteUri = item.uri;
+      } else {
+        // command originates from a document context menu
+        const uri = item.path
+          ? item.path.slice(0, item.path.lastIndexOf("."))
+          : undefined;
+        if (config.has("rootPath")) {
+          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
+        }
+      }
+
+      outputChannel.appendLine(
+        `${new Date().toLocaleString()} Launching remote form at URI: ${remoteUri}`
+      );
+
+      const result = await enterpriseService.runXFDForm(remoteUri.toString());
+      if (result) {
+        outputChannel.appendLine("Launched form successfully. Please wait while the STARLIMS HTML bridge completes the request.");
+        outputChannel.show();
+      }
+    }
+  );
+
   vscode.window.showInformationMessage(
     `Connected to STARLIMS on ${config.url}.`
   );
