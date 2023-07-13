@@ -478,7 +478,7 @@ export class EnterpriseService implements Enterprise {
    */
   public async runXFDForm(uri: string) {
 
-    const isBridgeUp = this.connectStarlimsBridge();
+    const isBridgeUp = await this.connectStarlimsBridge();
     if (!isBridgeUp) {
       vscode.window.showErrorMessage("STARLIMS bridge is not running.");
       return;
@@ -517,7 +517,7 @@ export class EnterpriseService implements Enterprise {
       const response = await fetch(bridgeURL, options);
       await response.text();
     } catch (e: any) {
-      vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
+      vscode.window.showErrorMessage("Failed execute HTTP call to remote service.");
       console.error(e);
       return false;
     }
