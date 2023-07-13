@@ -12,4 +12,5 @@ export interface Enterprise {
   getEnterpriseItemUri(uri: string, rootPath: string): any;
   scrollToBottom(): any;
   searchForItems(searchText: string): any;
+  runXFDForm(uri: string): any;
 }

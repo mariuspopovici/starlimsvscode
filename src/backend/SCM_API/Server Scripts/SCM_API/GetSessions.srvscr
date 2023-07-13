@@ -1,0 +1,54 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	MARIUS
+Date......... : 2023-07-11
+********************************************************************************
+_______________________________________________________________________________
+
+Ticket #..... :	
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse;
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:TRY;
+	oResult := CreateUDObject();
+	oResult:aspnetsessionid := Session:SessionId;
+	
+	:DECLARE sSLSessionId, sKey;
+	sKey := MYUSERNAME + "_VSCODE_SESSION";
+	:IF Empty(PublicConsts:GetValue(sKey));
+		sSLSessionId := CreateGuid();
+		PublicConsts:AddValue(sKey, sSLSessionId);
+	:ELSE;
+		sSLSessionId := PublicConsts:GetValue(sKey);
+	:ENDIF;
+	oResult:starlimssessionid := sSLSessionId;
+	Session:Add("SessionId", oResult:starlimssessionid);
+	Session:Add("STARLIMSUser", MYUSERNAME);
+	oResult:langid := GetSetting("DEFAULTLANGUAGE");
+:CATCH;
+	Response:StatusCode := 200;
+	oResponse:success := .F.;
+	oResponse:data := "Unexpected error.";
+	:RETURN oResponse;
+:ENDTRY;
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+oResponse:data := oResult;
+:RETURN oResponse;

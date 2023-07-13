@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.12",
+  "version": "1.2.9",
   "publisher": "Marius Popovici, Christoph Döllinger, Jan Bouecke",
   "keywords": [
     "STARLIMS",
@@ -120,6 +120,10 @@
           "dark": "resources/dark/delete.svg",
           "light": "resources/light/delete.svg"
         }
+      },
+      {
+        "command": "STARLIMS.OpenXFDForm",
+        "title": "Open Form"
       }
     ],
     "menus": {
@@ -172,7 +176,7 @@
         },
         {
           "command": "STARLIMS.OpenForm",
-          "when": "view == STARLIMS && viewItem == HTMLFORMXML"
+          "when": "view == STARLIMS && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)"
         },
         {
           "command": "STARLIMS.Delete",
@@ -181,6 +185,10 @@
         {
           "command": "STARLIMS.Add",
           "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != APP"
+        },
+        {
+          "command": "STARLIMS.OpenXFDForm",
+          "when": "view == STARLIMS && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)"
         }
       ],
       "explorer/context": [
@@ -221,6 +229,14 @@
         {
           "command": "STARLIMS.ClearLog",
           "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
+        },
+        {
+          "command": "STARLIMS.OpenXFDForm",
+          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /XFDForms/"
+        },
+        {
+          "command": "STARLIMS.OpenForm",
+          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
         }
       ]
     },
@@ -327,6 +343,7 @@
     "@vscode/test-electron": "^2.1.3",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
+    "esbuild": "^0.17.19",
     "eslint": "^8.11.0",
     "glob": "^7.2.0",
     "mocha": "^9.2.2",
@@ -334,8 +351,7 @@
     "ts-loader": "^9.2.8",
     "typescript": "^4.5.5",
     "webpack": "^5.84.1",
-    "webpack-cli": "^4.10.0",
-    "esbuild": "^0.17.19"
+    "webpack-cli": "^4.10.0"
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.2.2",
