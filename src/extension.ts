@@ -132,17 +132,6 @@ export async function activate(context: vscode.ExtensionContext) {
       // if not, get the item from the tree data provider
       item = enterpriseProvider.getTreeItemForDocument(item) as TreeEnterpriseItem;
     }
-  // register the 1terpriseItem command
-  vscode.commands.registerCommand(
-    "STARLIMS.selectEnterpriseItem",
-    async (item: TreeEnterpriseItem) => {
-      // check if item is TreeEnterpriseItem
-      if (!(item instanceof TreeEnterpriseItem)) {
-        // if not, get the item from the tree data provider
-        item = enterpriseProvider.getTreeItemForDocument(
-          item
-        ) as TreeEnterpriseItem;
-      }
 
     // set the selected item
     selectedItem = item;
@@ -247,22 +236,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
     outputChannel.appendLine(`${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`);
 
-      executeWithProgress(async () => {
-        const result = await enterpriseService.runScript(remoteUri.toString());
-          if (result) {
-            outputChannel.appendLine(result);
-            outputChannel.show();
-          }
-      }, "Executing script...");
-    }
-
-    outputChannel.appendLine(`${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`);
-
-    const result = await enterpriseService.runScript(remoteUri.toString());
-    if (result) {
-      outputChannel.appendLine(result);
-      outputChannel.show();
-    }
+    executeWithProgress(async () => {
+      const result = await enterpriseService.runScript(remoteUri.toString());
+      if (result) {
+        outputChannel.appendLine(result);
+        outputChannel.show();
+      }
+    }, "Executing script...");
   });
 
   // register the remote compare command
@@ -598,19 +578,13 @@ export async function activate(context: vscode.ExtensionContext) {
       const openDocument = vscode.workspace.textDocuments.find(
         (doc) => selectedItem !== undefined && doc.uri.fsPath.toLowerCase() === selectedItem.filePath?.toLowerCase()
       );
-      
-      
-      executeWithProgress(async () => {
-        const result = await enterpriseService.runScript(remoteUri);
-        if (result) {
-          outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
-          outputChannel.show();
-          DataViewPanel.render(context.extensionUri, {
-            name: remoteUri.toString(),
-            data: result,
-          });
-        }
-      }, "Executing data source...");     
+      if (openDocument) {
+        vscode.window.showTextDocument(openDocument).then(() => {
+          vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+        });
+      }
+      selectedItem = undefined;
+      enterpriseProvider.refresh();
     }
   });
 
@@ -633,34 +607,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
     outputChannel.appendLine(`${new Date().toLocaleString()} Executing remote data source at URI: ${remoteUri}`);
 
-    const result = await enterpriseService.runScript(remoteUri);
-    if (result) {
-      outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
-      outputChannel.show();
-      DataViewPanel.render(context.extensionUri, {
-        name: remoteUri.toString(),
-        data: result,
-      });
-    }
+    executeWithProgress(async () => {
+      const result = await enterpriseService.runScript(remoteUri);
+      if (result) {
+        outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
+        outputChannel.show();
+        DataViewPanel.render(context.extensionUri, {
+          name: remoteUri.toString(),
+          data: result,
+        });
+      }
+    }, "Executing data source...");
   });
-      outputChannel.appendLine(
-        `${new Date().toLocaleString()} Executing remote data source at URI: ${remoteUri}`
-      );
-      
-      
-      executeWithProgress(async () => {
-        const result = await enterpriseService.runScript(remoteUri);
-        if (result) {
-          outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
-          outputChannel.show();
-          DataViewPanel.render(context.extensionUri, {
-            name: remoteUri.toString(),
-            data: result,
-          });
-        }
-      }, "Executing data source...");     
-    }
-  );
 
   // register the RunXFDForm command handler
   vscode.commands.registerCommand("STARLIMS.OpenXFDForm", async (item: TreeEnterpriseItem | any) => {
