@@ -93,4 +93,5 @@ New features:
 - Add/delete new items and categories
 - Search for items
 - Run HTML forms in browser
+- Run XFD form (requires STARLIMS Bridge)
 - Integrated SSL-Lang theme
