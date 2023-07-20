@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.9",
+  "version": "1.2.14",
   "publisher": "Marius Popovici, Christoph Döllinger, Jan Bouecke",
   "keywords": [
     "STARLIMS",
@@ -124,6 +124,10 @@
       {
         "command": "STARLIMS.OpenXFDForm",
         "title": "Open Form"
+      },
+      {
+        "command": "STARLIMS.DebugForm",
+        "title": "Debug Form"
       }
     ],
     "menus": {
@@ -152,23 +156,28 @@
       "view/item/context": [
         {
           "command": "STARLIMS.Refresh",
-          "when": "view == STARLIMS"
+          "when": "view == STARLIMS",
+          "group": "z_navigation"
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMS && (viewItem == SS || viewItem == APPSS)"
+          "when": "view == STARLIMS && (viewItem == SS || viewItem == APPSS)",
+          "group": "run"
         },
         {
           "command": "STARLIMS.RunDataSource",
-          "when": "view == STARLIMS && (viewItem == DS || viewItem == APPDS)"
+          "when": "view == STARLIMS && (viewItem == DS || viewItem == APPDS)",
+          "group": "run"
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP"
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
+          "group": "sourceControl"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP"
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
+          "group": "sourceControl"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
@@ -176,19 +185,28 @@
         },
         {
           "command": "STARLIMS.OpenForm",
-          "when": "view == STARLIMS && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)"
+          "when": "view == STARLIMS && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
+          "group": "run"
         },
         {
+          "command": "STARLIMS.DebugForm",
+          "when": "view == STARLIMS && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
+          "group": "run"
+        },       
+        {
           "command": "STARLIMS.Delete",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY"
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY",
+          "group": "addRemove"
         },
         {
           "command": "STARLIMS.Add",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != APP"
+          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != APP",
+          "group": "addRemove"
         },
         {
           "command": "STARLIMS.OpenXFDForm",
-          "when": "view == STARLIMS && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)"
+          "when": "view == STARLIMS && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)",
+          "group": "run"
         }
       ],
       "explorer/context": [
@@ -264,6 +282,19 @@
             "type": "string",
             "default": "",
             "description": "Root path for temporary STARLIMS files. For example: C:\\STARLIMS\\. SLVSCODE will be appended to this path."
+          },
+          "STARLIMS.browser": {
+            "type": "string",
+            "enum": [
+              "chrome",
+              "msedge"
+            ],
+            "enumDescriptions": [
+              "Google Chrome",
+              "Microsoft Edge"
+            ],
+            "default": "chrome",
+            "description": "Browser to use for debugging STARLIMS forms. Possible values: chrome, msedge"
           }
         }
       }

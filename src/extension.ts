@@ -421,32 +421,140 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand("STARLIMS.OpenForm",
     async (item: TreeEnterpriseItem | any) => {
       
-      let remoteUri : string = "";
-      const isTreeCommand = item instanceof TreeEnterpriseItem;
-      
-      if (isTreeCommand) {
-        remoteUri = item.uri;
-      } else {
-        // command originates from a document context menu
-        const uri = item.path
-          ? item.path.slice(0, item.path.lastIndexOf("."))
-          : undefined;
-        if (config.has("rootPath")) {
-          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
-          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
-        }
-      }
-
-      //TODO: implement service call to obtain the form GUID when the form command is executed from
-      // the editor 
+      // TODO: service call to obtain the form GUID when the form command is executed from the editor 
       if (item.guid === undefined) {
+        //item.guid = await enterpriseService.getFormGuid(remoteUri);
         return;
       }
+
       // open form in default browser
       const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
       vscode.env.openExternal(vscode.Uri.parse(formUrl));
     }
   );
+
+  // register the start debugging command
+  vscode.commands.registerCommand("STARLIMS.DebugForm",
+    async (item: TreeEnterpriseItem) => {
+      // get guid for the form
+      if (item.guid === undefined) {
+        return;
+        //item.guid = await enterpriseService.getFormGuid(item.uri);
+      }
+
+      // read STARLIMS.browser configuration value (edge or chrome)
+      const browserType = config.get("browser") as string;
+
+      // check if vscode debugger is already running
+      const debuggerRunning = vscode.debug.activeDebugSession !== undefined;
+
+      var debugConfig;
+      if (!debuggerRunning) {
+        // launch browser in debug mode
+        debugConfig = {
+          type: browserType,
+          name: "Launch STARLIMS Debugging",
+          request: "launch",
+          url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`,
+          webRoot: rootPath,
+          userDataDir: path.join(context.globalStorageUri.fsPath, "edge"),
+          runtimeArgs: [
+            "--remote-debugging-port=9222",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--disable-extensions",
+            "--disable-default-apps",
+            "--disable-popup-blocking",
+            "--disable-translate",
+            "--disable-session-crashed-bubble"
+          ]
+        };
+      }
+      else {
+        // check if the url is already open in debugger
+        const debuggerAttached = vscode.debug.activeDebugSession?.name.includes(`FormId=${item.guid.toLowerCase()}`);
+
+        // if not, attach new debug session to the browser
+        if (!debuggerAttached) {
+          debugConfig = {
+            type: browserType,
+            name: "Attach to STARLIMS Debugging",
+            request: "attach",
+            url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`,
+            webRoot: rootPath,
+            userDataDir: path.join(context.globalStorageUri.fsPath, "edge"),
+            port: 9222
+          };
+        }
+      }
+
+      if (debugConfig) {
+        // start new vscode debugger
+        await vscode.debug.startDebugging(undefined, debugConfig);
+      }
+
+      // get the form script name
+      const appName = item.uri.split("/")[3];
+      const fileName = item.uri.split("/").pop() + ".js";
+      const scriptName = `${appName}.${fileName}`;
+
+      // wait until the form script has been loaded
+      let formScript = await new Promise<any>(resolve => {
+        var counter = 0;
+        const interval = setInterval(async () => {
+          // get debug protocol source from vscode loaded scripts
+          const loadedScripts = await vscode.debug.activeDebugSession?.customRequest("loadedSources");
+
+          // parse the array to find the script
+          const script = loadedScripts?.sources.find((script: any) => script.name.includes(scriptName));
+
+          // script found, resolve the promise
+          if (script) {
+            clearInterval(interval);
+            resolve(script);
+          }
+
+          // if the script is not loaded after 1 minute, stop the interval and return undefined
+          if (counter++ > 59) {
+            clearInterval(interval);
+            resolve(undefined);
+          }
+          counter++;
+        }, 1000);
+      });
+
+      // script not found, abort
+      if (!formScript) {
+        vscode.window.showErrorMessage(`Could not find script ${scriptName} in the debugger. Are you logged in to STARLIMS?`);
+        return;
+      }
+
+      // get the form script source reference
+      let ref = formScript.sourceReference;
+
+      // get debugger session id
+      const sessionId = vscode.debug.activeDebugSession?.id;
+
+      // build uri and open the remote script
+      const scriptUri = vscode.Uri.parse(`debug:${cleanUrl(config.url).replace("https://", "").replace("http://", "")}/${scriptName}?session=${sessionId}&ref=${ref}`);
+      const scriptDocument = await vscode.workspace.openTextDocument(scriptUri);
+      await vscode.window.showTextDocument(scriptDocument);
+
+      // set the editor to read only
+      if ((await vscode.commands.getCommands()).includes("workbench.action.files.setActiveEditorReadonlyInSession")) {
+        vscode.commands.executeCommand(
+          "workbench.action.files.setActiveEditorReadonlyInSession"
+        );
+      }
+
+      // show the debug console
+      vscode.commands.executeCommand("workbench.debug.action.toggleRepl");
+
+      // show the output channel
+      outputChannel.show();
+    }
+  );
+
 
   // register the add item command
   vscode.commands.registerCommand("STARLIMS.Add",
