@@ -8,9 +8,7 @@ import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 import path = require("path");
 import { DataViewPanel } from "./panels/DataViewPanel";
-import { cleanUrl } from "./utilities/miscUtils";
-import { exec } from "child_process";
-import * as qs from 'querystring';
+import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 
 const SLVSCODE_FOLDER = "SLVSCODE";
 
@@ -276,11 +274,13 @@ export async function activate(context: vscode.ExtensionContext) {
         `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
       );
 
-      const result = await enterpriseService.runScript(remoteUri.toString());
-      if (result) {
-        outputChannel.appendLine(result);
-        outputChannel.show();
-      }
+      executeWithProgress(async () => {
+        const result = await enterpriseService.runScript(remoteUri.toString());
+        if (result) {
+          outputChannel.appendLine(result);
+          outputChannel.show();
+        }
+      }, "Executing script...");
     }
   );
 
@@ -379,6 +379,7 @@ export async function activate(context: vscode.ExtensionContext) {
         var localUri = editor.document.uri;
         if (localUri) {
           let remotePath = localUri.path.slice(rootPath.length + 1);
+          remotePath = remotePath.startsWith("/") ? remotePath : `/${remotePath}`;
           enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
         }
       }
@@ -806,15 +807,17 @@ export async function activate(context: vscode.ExtensionContext) {
         `${new Date().toLocaleString()} Executing remote data source at URI: ${remoteUri}`
       );
 
-      const result = await enterpriseService.runScript(remoteUri);
-      if (result) {
-        outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
-        outputChannel.show();
-        DataViewPanel.render(context.extensionUri, {
-          name: remoteUri.toString(),
-          data: result,
-        });
-      }
+      executeWithProgress(async () => {
+        const result = await enterpriseService.runScript(remoteUri);
+        if (result) {
+          outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
+          outputChannel.show();
+          DataViewPanel.render(context.extensionUri, {
+            name: remoteUri.toString(),
+            data: result,
+          });
+        }
+      }, "Executing data source...");
     }
   );
 

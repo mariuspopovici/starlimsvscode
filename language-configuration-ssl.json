@@ -22,8 +22,7 @@
     ["\"", "\""],
     ["'", "'"]
   ],
-  "folding":
-  {
+  "folding": {
     "offSide": false,
     "markers": {
       "start": "^\\s*(\\/\\*\\s?region).*$",
@@ -34,13 +33,13 @@
   },
   "onEnterRules": [
     {
-      "beforeText": "^\\s*(:FOR|:WHILE|:PROCEDURE|:IF|:BEGINCASE|:CASE|:TRY|:CATCH|:FINALLY|:REGION).*$",
+      "beforeText": "^\\s*(:FOR|:WHILE|:PROCEDURE|:IF|:BEGINCASE|:CASE|:TRY|:CATCH|:FINALLY|:REGION|:ERROR|:CLASS).*$",
       "action": {
         "indent": "indent"
       }
     },
     {
-      "beforeText": "^\\s*(:ENDCASE|:END|:NEXT|:ENDWHILE|:ENDPROCEDURE|:ENDIF|:ENDTRY|:ENDREGION).*$",
+      "beforeText": "^\\s*(:ENDCASE|:END|:NEXT|:ENDWHILE|:ENDPROC|:ENDIF|:ENDTRY|:ENDREGION).*$",
       "action": {
         "indent": "outdent"
       }

@@ -136,7 +136,7 @@
     },
     "navigatorVars": {
       "name": "starlims.navigator-variables",
-      "match": "(?i)(MYUSERNAME|STARLIMSDEPT|MYUSERROLE)"
+      "match": "(?i)(MYUSERNAME|STARLIMSDEPT|MYUSERROLE|REQUEST|RESPONSE|PUBLICCONSTS|PLATFORMA|STARLIMSSITECODE|MYTREEAUTH)"
     },
     "iif": {
       "name": "starlims.blue-function",
@@ -243,11 +243,11 @@
           "patterns": [
             {
               "include": "#expression"
-        }
+            }
           ]
         }
       ]
-      },
+    },
     "expression_in_sql": {
       "patterns": [
         {
