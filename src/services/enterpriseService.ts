@@ -339,7 +339,7 @@ export class EnterpriseService implements Enterprise {
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
-      headers,
+      headers
     };
 
     try {
