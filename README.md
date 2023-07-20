@@ -95,3 +95,4 @@ New features:
 - Run HTML forms in browser
 - Run XFD form (requires STARLIMS Bridge)
 - Integrated SSL-Lang theme
+- Debug HTML forms directly in VS Code
