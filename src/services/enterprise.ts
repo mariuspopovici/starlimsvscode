@@ -13,4 +13,5 @@ export interface Enterprise {
   scrollToBottom(): any;
   searchForItems(searchText: string): any;
   runXFDForm(uri: string): any;
+  getGUID(uri: string): any;
 }

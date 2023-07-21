@@ -1,0 +1,35 @@
+/******************************************************************************
+Description.. :	Script to get the GUID of an enterprise item from its uri
+Author....... :	DC
+Date......... : 2023-07-20
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse;
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils, oEnterpriseItem, sItemID, sGUID;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oEnterpriseItem := oUtils:ParseURI(sURI);
+sItemID := oEnterpriseItem:AppName + "." + oEnterpriseItem:Name;
+sGUID := oUtils:GetItemGUID(sItemID, oEnterpriseItem:Type);
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+oResponse:data := sGUID;
+:RETURN oResponse;

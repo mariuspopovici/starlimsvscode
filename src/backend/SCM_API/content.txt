@@ -1,5 +1,5 @@
 Package Name: SCM_API
-Package Date: 2023-07-10 14:35:24
+Package Date: 2023-07-21 08:50:55
 
 Exported languages: English.
 
@@ -11,6 +11,8 @@ Server Script Category: SCM_API
 	- Delete
 	- GetCode
 	- GetEnterpriseItems
+	- GetItemGUID
+	- GetSessions
 	- RunScript
 	- SaveCode
 	- Search
