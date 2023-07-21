@@ -28,11 +28,12 @@ Design HTML forms directly in VS Code via a HTML preview window.
 
 Features:
 
-- Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts).
-- Check out STARLIMS code items to a local folder.
+- Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts)
+- Check out STARLIMS code items to a local folder
 - Edit local copies and compare changes with remote version
 - Check in changes to a server
-- Execute remote scripts and view execution return values.
+- Open forms in browser (Chrome or Edge) and debug them in VS Code
+- Execute remote scripts and view execution return values
 - Execute data sources and render data source execution results in a grid view
 - View and clear user logs
 - Launch XFD forms via the STARLIMS bridge
@@ -40,17 +41,22 @@ Features:
 
 To Do:
 
-- Ability to add, delete and move scripts
+- Show all checked out items
+- Move forms and scripts
 - Edit form resources
 - Edit HTML forms visually
+- Global find function
+- Create a HTML form designer
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-- `STARLIMS.url`: URL to starlims installation (e.g. http://starlimsdev/STARLIMS11.STARLIMS.DEV/)
-- `STARLIMS.user`: user for STARLIMS authentication
-- `STARLIMS.password`: user password STARLIMS authentication
+- `STARLIMS.url`: URL to Starlims installation (e. g. http://starlimsdev/STARLIMS11.STARLIMS.DEV/)
+- `STARLIMS.user`: User for STARLIMS authentication
+- `STARLIMS.password`: User password STARLIMS authentication
+- `STARLIMS.browser`: Browser for debugging forms (only Chrome or Edge supported)
+- `STARLIMS.rootPath`: Path for storing temporary files (downloaded forms and scripts)
 
 ## How to Use
 
@@ -62,7 +68,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-N/A
+- Please let us know under "Issues"
 
 ## Release Notes
 
@@ -87,7 +93,7 @@ Implemented a TextDocumentContentProvider for viewing STARLIMS code and refactor
 
 New features:
 
-- Automatically export items to local workspace.
+- Automatically export items to local workspace
 - Check in/out items
 - View/clear user logs
 - Add/delete new items and categories
