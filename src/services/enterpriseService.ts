@@ -15,7 +15,7 @@ import { cleanUrl } from "../utilities/miscUtils";
 export class EnterpriseService implements Enterprise {
   private config: any;
   private baseUrl: string;
-  private refreshSessionInterval : NodeJS.Timeout | undefined;
+  private refreshSessionInterval: NodeJS.Timeout | undefined;
 
   /** 
    * Constructor
@@ -32,8 +32,7 @@ export class EnterpriseService implements Enterprise {
    * @param itemType the type of the new item
    * @param language the language of the new item
    */
-  async addItem(itemName: string, itemType: string, language: string, categoryName: string, appName: string)
-  {
+  async addItem(itemName: string, itemType: string, language: string, categoryName: string, appName: string) {
     const url = `${this.baseUrl}/SCM_API.Add.lims`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -491,9 +490,9 @@ export class EnterpriseService implements Enterprise {
 
     // start a session refresh task otherwise the current session
     // will expire in 2 minutes
-    
+
     const uriComponents = uri.split("/").slice(-4);
-    const [appName,,, formName] = uriComponents;
+    const [appName, , , formName] = uriComponents;
     const bridgeURL = `http://localhost:5468/xfdforms/${appName}/${formName}`;
     const starlimsUrl = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`;
     const bridgeRequestBody = {
@@ -576,5 +575,36 @@ export class EnterpriseService implements Enterprise {
     }
 
     return result;
+  }
+
+/**
+ * Gets the GUID of the specified enterprise item from the server.
+ * 
+ * @param uri the URI of the enterprise item
+ * @returns the GUID of the enterprise item
+*/
+  public async getGUID(uri: string) : Promise<string | null> {
+    const url = `${this.baseUrl}/SCM_API.GetItemGUID.lims?URI=${uri}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
+        return null;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not get GUID.");
+      console.error(e);
+      return null;
+    }
   }
 }

@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // this command activates the extension
-  vscode.commands.registerCommand("STARLIMS.Connect", () => { });
+  vscode.commands.registerCommand("STARLIMS.Connect", () => {});
 
   // register the selectEnterpriseItem command
   vscode.commands.registerCommand(
@@ -353,7 +353,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the refresh command
   vscode.commands.registerCommand(
     "STARLIMS.Refresh",
-    async (item: TreeEnterpriseItem) => {
+    async () => {
       enterpriseProvider.refresh();
     }
   );
@@ -365,10 +365,11 @@ export async function activate(context: vscode.ExtensionContext) {
       enterpriseProvider.refresh();
     }
   );
+
   // register the save file command
   vscode.commands.registerCommand(
     "STARLIMS.Save",
-    async (item: TreeEnterpriseItem) => {
+    async () => {
       const rootPath: string = path.join(
         config.get("rootPath") as string,
         SLVSCODE_FOLDER
@@ -404,7 +405,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register the search command
   vscode.commands.registerCommand("STARLIMS.Search",
-    async (item: TreeEnterpriseItem) => {
+    async () => {
       // ask for search text
       const itemName = await vscode.window.showInputBox({
         prompt: "Enter search text",
@@ -420,27 +421,48 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the open form command
   vscode.commands.registerCommand("STARLIMS.OpenForm",
     async (item: TreeEnterpriseItem | any) => {
-      
-      // TODO: service call to obtain the form GUID when the form command is executed from the editor 
-      if (item.guid === undefined) {
-        //item.guid = await enterpriseService.getFormGuid(remoteUri);
-        return;
+      var remotePath;
+        // get remote path from local path if opened from editor context menu
+        if (item.uri === undefined) {
+        const uri = item.path
+          ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
+        if (!uri) {
+          return;
+        }
+        remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+      }
+      else {
+        remotePath = item.uri;
       }
 
+      // get the form GUID
+      const formGuid = await enterpriseService.getGUID(remotePath);
+
       // open form in default browser
-      const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`;
+      const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`;
       vscode.env.openExternal(vscode.Uri.parse(formUrl));
     }
   );
 
   // register the start debugging command
   vscode.commands.registerCommand("STARLIMS.DebugForm",
-    async (item: TreeEnterpriseItem) => {
-      // get guid for the form
-      if (item.guid === undefined) {
+    async (item: TreeEnterpriseItem | any) => {
+      var remotePath;
+      // get remote path from local path if opened from editor context menu
+      if (item.uri === undefined) {
+      const uri = item.path
+        ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
+      if (!uri) {
         return;
-        //item.guid = await enterpriseService.getFormGuid(item.uri);
       }
+      remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+    }
+    else {
+      remotePath = item.uri;
+    }
+
+    // get the form GUID
+    const formGuid = await enterpriseService.getGUID(remotePath);
 
       // read STARLIMS.browser configuration value (edge or chrome)
       const browserType = config.get("browser") as string;
@@ -455,7 +477,7 @@ export async function activate(context: vscode.ExtensionContext) {
           type: browserType,
           name: "Launch STARLIMS Debugging",
           request: "launch",
-          url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`,
+          url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`,
           webRoot: rootPath,
           userDataDir: path.join(context.globalStorageUri.fsPath, "edge"),
           runtimeArgs: [
@@ -472,7 +494,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
       else {
         // check if the url is already open in debugger
-        const debuggerAttached = vscode.debug.activeDebugSession?.name.includes(`FormId=${item.guid.toLowerCase()}`);
+        const debuggerAttached = vscode.debug.activeDebugSession?.name.includes(`FormId=${formGuid}`);
 
         // if not, attach new debug session to the browser
         if (!debuggerAttached) {
@@ -480,7 +502,7 @@ export async function activate(context: vscode.ExtensionContext) {
             type: browserType,
             name: "Attach to STARLIMS Debugging",
             request: "attach",
-            url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${item.guid.toLowerCase()}&Debug=true`,
+            url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`,
             webRoot: rootPath,
             userDataDir: path.join(context.globalStorageUri.fsPath, "edge"),
             port: 9222
@@ -558,7 +580,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register the add item command
   vscode.commands.registerCommand("STARLIMS.Add",
-    async (item: TreeEnterpriseItem) => {
+    async () => {
       // check if a folder has been selected
       if (selectedItem === undefined) {
         vscode.window.showErrorMessage("Please select a folder to add the item to.");
@@ -740,7 +762,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register the delete item command
   vscode.commands.registerCommand("STARLIMS.Delete",
-    async (item: TreeEnterpriseItem) => {
+    async () => {
       if (selectedItem === undefined) {
         vscode.window.showErrorMessage("Please select an item to delete.");
         return;

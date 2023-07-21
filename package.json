@@ -255,6 +255,10 @@
         {
           "command": "STARLIMS.OpenForm",
           "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+        },
+        {
+          "command": "STARLIMS.DebugForm",
+          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
         }
       ]
     },
