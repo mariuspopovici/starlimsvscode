@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // this command activates the extension
-  vscode.commands.registerCommand("STARLIMS.Connect", () => {});
+  vscode.commands.registerCommand("STARLIMS.Connect", () => { });
 
   // register the selectEnterpriseItem command
   vscode.commands.registerCommand(
@@ -422,8 +422,8 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand("STARLIMS.OpenForm",
     async (item: TreeEnterpriseItem | any) => {
       var remotePath;
-        // get remote path from local path if opened from editor context menu
-        if (item.uri === undefined) {
+      // get remote path from local path if opened from editor context menu
+      if (item.uri === undefined) {
         const uri = item.path
           ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
         if (!uri) {
@@ -450,19 +450,19 @@ export async function activate(context: vscode.ExtensionContext) {
       var remotePath;
       // get remote path from local path if opened from editor context menu
       if (item.uri === undefined) {
-      const uri = item.path
-        ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
-      if (!uri) {
-        return;
+        const uri = item.path
+          ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
+        if (!uri) {
+          return;
+        }
+        remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
       }
-      remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
-    }
-    else {
-      remotePath = item.uri;
-    }
+      else {
+        remotePath = item.uri;
+      }
 
-    // get the form GUID
-    const formGuid = await enterpriseService.getGUID(remotePath);
+      // get the form GUID
+      const formGuid = await enterpriseService.getGUID(remotePath);
 
       // read STARLIMS.browser configuration value (edge or chrome)
       const browserType = config.get("browser") as string;
@@ -516,8 +516,8 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       // get the form script name
-      const appName = item.uri.split("/")[3];
-      const fileName = item.uri.split("/").pop() + ".js";
+      const appName = remotePath.split("/")[3];
+      const fileName = remotePath.split("/").pop() + ".js";
       const scriptName = `${appName}.${fileName}`;
 
       // wait until the form script has been loaded
