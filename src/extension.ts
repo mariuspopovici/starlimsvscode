@@ -277,7 +277,7 @@ export async function activate(context: vscode.ExtensionContext) {
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri.toString());
         if (result) {
-          outputChannel.appendLine(result);
+          outputChannel.appendLine(result.data);
           outputChannel.show();
         }
       }, "Executing script...");
