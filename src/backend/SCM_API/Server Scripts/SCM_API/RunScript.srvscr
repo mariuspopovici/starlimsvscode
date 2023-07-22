@@ -114,7 +114,7 @@ Response:StatusCode := 200;
 	
 	sOutputType := Upper(sOutputType);
 	
-	:DECLARE oOutput, sXML, oRunReturn, oResult;
+	:DECLARE sXML, oRunReturn, oResult, oDataSet;
 	oRunReturn := CreateUDObject({
 		{"success", .T.},
 		{"data", NIL}
@@ -132,7 +132,7 @@ Response:StatusCode := 200;
 			oResult := sXML;	
 		:EXITCASE;
 		:CASE sOutputType == "ARRAY";
-			:DECLARE oDataSet, aHeader;
+			:DECLARE aHeader, i;
 			oDataSet := DoProc("Enterprise_Server.DataSetSupport.DSFromString", {sXML});
 			aHeader := ArrayNew(oDataSet:Tables[0]:Columns:Count);
 			:FOR i:=0 :TO oDataSet:Tables[0]:Columns:Count-1;
@@ -141,7 +141,6 @@ Response:StatusCode := 200;
 			oResult := ArrayCalc({aHeader}, "MERGE", DoProc("Enterprise_Server.DataSetSupport.DSToArray", {oDataSet}));
 		:EXITCASE;
 		:CASE sOutputType == "JSON";
-			:DECLARE oDataSet;
 			oDataSet := DoProc("Enterprise_Server.DataSetSupport.DSFromString", {sXML});
 			oResult := ToJson(oDataSet);
 		:EXITCASE;
