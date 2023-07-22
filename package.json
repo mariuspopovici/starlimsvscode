@@ -4,7 +4,10 @@
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
   "version": "1.2.22",
-  "publisher": "Marius Popovici, Christoph Döllinger, Jan Bouecke",
+  "publisher": "MariusPopovici",
+  "author": {
+    "name": "Marius Popovici, Christoph Döllinger, Jan Bouecke"
+  },
   "keywords": [
     "STARLIMS",
     "SSL",
