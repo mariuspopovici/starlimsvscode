@@ -71,16 +71,21 @@ sOutputType := "ARRAY";
 			oResult := ExecFunction(sScript, aParams);
 		:EXITCASE;
 		:CASE oEnterpriseItem:Type == "SS";
-			sScript := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;
+			sScript := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;			
 			oResult := ExecFunction(sScript, aParams);
 		:EXITCASE;
 		:CASE oEnterpriseItem:Type == "DS";
 			sScript := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;
-			oResult := DoProc("RunDataSource", {sScript});
+			:DECLARE oRunDSResult;
+			oRunDSResult := DoProc("RunDataSource", {sScript});
+			oResponse:success := oRunDSResult:success;
+			oResult := oRunDSResult:data;
 		:EXITCASE;
 		:CASE oEnterpriseItem:Type == "APPDS";
 			sScript := oEnterpriseItem:AppName + "." + oEnterpriseItem:Name;
-			oResult := DoProc("RunDataSource", {sScript});
+			oRunDSResult := DoProc("RunDataSource", {sScript});
+			oResponse:success := oRunDSResult:success;
+			oResult := oRunDSResult:data;
 		:EXITCASE;
 		:OTHERWISE;
 			oResponse:success := .F.;
@@ -108,17 +113,27 @@ Response:StatusCode := 200;
 :DEFAULT sOutputType, "ARRAY";
 	
 	sOutputType := Upper(sOutputType);
-	:DECLARE oOutput;
+	
+	:DECLARE oOutput, sXML, oRunReturn, oResult;
+	oRunReturn := CreateUDObject({
+		{"success", .T.},
+		{"data", NIL}
+	});
+	
+	sXML := RunDS(sDataSourceName,, "XML"); 
+	
+	:IF .NOT. ("<?xml" $ sXML);
+		/* most likely an error occurred;
+		oRunReturn:success := .F.;
+	:ENDIF;
 	
 	:BEGINCASE;
 		:CASE sOutputType == "XML";
-			oResult := RunDS(sDataSourceName,, "XML"); 
+			oResult := sXML;	
 		:EXITCASE;
 		:CASE sOutputType == "ARRAY";
-			:DECLARE sXML, oDataSet, aHeader;
-			sXML := RunDS(sDataSourceName,, "XML"); 
+			:DECLARE oDataSet, aHeader;
 			oDataSet := DoProc("Enterprise_Server.DataSetSupport.DSFromString", {sXML});
-			
 			aHeader := ArrayNew(oDataSet:Tables[0]:Columns:Count);
 			:FOR i:=0 :TO oDataSet:Tables[0]:Columns:Count-1;
 				aHeader[i+1] := oDataSet:Tables[0]:Columns[i]:ColumnName;
@@ -126,12 +141,13 @@ Response:StatusCode := 200;
 			oResult := ArrayCalc({aHeader}, "MERGE", DoProc("Enterprise_Server.DataSetSupport.DSToArray", {oDataSet}));
 		:EXITCASE;
 		:CASE sOutputType == "JSON";
-			:DECLARE sXML, oDataSet;
-			sXML := RunDS(sDataSourceName,, "XML"); 
+			:DECLARE oDataSet;
 			oDataSet := DoProc("Enterprise_Server.DataSetSupport.DSFromString", {sXML});
 			oResult := ToJson(oDataSet);
 		:EXITCASE;
 	:ENDCASE;
 	
-	:RETURN oResult;
+	oRunReturn:data := oResult;
+	
+	:RETURN oRunReturn;
 :ENDPROC;

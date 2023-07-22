@@ -8,7 +8,7 @@ import { Enterprise } from "./enterprise";
 import { connectBridge } from "../utilities/bridge";
 import { cleanUrl } from "../utilities/miscUtils";
 
-/** 
+/**
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
  * at time using the SCM_API REST services in STARLIMS backed.
  */
@@ -17,7 +17,7 @@ export class EnterpriseService implements Enterprise {
   private baseUrl: string;
   private refreshSessionInterval: NodeJS.Timeout | undefined;
 
-  /** 
+  /**
    * Constructor
    * @param config Workspace config object for the STARLIMS VS Code extension.
    */
@@ -52,8 +52,7 @@ export class EnterpriseService implements Enterprise {
       const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
         vscode.window.showInformationMessage("Item added successfully.");
-      }
-      else {
+      } else {
         vscode.window.showErrorMessage(data);
       }
       return data instanceof Object ? JSON.stringify(data) : data;
@@ -64,7 +63,7 @@ export class EnterpriseService implements Enterprise {
     }
   }
 
-  /** 
+  /**
    * Execute script remotely.
    * @param uri the URI of the remote script.
    */
@@ -82,22 +81,28 @@ export class EnterpriseService implements Enterprise {
     try {
       const response = await fetch(url, options);
       const { success, data }: { success: boolean; data: any } = await response.json();
-      return data instanceof Object ? JSON.stringify(data) : data;
+      return {
+        success: success,
+        data: data instanceof Object ? JSON.stringify(data, null, 2) : data
+      };
     } catch (e: any) {
       console.error(e);
       vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
-      return;
+      return {
+        success: false,
+        data: "An unexpected error ocurred while calling remote service."
+      };
     }
   }
 
-  /** 
+  /**
    * Gets the service config
    * @returns the service configuration settings */
   public getConfig(): vscode.WorkspaceConfiguration {
     return this.config;
   }
 
-  /** 
+  /**
    * Gets all enterprise items below the specified URI.
    * @param uri the URI of the remote STARLIMS code item.
    * @returns A descriptor object with the following properties: name, type, uri, language, isFolder
@@ -113,8 +118,7 @@ export class EnterpriseService implements Enterprise {
 
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
         return data.items;
       } else {
@@ -129,7 +133,7 @@ export class EnterpriseService implements Enterprise {
     }
   }
 
-  /** 
+  /**
    * Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
    * by the specified URI.
    * @param uri the URI of the remote STARLIMS script / code item.
@@ -141,16 +145,15 @@ export class EnterpriseService implements Enterprise {
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
-      headers,
+      headers
     };
 
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
         if (data.language === "JS") {
-          // comment out all occurences of '#include' in order for eslint to work       
+          // comment out all occurences of '#include' in order for eslint to work
           data.code = data.code.replace(/^#include/gm, "//#include");
         }
         return data;
@@ -177,13 +180,12 @@ export class EnterpriseService implements Enterprise {
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
-      headers,
+      headers
     };
 
     try {
       const response = await fetch(url, options);
-      const { success }: { success: boolean } =
-        await response.json();
+      const { success }: { success: boolean } = await response.json();
       if (success) {
         vscode.window.showInformationMessage("Enterprise item checked out successfully.");
         return true;
@@ -210,7 +212,10 @@ export class EnterpriseService implements Enterprise {
       vscode.window.showErrorMessage("Could not check in enterprise item. Missing URI.");
       return false;
     }
-    const params = new URLSearchParams([["URI", uri], ["Reason", reason]]);
+    const params = new URLSearchParams([
+      ["URI", uri],
+      ["Reason", reason]
+    ]);
     const url = `${this.baseUrl}/SCM_API.CheckIn.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -220,8 +225,7 @@ export class EnterpriseService implements Enterprise {
 
     try {
       const response = await fetch(url, options);
-      const { success }: { success: boolean } =
-        await response.json();
+      const { success }: { success: boolean } = await response.json();
       if (success) {
         vscode.window.showInformationMessage("Enterprise item checked in successfully.");
         return true;
@@ -243,11 +247,7 @@ export class EnterpriseService implements Enterprise {
    * @param returnCode if true, the function will return the code as a string instead of the local file path
    * @returns the local file path if returnCode is false, otherwise the code as a string
    */
-  public async getLocalCopy(
-    uri: string,
-    workspaceFolder: string,
-    returnCode: boolean = false
-  ): Promise<string | null> {
+  public async getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean = false): Promise<string | null> {
     const item = await this.getEnterpriseItemCode(uri);
     if (item) {
       // create local file path
@@ -258,7 +258,7 @@ export class EnterpriseService implements Enterprise {
         const localFolder = path.dirname(localFilePath);
         await fs.mkdir(localFolder, { recursive: true });
 
-        // comment out all occurences of '#include' for eslint to work       
+        // comment out all occurences of '#include' for eslint to work
         item.code = item.code.replace(/^#include/gm, "//#include");
 
         await fs.writeFile(localFilePath, item.code, {
@@ -267,8 +267,7 @@ export class EnterpriseService implements Enterprise {
 
         if (returnCode) {
           return item.code;
-        }
-        else {
+        } else {
           return localFilePath;
         }
       } catch (e) {
@@ -323,7 +322,7 @@ export class EnterpriseService implements Enterprise {
       ["STARLIMSUser", this.config.user],
       ["STARLIMSPass", this.config.password],
       ["Content-Type", "application/json"],
-      ["Accept", "*/*"],
+      ["Accept", "*/*"]
     ];
   }
 
@@ -343,16 +342,13 @@ export class EnterpriseService implements Enterprise {
 
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
         vscode.window.showInformationMessage("Log file cleared successfully.");
 
         // close log file if it is open (check by file name)
         const logFileName = `${user}.log`;
-        const logFile = vscode.workspace.textDocuments.find(
-          (doc) => doc.fileName.endsWith(logFileName)
-        );
+        const logFile = vscode.workspace.textDocuments.find((doc) => doc.fileName.endsWith(logFileName));
         if (logFile) {
           await vscode.window.showTextDocument(logFile);
           await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
@@ -421,8 +417,7 @@ export class EnterpriseService implements Enterprise {
 
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
         return data.items;
       } else {
@@ -452,8 +447,7 @@ export class EnterpriseService implements Enterprise {
 
     try {
       const response = await fetch(url, options);
-      const { success, data }: { success: boolean; data: any } =
-        await response.json();
+      const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
         vscode.window.showInformationMessage("Item deleted successfully.");
         return true;
@@ -471,12 +465,11 @@ export class EnterpriseService implements Enterprise {
 
   /**
    * Launches an XFD form via the STARLIMS HTML bridge.
-   * 
+   *
    * @param uri the URI of the enterprise item
    * @returns the form return value
    */
   public async runXFDForm(uri: string) {
-
     const isBridgeUp = await this.connectStarlimsBridge();
     if (!isBridgeUp) {
       vscode.window.showErrorMessage("STARLIMS bridge is not running.");
@@ -494,16 +487,15 @@ export class EnterpriseService implements Enterprise {
     const uriComponents = uri.split("/").slice(-4);
     const [appName, , , formName] = uriComponents;
     const bridgeURL = `http://localhost:5468/xfdforms/${appName}/${formName}`;
-    const starlimsUrl = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`;
+    const starlimsUrl = this.baseUrl.endsWith("/") ? this.baseUrl : `${this.baseUrl}/`;
     const bridgeRequestBody = {
-      "webAddress": starlimsUrl,
+      webAddress: starlimsUrl,
       "aspnet-sessionid": sessionInfo.aspnetsessionid,
       "starlims-sessionid": sessionInfo.starlimssessionid,
-      "langid": sessionInfo.langid,
-      "needsGUID": true,
-      "formParameters": []
+      langid: sessionInfo.langid,
+      needsGUID: true,
+      formParameters: []
     };
-
 
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -526,7 +518,7 @@ export class EnterpriseService implements Enterprise {
 
   /**
    * Gets the STARLIMS application session IDs from server.
-   * 
+   *
    * @returns object with ```aspnetsessionid``` and ```starlimssessionid```
    */
   private async getServerSessions() {
@@ -557,7 +549,7 @@ export class EnterpriseService implements Enterprise {
   /**
    * Attempts to connect to the STARLIMS bridge and starts a session refresh
    * task if successful.
-   * 
+   *
    * @returns ```true``` if the STARLIMS bridge is up and ```false``` otherwise
    */
   private async connectStarlimsBridge() {
@@ -577,13 +569,13 @@ export class EnterpriseService implements Enterprise {
     return result;
   }
 
-/**
- * Gets the GUID of the specified enterprise item from the server.
- * 
- * @param uri the URI of the enterprise item
- * @returns the GUID of the enterprise item
-*/
-  public async getGUID(uri: string) : Promise<string | null> {
+  /**
+   * Gets the GUID of the specified enterprise item from the server.
+   *
+   * @param uri the URI of the enterprise item
+   * @returns the GUID of the enterprise item
+   */
+  public async getGUID(uri: string): Promise<string | null> {
     const url = `${this.baseUrl}/SCM_API.GetItemGUID.lims?URI=${uri}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {

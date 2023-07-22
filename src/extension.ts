@@ -831,14 +831,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri);
-        if (result) {
-          outputChannel.appendLine(JSON.stringify(JSON.parse(result), null, 2));
-          outputChannel.show();
+        if (result?.success) {
           DataViewPanel.render(context.extensionUri, {
             name: remoteUri.toString(),
-            data: result,
+            data: result.data 
           });
         }
+        outputChannel.appendLine(result.data);
+        outputChannel.show();
       }, "Executing data source...");
     }
   );
