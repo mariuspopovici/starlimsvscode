@@ -63,8 +63,8 @@ This extension contributes the following settings:
 - Download extension files attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
 - (Install VSIX file, Import SCM_API.sdp package into STARLIMS)
 - Open a local workspace folder. This will serve as your local STARLIMS code repository.
-- Activate extension using the _STARLIMS Connect_ command (press F1).
-- Configure extension settings (STARLIMS url, user and password). You will be prompted to set these upon attempting to activate the extension for the first time.
+- Activate extension clicking the STARLIMS logo in the VS Code sidebar.
+- Configure extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time.
 
 ## Known Issues
 
@@ -102,3 +102,5 @@ New features:
 - Run XFD form (requires STARLIMS Bridge)
 - Integrated SSL-Lang theme
 - Debug HTML forms directly in VS Code
+- Run data sources and server scripts
+- Misc. bug fixes
