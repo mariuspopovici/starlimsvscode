@@ -14,4 +14,5 @@ export interface Enterprise {
   searchForItems(searchText: string): any;
   runXFDForm(uri: string): any;
   getGUID(uri: string): any;
+  getTableCommand(uri: string, type: string): any;
 }

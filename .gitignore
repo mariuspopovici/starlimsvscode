@@ -10,4 +10,3 @@ dist/*
 .DS_Store
 .vs/*
 *.sdp
-.vscode/settings.json
