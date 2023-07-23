@@ -7,13 +7,10 @@ import { Enterprise } from "../services/enterprise";
 /**
  * Implements the VS Code TreeDataProvider to build the STARLIMS designer tree explorer.
  */
-export class EnterpriseTreeDataProvider
-  implements vscode.TreeDataProvider<TreeEnterpriseItem>
-{
+export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeEnterpriseItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<TreeEnterpriseItem | null> =
     new vscode.EventEmitter<TreeEnterpriseItem | null>();
-  readonly onDidChangeTreeData: vscode.Event<TreeEnterpriseItem | null> =
-    this._onDidChangeTreeData.event;
+  readonly onDidChangeTreeData: vscode.Event<TreeEnterpriseItem | null> = this._onDidChangeTreeData.event;
 
   private service: Enterprise;
   private dataMode: string = "LOAD";
@@ -75,7 +72,7 @@ export class EnterpriseTreeDataProvider
     if (treeItems === undefined) {
       throw new Error("No items found!");
     }
-  
+
     // loop through the items and create new tree items
     const _this = this;
     treeItems.forEach(function (item: any) {
@@ -105,7 +102,7 @@ export class EnterpriseTreeDataProvider
       newItem.resourceUri = _this.getItemResource(item);
       returnItems.push(newItem);
     });
-    
+
     // save the tree items for getTreeItemByUri method
     this.treeItems = returnItems;
 
@@ -116,7 +113,7 @@ export class EnterpriseTreeDataProvider
    * Returns the parent of the given element or undefined if no element is passed.
    * @param element The element to return the parent for.
    * @returns The parent of the given element or undefined if no element is passed.
-  */
+   */
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     return item;
   }
@@ -126,9 +123,7 @@ export class EnterpriseTreeDataProvider
    * @param document The document to get the tree item for
    * @returns The tree item for the document
    */
-  getTreeItemForDocument(
-    document: any
-  ): TreeEnterpriseItem {
+  getTreeItemForDocument(document: any): TreeEnterpriseItem {
     const filePath = document.fsPath;
     const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
     const enterpriseUri = "starlims:///" + filePath.replace(/\\/g, "/") + "/";
@@ -172,7 +167,7 @@ export class EnterpriseTreeDataProvider
    * @param item The item to check
    * @returns A URI for the item if it is checked out by the current user, otherwise undefined.
    */
-private getItemResource(item: any): vscode.Uri | undefined {
+  private getItemResource(item: any): vscode.Uri | undefined {
     const config = this.service.getConfig();
     let resourceUri = undefined;
     if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
@@ -197,27 +192,27 @@ private getItemResource(item: any): vscode.Uri | undefined {
     if (item.isFolder) {
       return vscode.ThemeIcon.Folder;
     } else if (item.checkedOutBy) {
-      return item.checkedOutBy === config.get("user")
-        ? new vscode.ThemeIcon("unlock")
-        : new vscode.ThemeIcon("lock");
+      return item.checkedOutBy === config.get("user") ? new vscode.ThemeIcon("unlock") : new vscode.ThemeIcon("lock");
     } else {
       switch (item.type) {
-        case "DS":
-        case "APPDS":
+        case EnterpriseItemType.DataSource:
+        case EnterpriseItemType.AppDataSource:
           return new vscode.ThemeIcon("database");
-        case "SS":
-        case "APPSS":
-        case "APPCS":
-        case "HTMLFORMCODE":
-        case "XFDFORMCODE":
+        case EnterpriseItemType.ServerScript:
+        case EnterpriseItemType.AppServerScript:
+        case EnterpriseItemType.AppClientScript:
+        case EnterpriseItemType.HTMLFormCode:
+        case EnterpriseItemType.XFDFormCode:
           return new vscode.ThemeIcon("file-code");
-        case "XFDFORMXML":
-        case "HTMLFORMXML":
+        case EnterpriseItemType.XFDFormXML:
+        case EnterpriseItemType.HTMLFormXML:
           return new vscode.ThemeIcon("preview");
-        case "HTMLFORMGUIDE":
+        case EnterpriseItemType.HTMLFormGuide:
           return new vscode.ThemeIcon("list-flat");
-        case "SERVERLOG":
+        case EnterpriseItemType.ServerLog:
           return new vscode.ThemeIcon("output");
+        case EnterpriseItemType.Table:
+          return new vscode.ThemeIcon("database");
         default:
           return new vscode.ThemeIcon("file-code");
       }
@@ -278,5 +273,7 @@ export enum EnterpriseItemType {
   HTMLFormGuide = "HTMLFORMGUIDE",
   PhoneForm = "PHONEFORM",
   TabletForm = "TABLETFORM",
-  ServerLog = "SERVERLOG"
+  ServerLog = "SERVERLOG",
+  TableCategory = "TBLCATEGORY",
+  Table = "TABLE"
 }

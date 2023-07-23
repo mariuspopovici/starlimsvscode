@@ -80,3 +80,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.9] - 2023-07-12
 
 - run XFD forms via the STARLIMS bridge
+
+## [1.2.25] - 2023-07-23
+
+- added support for navigating the tables tree (database and dictionary)
+- added support for checkin and checkout of tables
+- added table commands in tree to generate SELECT, DELETE, INSERT and UPDATE SQL statements into the active editor
+- added table command to send the selected table name to the active editor

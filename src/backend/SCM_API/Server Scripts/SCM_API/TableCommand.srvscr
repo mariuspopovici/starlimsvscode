@@ -1,0 +1,161 @@
+/******************************************************************************
+Description.. :	Generate DELETE, INSERT, UPDATE, SELECT commands for a specified table.
+Author....... :	DC
+Date......... : 2023-07-23
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse;
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI, sCommandType;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+:IF Request:QueryString:IsProperty("CommandType");
+	sCommandType := Request:QueryString:CommandType;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "CommandType");
+	:RETURN oResponse;
+:ENDIF;
+
+:IF .NOT. (AScanExact({"SELECT", "UPDATE", "DELETE", "INSERT"}, sCommandType) > 0);
+  Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Unsupported command type: {0}", sCommandType);
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils, oEnterpriseItem, sItemID, sGUID, sCommand, oTableDTO;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oEnterpriseItem := oUtils:ParseURI(sURI);
+sGUID := oUtils:GetItemGUID(oEnterpriseItem:Name, oEnterpriseItem:Type);
+
+oTableDTO := DoProc("Enterprise_Data_Providers.TableProvider.GetById", {sGUID, .F., {}, .F., .T.});
+
+:BEGINCASE;
+  :CASE sCommandType == "SELECT";
+      sCommand := DoProc("GetTableSelect", {oTableDTO});
+  :EXITCASE;
+  :CASE sCommandType == "DELETE";
+      sCommand := DoProc("GetTableDelete", {oTableDTO});
+  :EXITCASE;
+  :CASE sCommandType == "INSERT";
+      sCommand := DoProc("GetTableInsert", {oTableDTO});
+  :EXITCASE;
+  :CASE sCommandType == "UPDATE";
+      sCommand := DoProc("GetTableUpdate", {oTableDTO});
+  :EXITCASE;
+:ENDCASE;
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+oResponse:data := sCommand;
+:RETURN oResponse;
+
+:PROCEDURE GetTableSelect;
+:PARAMETERS oTableDTO;
+  :DECLARE sSQLTemplate, sSQL, aColumns, aPKColumnConditions, oPK;
+  sSQLTemplate := "select {0} from {1} where {2}";
+
+  aColumns := {};
+  aPKColumnConditions := {};
+
+  AEval(oTableDTO:Fields, {|X|AAdd(aColumns, Upper(X:Name))});
+
+  oPK := oTableDTO:GetPK();
+  :IF Empty(oPK);
+    aPKColumnConditions := {"ORIGREC=?"};
+  :ELSE;
+    AEval(oPK:Fields, {|X|AAdd(aPKColumnConditions, Upper(X:FieldName) + " = ?")});
+  :ENDIF;
+
+  sSQL := String:Format(sSQLTemplate, 
+    BuildString(aColumns,,,", "),
+    oTableDTO:Name,
+    BuildString(aPKColumnConditions,,, " and ")
+  );
+
+  :RETURN sSQL;
+:ENDPROC;
+
+:PROCEDURE GetTableDelete;
+:PARAMETERS oTableDTO;
+  :DECLARE sSQLTemplate, sSQL, aPKColumnConditions, oPK;
+  sSQLTemplate := "delete from {0} where {1}";
+
+  aPKColumnConditions := {};
+
+  oPK := oTableDTO:GetPK();
+  :IF Empty(oPK);
+    aPKColumnConditions := {"ORIGREC=?"};
+  :ELSE;
+    AEval(oPK:Fields, {|X|AAdd(aPKColumnConditions, Upper(X:FieldName) + " = ?")});
+  :ENDIF;
+
+  sSQL := String:Format(sSQLTemplate, 
+    oTableDTO:Name,
+    BuildString(aPKColumnConditions,,, " and ")
+  );
+
+  :RETURN sSQL;
+:ENDPROC;
+
+:PROCEDURE GetTableInsert;
+:PARAMETERS oTableDTO;
+  :DECLARE sSQLTemplate, sSQL, aColumns, aParams;
+  sSQLTemplate := "insert into {0}({1}) values({2})";
+
+  aColumns := {};
+  aParams := {};
+
+  AEval(oTableDTO:Fields, {|X|AAdd(aColumns, Upper(X:Name))});
+  AEval(oTableDTO:Fields, {|X|AAdd(aParams, "?")});
+
+  sSQL := String:Format(sSQLTemplate, 
+    oTableDTO:Name,
+    BuildString(aColumns,,,", "),
+    BuildString(aParams,,, ", ")
+  );
+
+  :RETURN sSQL;
+:ENDPROC;
+
+:PROCEDURE GetTableUpdate;
+:PARAMETERS oTableDTO;
+:DECLARE sSQLTemplate, sSQL, aColumns, aPKColumnConditions, oPK;
+  sSQLTemplate := "update {0} set {1} where {2}";
+
+  aColumns := {};
+  aPKColumnConditions := {};
+
+  AEval(oTableDTO:Fields, {|X|AAdd(aColumns, Upper(X:Name) + " = ?")});
+
+  oPK := oTableDTO:GetPK();
+  :IF Empty(oPK);
+    aPKColumnConditions := {"ORIGREC=?"};
+  :ELSE;
+    AEval(oPK:Fields, {|X|AAdd(aPKColumnConditions, Upper(X:FieldName) + " = ?")});
+  :ENDIF;
+
+  sSQL := String:Format(sSQLTemplate, 
+    oTableDTO:Name,
+    BuildString(aColumns,,,", "),
+    BuildString(aPKColumnConditions,,, " and ")
+  );
+
+  :RETURN sSQL;
+:ENDPROC;

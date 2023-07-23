@@ -27,6 +27,40 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
+   * Gets a SQL command for the specified table.
+   * @param uri
+   */
+  async getTableCommand(uri: string, type: string) {
+    const params = new URLSearchParams([
+      ["URI", uri],
+      ["CommandType", type]
+    ]);
+    const url = `${this.baseUrl}/SCM_API.TableCommand.lims?${params}`;
+    const headers = new Headers(this.getAPIHeaders());
+
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data;
+      } else {
+        vscode.window.showErrorMessage("Could not retrieve table command.");
+        console.log(data);
+        return null;
+      }
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage("Could not retrieve table command.");
+      return null;
+    }
+  }
+
+  /**
    * Add a new enterprise item to the specified folder
    * @param itemName the name of the new item
    * @param itemType the type of the new item

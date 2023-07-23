@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.23",
+  "version": "1.2.25",
   "publisher": "MariusPopovici",
   "author": {
     "name": "Marius Popovici, Christoph Döllinger, Jan Bouecke"
@@ -131,6 +131,26 @@
       {
         "command": "STARLIMS.DebugForm",
         "title": "Debug Form"
+      },
+      {
+        "command": "STARLIMS.SendNameToEditor",
+        "title": "Send To Editor"
+      },
+      {
+        "command": "STARLIMS.GenerateTableSelect",
+        "title": "Generate SELECT"
+      },
+      {
+        "command": "STARLIMS.GenerateTableInsert",
+        "title": "Generate INSERT"
+      },
+      {
+        "command": "STARLIMS.GenerateTableUpdate",
+        "title": "Generate UPDATE"
+      },
+      {
+        "command": "STARLIMS.GenerateTableDelete",
+        "title": "Generate DELETE"
       }
     ],
     "menus": {
@@ -210,6 +230,31 @@
           "command": "STARLIMS.OpenXFDForm",
           "when": "view == STARLIMS && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)",
           "group": "run"
+        },
+        {
+          "command": "STARLIMS.SendNameToEditor",
+          "when": "view == STARLIMS && viewItem == TABLE",
+          "group": "all"
+        },
+        {
+          "command": "STARLIMS.GenerateTableSelect",
+          "when": "view == STARLIMS && viewItem == TABLE",
+          "group": "table"
+        },
+        {
+          "command": "STARLIMS.GenerateTableInsert",
+          "when": "view == STARLIMS && viewItem == TABLE",
+          "group": "table"
+        },
+        {
+          "command": "STARLIMS.GenerateTableUpdate",
+          "when": "view == STARLIMS && viewItem == TABLE",
+          "group": "table"
+        },
+        {
+          "command": "STARLIMS.GenerateTableDelete",
+          "when": "view == STARLIMS && (viewItem == TABLE)",
+          "group": "table"
         }
       ],
       "explorer/context": [

@@ -4,7 +4,7 @@ Author....... :	MARIUS, DC
 Date......... : 2018-11-06
 *******************************************************************************/;
 :DECLARE sOutType, aItems, aEnterpriseCategories, i, oResult, sDataSet, oDataSet, bFolder;
-:DECLARE aApplicationSubCategories, sURI, oRow;
+:DECLARE aApplicationSubCategories, aTablesSubCategories, sURI, oRow;
 
 :IF Request:QueryString:IsProperty("URI");
 	sURI := Request:QueryString:URI;
@@ -25,7 +25,13 @@ aEnterpriseCategories := {
 	{"Server Scripts", "CATEGORY", "N/A", sURI + "/ServerScripts", NIL, NIL},
 	{"Client Scripts", "CATEGORY", "N/A", sURI + "/ClientScripts", NIL, NIL},
 	{"Data Sources", "CATEGORY", "N/A", sURI + "/DataSources", NIL, NIL},
+	{"Tables", "CATEGORY", "N/A", sURI + "/Tables", NIL, NIL},
 	{"Server Log", "CATEGORY", "N/A", sURI + "/ServerLogs", NIL, NIL}
+};
+
+aTablesSubCategories := {
+	{"Database", "ENT_TABLES_DATABASE", "N/A", sURI + "/Database", NIL, NIL},
+	{"Dictionary", "ENT_TABLES_DICTIONARY", "N/A", sURI + "/Dictionary", NIL, NIL}
 };
 
 aApplicationSubCategories := {
@@ -115,7 +121,7 @@ bFolder := .T.;
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			sFormName := oEnterpriseItem:AppName + "." + oRow["FORMNAME"];
-			sGUID := oUtils:GetItemGUID(sFormName, "HTMLFORMXML");
+			sGUID := oRow["FORMID"];
 			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
 			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "HTMLFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
 			AAdd(aItems, {oRow["FORMNAME"] + " [Guide]", "HTMLFORMGUIDE", "JSON", sURI + "/Guide/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
@@ -180,11 +186,31 @@ bFolder := .T.;
 	:CASE oEnterpriseItem:Type == "ENT_CAT_LOG";
 		sOutType := "SERVERLOG";
 		bFolder := .F.;
+		:DECLARE aDataSet;
 		aDataSet := DoProc("Enterprise_Data_Providers.EnterpriseUtilsProvider.GetUsersWithLog");
 		:FOR i := 1 :TO Len(aDataSet);
 			AAdd(aItems, {aDataSet[i], sOutType, sOutType, sURI + "/" + aDataSet[i], "", NIL});
 		:NEXT;
 	:EXITCASE;
+
+	:CASE oEnterpriseItem:Type == "ENT_CAT_TABLES";
+		aItems := aTablesSubCategories;
+		sOutType := "CATEGORY";
+		bFolder := .T.;
+	:EXITCASE;
+
+	:CASE oEnterpriseItem:Type == "TBLCATEGORY";
+		sOutType := "TABLE";
+		UsrMes(ToJson(oEnterpriseItem));
+		sDataSet := DoProc("Enterprise_Data_Providers.TableProvider.GetList", {Upper(oEnterpriseItem:Name)});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
+			oRow := oDataSet:Tables[0]:Rows[i];
+			AAdd(aItems, {oRow["TABLENAME"], sOutType, sOutType, sURI + "/" + oRow["TABLENAME"], oRow["CHECKEDOUTBY"], oRow["TABLEID"]});
+		:NEXT;		
+		bFolder := .F.;
+	:EXITCASE;
+
 :ENDCASE;
 
 :DECLARE aResultItems;

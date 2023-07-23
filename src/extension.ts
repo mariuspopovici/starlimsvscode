@@ -155,53 +155,9 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      // check if the item is already open, switch the tab if it is
-      const openDocument = vscode.workspace.textDocuments.find(
-        (doc) => doc.uri.fsPath.toLowerCase() === item.filePath?.toLowerCase()
-      );
-      if (openDocument) {
-        // reload document, if it is a log file
-        if (openDocument.uri.toString().endsWith(".log")) {
-          // get the remote URI
-          const remoteUri = enterpriseService.getEnterpriseItemUri(
-            item.uri,
-            rootPath!
-          );
-
-          // update local copy
-          await enterpriseService.getLocalCopy(remoteUri, rootPath!);
-
-          // show the document
-          await vscode.window.showTextDocument(openDocument);
-
-          setReadWrite(item);
-
-          // scroll to bottom of document
-          enterpriseService.scrollToBottom();
-        } else {
-          // other file types, just show the document
-          await vscode.window.showTextDocument(openDocument);
-        }
-      } else {
-        // get local copy of the item
-        const localFilePath = await enterpriseService.getLocalCopy(
-          item.uri,
-          rootPath!
-        );
-
-        // open the item locally
-        if (localFilePath) {
-          item.filePath = localFilePath;
-          let localUri: vscode.Uri = vscode.Uri.file(localFilePath);
-          await vscode.window.showTextDocument(localUri, { preview: false });
-
-          setReadWrite(item);
-
-          // scroll to bottom of log files
-          if (localUri.toString().endsWith(".log")) {
-            enterpriseService.scrollToBottom();
-          }
-        }
+      const handler : Function | undefined = getSelectItemHandler(item);
+      if (handler !== undefined) {
+        await handler(item);
       }
     }
   );
@@ -225,6 +181,80 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }
   );
+
+  function getSelectItemHandler(item: TreeEnterpriseItem) : Function | undefined {
+    const config = new Map([
+      [EnterpriseItemType.Table, handleSelectTableItem],      
+    ]);
+
+    return config.has(item.type) ? config.get(item.type) : handleSelectCodeItem;
+  }
+
+  /**
+   * Handles selecting a table item in the enterprise tree.
+   * 
+   * @param item the enterprise tree item to handle
+   */
+  async function handleSelectTableItem(item:TreeEnterpriseItem) {
+    // do nothing 
+  }
+
+  /**
+   * Handles selecting a code type enterprise item. Such items are: server scripts, data sources, client scripts, 
+   * basically anything that needs to be opened in a code editor.
+   * 
+   * @param item the enterprise tree item to handle
+   */
+  async function handleSelectCodeItem(item: TreeEnterpriseItem) {
+    // check if the item is already open, switch the tab if it is
+    const openDocument = vscode.workspace.textDocuments.find(
+      (doc) => doc.uri.fsPath.toLowerCase() === item.filePath?.toLowerCase()
+    );
+    if (openDocument) {
+      // reload document, if it is a log file
+      if (openDocument.uri.toString().endsWith(".log")) {
+        // get the remote URI
+        const remoteUri = enterpriseService.getEnterpriseItemUri(
+          item.uri,
+          rootPath!
+        );
+
+        // update local copy
+        await enterpriseService.getLocalCopy(remoteUri, rootPath!);
+
+        // show the document
+        await vscode.window.showTextDocument(openDocument);
+
+        setReadWrite(item);
+
+        // scroll to bottom of document
+        enterpriseService.scrollToBottom();
+      } else {
+        // other file types, just show the document
+        await vscode.window.showTextDocument(openDocument);
+      }
+    } else {
+      // get local copy of the item
+      const localFilePath = await enterpriseService.getLocalCopy(
+        item.uri,
+        rootPath!
+      );
+
+      // open the item locally
+      if (localFilePath) {
+        item.filePath = localFilePath;
+        let localUri: vscode.Uri = vscode.Uri.file(localFilePath);
+        await vscode.window.showTextDocument(localUri, { preview: false });
+
+        setReadWrite(item);
+
+        // scroll to bottom of log files
+        if (localUri.toString().endsWith(".log")) {
+          enterpriseService.scrollToBottom();
+        }
+      }
+    }
+  }
 
   // set document to read only if item is not checked out and vice versa (requires vscode insiders)
   async function setReadWrite(item: TreeEnterpriseItem) {
@@ -874,6 +904,62 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel.appendLine("Launched form successfully. Please wait while the STARLIMS HTML bridge completes the request.");
         outputChannel.show();
       }
+    }
+  );
+
+  const editorInsert = (text: string) => {
+    const activeTextEditor = vscode.window.activeTextEditor;
+      if (activeTextEditor) {
+        activeTextEditor.edit(editBuilder => {
+          editBuilder.insert(activeTextEditor.selection.active, text);
+        });
+      }
+  }
+
+  vscode.commands.registerCommand(
+    "STARLIMS.GenerateTableSelect",
+    async (item: TreeEnterpriseItem | any) => {
+      const result = await enterpriseService.getTableCommand(item.uri, "SELECT");
+      if (result) {
+        editorInsert(result);
+      }
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.GenerateTableDelete",
+    async (item: TreeEnterpriseItem | any) => {
+      const result = await enterpriseService.getTableCommand(item.uri, "DELETE");
+      if (result) {
+        editorInsert(result);
+      }
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.GenerateTableInsert",
+    async (item: TreeEnterpriseItem | any) => {
+      const result = await enterpriseService.getTableCommand(item.uri, "INSERT");
+      if (result) {
+        editorInsert(result);
+      }
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.GenerateTableUpdate",
+    async (item: TreeEnterpriseItem | any) => {
+      const result = await enterpriseService.getTableCommand(item.uri, "UPDATE");
+      if (result) {
+        editorInsert(result);
+      }
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.SendNameToEditor",
+    async (item: TreeEnterpriseItem | any) => {
+      editorInsert(item.label);
     }
   );
 
