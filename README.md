@@ -4,6 +4,12 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 
 ![STARLIMS VS Code Screenshot](resources/screenshot.png)
 
+# Authors
+
+- [Marius Popovici](https://github.com/mariuspopovici)
+- [Christoph Döllinger](https://github.com/MrDoe/)
+- [Jan Bouecke](https://github.com/jbouecke/)
+
 ## Pre-requisites
 
 - Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
@@ -47,6 +53,7 @@ To Do:
 - Edit HTML forms visually
 - Global find function
 - Create a HTML form designer
+- Implement table support including a schema and ERD generator / viewer
 
 ## Extension Settings
 
@@ -62,9 +69,10 @@ This extension contributes the following settings:
 
 - Download extension files attached to [current release](https://github.com/MrDoe/starlimsvscode/releases).
 - (Install VSIX file, Import SCM_API.sdp package into STARLIMS)
-- Open a local workspace folder. This will serve as your local STARLIMS code repository.
+- Add a local folder to the current VS Code workspace. This will serve as your local STARLIMS code repository.
 - Activate extension clicking the STARLIMS logo in the VS Code sidebar.
-- Configure extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time.
+- Configure extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time. The root folder should be set as the path to the folder selected in the previous step.
+- Configure VS Code Color Theme and activate the **SSL Language Theme (Dark)** theme.
 
 ## Known Issues
 
@@ -89,7 +97,7 @@ Implemented a TextDocumentContentProvider for viewing STARLIMS code and refactor
 - Activation of extension when executing a compare command
 - Showing remote checkout status in explorer tree
 
-## 1.2.0
+## 1.2.x
 
 New features:
 
@@ -103,4 +111,5 @@ New features:
 - Integrated SSL-Lang theme
 - Debug HTML forms directly in VS Code
 - Run data sources and server scripts
+- Support for exploring database and dictionary including tree commands for generating INSERT, DELETE, SELECT and UPDATE statements for the selected table.
 - Misc. bug fixes
