@@ -441,8 +441,11 @@ export class EnterpriseService implements Enterprise {
    * @param itemName the name of the enterprise item
    * @returns the uri of the enterprise item
    */
-  public async searchForItems(itemName: string): Promise<any> {
-    const url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
+  public async searchForItems(itemName: string, itemType: string): Promise<any> {    
+    let url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
+    if(itemType !== "") {
+      url += `&itemType=${itemType}`;
+    }
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
