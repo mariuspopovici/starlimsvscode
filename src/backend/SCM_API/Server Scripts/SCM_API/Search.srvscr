@@ -3,8 +3,8 @@ Description.. :	Search for items and return all matches
 Author....... :	DC
 Date......... : 2023-06-29
 *******************************************************************************/;
-:DECLARE sSQL, searchStr, aItems, oResult, oUtils, bFolder, nLayerID;
-
+:DECLARE sSQL, sItemName, sItemType, aItems, oResult, oUtils, nLayerID, String, sAppCatName, aItemName;
+String := "";
 oUtils := CreateUDObject("SCM_API.Utils", {});
 oResponse := CreateUDObject({
 	{"success", .F.},
@@ -12,181 +12,273 @@ oResponse := CreateUDObject({
 });
 
 :IF Request:QueryString:IsProperty("itemName");
-	searchStr := Request:QueryString:itemName;
+	sItemName := Request:QueryString:itemName;
 :ELSE;
 	Response:StatusCode := 400;
 	oResponse:success := .F.;
 	oResponse:data := String:Format("Missing required parameter: {0}", "itemName");
+	usrmes(oResponse:data);
 	:RETURN oResponse;
 :ENDIF;
 
+:IF Request:QueryString:IsProperty("itemType");
+	sItemType := Request:QueryString:itemType;
+:ENDIF;
+
+/* split the search string into appname/catname + sItemName */;
+:IF At(".", sItemName) > 0;
+	aItemName := BuildArray(sItemName,, ".");
+	sAppCatName := aItemName[1];
+	sItemName := aItemName[2];
+:ENDIF;
+
 nLayerID := GetSystemLayerId();
+sSQL := "";
 
-sSQL :=
-"select 
-f.DISPLAYTEXT as name,
-case f.FORMTYPE
-	when 'XFD' then 'XFDFORMCODE'
-	when 'HTML' then 'HTMLFORMCODE'
-	when 'PHONE' then 'PHONEFORMCODE'
-	when 'TABLET' then 'TABLETFORMCODE'
-end as type,
-case f.FORMTYPE
-	when 'XFD' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/CodeBehind/' + f.DISPLAYTEXT
-	when 'HTML' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/CodeBehind/' + f.DISPLAYTEXT
-	when 'PHONE' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/PhoneForms/CodeBehind/' + f.DISPLAYTEXT
-	when 'TABLET' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/TabletForms/CodeBehind/' + f.DISPLAYTEXT
-end as uri,
-f.CHECKEDOUTBY as checkedOutBy,
-'JS' as language,
-'N' as isFolder,
-f.FORMID as guid
-from LIMSXFDFORMS f
-join LIMSAPPLICATIONS a on a.APPID = f.APPID
-join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-where f.FORMNAME like '%" + limsstring(searchStr) + "%'
-and f.LAYERID = ?nLayerID?
+:IF sItemType == "FORMCODEBEHIND" .OR. Empty(sItemType);
+sSQL += "select
+	f.DISPLAYTEXT as name,
+	case f.FORMTYPE
+		when 'XFD' then 'XFDFORMCODE'
+		when 'HTML' then 'HTMLFORMCODE'
+		when 'PHONE' then 'PHONEFORMCODE'
+		when 'TABLET' then 'TABLETFORMCODE'
+	end as type,
+	case f.FORMTYPE
+		when 'XFD' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/CodeBehind/' + f.DISPLAYTEXT
+		when 'HTML' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/CodeBehind/' + f.DISPLAYTEXT
+		when 'PHONE' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/PhoneForms/CodeBehind/' + f.DISPLAYTEXT
+		when 'TABLET' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/TabletForms/CodeBehind/' + f.DISPLAYTEXT
+	end as uri,
+	f.CHECKEDOUTBY as checkedOutBy,
+	'JS' as language,
+	'N' as isFolder,
+	f.FORMID as guid
+	from LIMSXFDFORMS f
+	join LIMSAPPLICATIONS a on a.APPID = f.APPID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where f.FORMNAME like '%" + limsstring(sItemName) + "%'";
 
-union
+	:IF !Empty(sAppCatName);
+		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
 
-select
-f.DISPLAYTEXT as name,
-case f.FORMTYPE
-	when 'XFD' then 'XFDFORMXML'
-	when 'HTML' then 'HTMLFORMXML'
-	when 'PHONE' then 'PHONEFORMXML'
-	when 'TABLET' then 'TABLETFORMXML'
-end as type,
-case f.FORMTYPE
-	when 'XFD' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/XML/' + f.DISPLAYTEXT
-	when 'HTML' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/XML/' + f.DISPLAYTEXT
-	when 'PHONE' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/PhoneForms/XML/' + f.DISPLAYTEXT
-	when 'TABLET' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/TabletForms/XML/' + f.DISPLAYTEXT
-end as uri,
-f.CHECKEDOUTBY as checkedOutBy,
-'XML' as language,
-'N' as isFolder,
-f.FORMID as guid
-from LIMSXFDFORMS f
-join LIMSAPPLICATIONS a on a.APPID = f.APPID
-join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-where f.FORMNAME like '%" + limsstring(searchStr) + "%'
-and f.LAYERID = ?nLayerID?
+	sSQL += " and f.LAYERID = ?nLayerID?";
+:ENDIF;
 
-union
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
 
-select
-f.DISPLAYTEXT as name,
-'HTMLFORMGUIDE' as type,
-'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/Guide/' + f.DISPLAYTEXT as uri,
-f.CHECKEDOUTBY as checkedOutBy,
-'JSON' as language,
-'N' as isFolder,
-f.FORMID as guid
-from LIMSXFDFORMS f
-join LIMSAPPLICATIONS a on a.APPID = f.APPID
-join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-where f.FORMNAME like '%" + limsstring(searchStr) + "%'
-and f.FORMTYPE = 'HTML'
-and f.LAYERID = ?nLayerID?
+:IF sItemType == "FORMXML" .OR. Empty(sItemType);
+	sSQL += "select
+	f.DISPLAYTEXT as name,
+	case f.FORMTYPE
+		when 'XFD' then 'XFDFORMXML'
+		when 'HTML' then 'HTMLFORMXML'
+		when 'PHONE' then 'PHONEFORMXML'
+		when 'TABLET' then 'TABLETFORMXML'
+	end as type,
+	case f.FORMTYPE
+		when 'XFD' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/XML/' + f.DISPLAYTEXT
+		when 'HTML' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/XML/' + f.DISPLAYTEXT
+		when 'PHONE' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/PhoneForms/XML/' + f.DISPLAYTEXT
+		when 'TABLET' then '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/TabletForms/XML/' + f.DISPLAYTEXT
+	end as uri,
+	f.CHECKEDOUTBY as checkedOutBy,
+	'XML' as language,
+	'N' as isFolder,
+	f.FORMID as guid
+	from LIMSXFDFORMS f
+	join LIMSAPPLICATIONS a on a.APPID = f.APPID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where f.FORMNAME like '%" + limsstring(sItemName) + "%'";
 
-union
+	:IF !Empty(sAppCatName);
+		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
 
-select
-s.DISPLAYTEXT as name, 
-'APPSS' as type,
-'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ServerScripts/' + s.DISPLAYTEXT as URI,
-s.CHECKEDOUTBY as checkedOutBy,
-s.SCRIPTLANGUAGE as language,
-'N' as isFolder,
-s.SCRIPTID as guid
-from LIMSAPPLICATIONS a
-join LIMSAPPSERVERSCRIPTS aps on aps.APPID = a.APPID
-join LIMSSERVERSCRIPTS s on s.SCRIPTID = aps.SCRIPTID
-join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
-and s.LAYERID = ?nLayerID?
+	sSQL += " and f.LAYERID = ?nLayerID?";
+:ENDIF;
 
-union
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
 
-select
-s.DISPLAYTEXT as name,
-'APPCS' as type,
-'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ClientScripts/' + s.DISPLAYTEXT as uri,
-s.CHECKEDOUTBY as checkedOutBy,
-s.SCRIPTLANGUAGE as language,
-'N' as isFolder,
-s.SCRIPTID as guid
-from LIMSAPPLICATIONS a
-join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-join LIMSAPPCLIENTSCRIPTS apc on apc.APPID = a.APPID
-join LIMSCLIENTSCRIPTS s on s.SCRIPTID = apc.SCRIPTID
-where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
-and s.LAYERID = ?nLayerID?
+:IF sItemType == "HTMLFORMGUIDE" .OR. Empty(sItemType);
+	sSQL += "select
+	f.DISPLAYTEXT as name,
+	'HTMLFORMGUIDE' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/Guide/' + f.DISPLAYTEXT as uri,
+	f.CHECKEDOUTBY as checkedOutBy,
+	'JSON' as language,
+	'N' as isFolder,
+	f.FORMID as guid
+	from LIMSXFDFORMS f
+	join LIMSAPPLICATIONS a on a.APPID = f.APPID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where f.FORMNAME like '%" + limsstring(sItemName) + "%'";
 
-union
+	:IF !Empty(sAppCatName);
+		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%' ";
+	:ENDIF;
 
-select
-s.DISPLAYTEXT as name, 
-'APPDS' as type,
-'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/DataSources/' + s.DISPLAYTEXT as uri,
-s.CHECKEDOUTBY as checkedOutBy,
-s.SCRIPTLANGUAGE as language,
-'N' as isFolder,
-s.DATASOURCEID as guid
-from LIMSAPPLICATIONS a
-join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-join LIMSAPPDATASOURCES aps on aps.APPID = a.APPID
-join LIMSDATASOURCES s on s.DATASOURCEID = aps.DATASOURCEID
-where s.DSNAME like '%" + limsstring(searchStr) + "%'
-and s.LAYERID = ?nLayerID?
+	sSQL += " and f.FORMTYPE = 'HTML'
+			  and f.LAYERID = ?nLayerID?";
+:ENDIF;
 
-union
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
 
-select
-s.DISPLAYTEXT as name,
-'SS' as type,
-'/ServerScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
-s.CHECKEDOUTBY as checkedOutBy,
-s.SCRIPTLANGUAGE as language,
-'N' as isFolder,
-s.SCRIPTID as guid
-from LIMSSERVERSCRIPTCATEGORIES c
-join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
-where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
-and s.LAYERID = ?nLayerID?
+:IF sItemType == "SS" .OR. Empty(sItemType);
+	sSQL += "select
+	s.DISPLAYTEXT as name, 
+	'APPSS' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ServerScripts/' + s.DISPLAYTEXT as URI,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSAPPLICATIONS a
+	join LIMSAPPSERVERSCRIPTS aps on aps.APPID = a.APPID
+	join LIMSSERVERSCRIPTS s on s.SCRIPTID = aps.SCRIPTID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
 
-union
+	:IF !Empty(sAppCatName);
+		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
 
-select
-s.DISPLAYTEXT as name,
-'DS' as type,
-'/DataSources/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
-s.CHECKEDOUTBY as checkedOutBy,
-s.SCRIPTLANGUAGE as language,
-'N' as isFolder,
-s.DATASOURCEID as guid
-from LIMSDATASOURCECATEGORIES c
-join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
-where s.DSNAME like '%" + limsstring(searchStr) + "%'
-and s.LAYERID = ?nLayerID?
+	sSQL += " and s.LAYERID = ?nLayerID?";
+:ENDIF;
 
-union
+:IF Empty(sItemType) .OR. sItemType == "SS";
+	sSQL += " union ";
+:ENDIF;
 
-select
-s.DISPLAYTEXT as name,
-'CS' as type,
-'/ClientScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
-s.CHECKEDOUTBY as checkedOutBy,
-s.SCRIPTLANGUAGE as language,
-'N' as isFolder,
-s.SCRIPTID as guid
-from LIMSCLIENTSCRIPTCATEGORIES c
-join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
-where s.SCRIPTNAME like '%" + limsstring(searchStr) + "%'
-and s.LAYERID = ?nLayerID?
+:IF sItemType == "CS" .OR. Empty(sItemType);
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'APPCS' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ClientScripts/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSAPPLICATIONS a
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	join LIMSAPPCLIENTSCRIPTS apc on apc.APPID = a.APPID
+	join LIMSCLIENTSCRIPTS s on s.SCRIPTID = apc.SCRIPTID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
 
-order by 3";
+	:IF !Empty(sAppCatName);
+		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
+
+	sSQL += " and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF Empty(sItemType) .OR. sItemType == "CS";
+	sSQL += " union ";
+:ENDIF;
+
+:IF sItemType == "DS" .OR. Empty(sItemType);
+	sSQL += "select
+	s.DISPLAYTEXT as name, 
+	'APPDS' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/DataSources/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.DATASOURCEID as guid
+	from LIMSAPPLICATIONS a
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	join LIMSAPPDATASOURCES aps on aps.APPID = a.APPID
+	join LIMSDATASOURCES s on s.DATASOURCEID = aps.DATASOURCEID
+	where s.DSNAME like '%" + limsstring(sItemName) + "%'";
+
+	:IF !Empty(sAppCatName);
+		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
+
+	sSQL += " and s.LAYERID = ?nLayerID?
+			  and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF Empty(sItemType) .OR. sItemType == "DS";
+	sSQL += " union ";
+:ENDIF;
+
+:IF sItemType == "SS" .OR. Empty(sItemType);
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'SS' as type,
+	'/ServerScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSSERVERSCRIPTCATEGORIES c
+	join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	
+	:IF !Empty(sAppCatName);
+		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
+
+	sSQL += " and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
+
+:IF sItemType == "DS" .OR. Empty(sItemType);
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'DS' as type,
+	'/DataSources/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.DATASOURCEID as guid
+	from LIMSDATASOURCECATEGORIES c
+	join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
+	where s.DSNAME like '%" + limsstring(sItemName) + "%'";
+
+	:IF !Empty(sAppCatName);
+		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
+	
+	sSQL += " and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
+
+:IF sItemType == "CS" .OR. Empty(sItemType);
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'CS' as type,
+	'/ClientScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSCLIENTSCRIPTCATEGORIES c
+	join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	
+	:IF !Empty(sAppCatName);
+		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
+	:ENDIF;
+
+	sSQL += " and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+sSQL += " order by 3";
 
 aItems := SQLexecute(sSQL, "Dictionary");
 

@@ -444,7 +444,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (!itemName) {
         return;
       }
-      await enterpriseProvider.search(itemName);
+      await enterpriseProvider.search(itemName, "", false);
     }
   );
 
@@ -907,6 +907,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // insert text into the active editor
   const editorInsert = (text: string) => {
     const activeTextEditor = vscode.window.activeTextEditor;
       if (activeTextEditor) {
@@ -914,8 +915,9 @@ export async function activate(context: vscode.ExtensionContext) {
           editBuilder.insert(activeTextEditor.selection.active, text);
         });
       }
-  }
+  };
 
+  // register the generate table select command
   vscode.commands.registerCommand(
     "STARLIMS.GenerateTableSelect",
     async (item: TreeEnterpriseItem | any) => {
@@ -926,6 +928,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the generate table delete command
   vscode.commands.registerCommand(
     "STARLIMS.GenerateTableDelete",
     async (item: TreeEnterpriseItem | any) => {
@@ -936,6 +939,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the generate table insert command
   vscode.commands.registerCommand(
     "STARLIMS.GenerateTableInsert",
     async (item: TreeEnterpriseItem | any) => {
@@ -946,6 +950,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the generate table update command
   vscode.commands.registerCommand(
     "STARLIMS.GenerateTableUpdate",
     async (item: TreeEnterpriseItem | any) => {
@@ -956,10 +961,95 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the send name to editor command
   vscode.commands.registerCommand(
     "STARLIMS.SendNameToEditor",
     async (item: TreeEnterpriseItem | any) => {
       editorInsert(item.label);
+    }
+  );
+
+  // register the GoToServerScript command
+  vscode.commands.registerCommand(
+    "STARLIMS.GoToServerScript",
+    async () => {
+      // get the server script name from editor selection
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const selection = editor.selection;
+        const scriptName = editor.document.getText(selection);
+
+        // use search to find the script
+        const itemFound = await enterpriseProvider.search(scriptName, "SS", true);
+
+        // open the first item found
+        if (itemFound !== undefined) {
+          vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
+        }  
+      }
+    }
+  );
+
+  // register the GoToDataSource command
+  vscode.commands.registerCommand(
+    "STARLIMS.GoToDataSource",
+    async () => {
+      // get the data source name from editor selection
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const selection = editor.selection;
+        const scriptName = editor.document.getText(selection);
+
+        // use search to find the script
+        const itemFound = await enterpriseProvider.search(scriptName, "DS", true);
+
+        // open the first item found
+        if (itemFound !== undefined) {
+          vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
+        }
+      }
+    }
+  );
+
+  // register the GoToClientScript command
+  vscode.commands.registerCommand(
+    "STARLIMS.GoToClientScript",
+    async () => {
+      // get the client script name from editor selection
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const selection = editor.selection;
+        const scriptName = editor.document.getText(selection);
+
+        // use search to find the script
+        const itemFound = await enterpriseProvider.search(scriptName, "CS", true);
+
+        // open the first item found
+        if (itemFound !== undefined) {
+          vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
+        }
+      }
+    }
+  );
+
+  // register the GoToForm command
+  vscode.commands.registerCommand(
+    "STARLIMS.GoToForm",
+    async () => {
+      // get the form name from editor selection
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const selection = editor.selection;
+        const formName = editor.document.getText(selection);
+
+        // use search to find the script
+        const itemFound = await enterpriseProvider.search(formName, "FORMCODEBEHIND", true);
+
+        // open the first item found
+        if (itemFound !== undefined) {
+          vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
+        }
+      }
     }
   );
 
