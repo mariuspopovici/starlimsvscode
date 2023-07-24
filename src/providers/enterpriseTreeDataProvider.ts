@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
 import { Enterprise } from "../services/enterprise";
+import path from "path";
 
 /**
  * Implements the VS Code TreeDataProvider to build the STARLIMS designer tree explorer.
@@ -148,23 +149,28 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @param document The document to get the tree item for
    * @returns The tree item for the document
    */
-  getTreeItemForDocument(document: any): TreeEnterpriseItem {
-    const filePath = document.fsPath;
-    const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
-    const enterpriseUri = "starlims:///" + filePath.replace(/\\/g, "/") + "/";
-    const guid = document.guid;
-    const enterpriseItem = new TreeEnterpriseItem(
-      EnterpriseItemType.Application,
-      fileName,
-      "en",
-      enterpriseUri,
-      vscode.TreeItemCollapsibleState.None,
-      undefined,
-      filePath,
-      guid
+  async getTreeItemForDocument(document: any): Promise<TreeEnterpriseItem | undefined> {
+    const localUri = document.uri;
+    const config = this.service.getConfig();
+    const rootPath: string = path.join(config.get("rootPath") as string, "SLVSCODE");
+    let remotePath = localUri.path.slice(rootPath.length + 1);
+    remotePath = remotePath.slice(0, remotePath.lastIndexOf("."));
+    remotePath = remotePath.startsWith("/") ? remotePath : `/${remotePath}`;
+
+    const [item] = await this.service.getEnterpriseItems(remotePath);
+
+    let newItem = new TreeEnterpriseItem(
+      item.type,
+      item.name,
+      item.language,
+      item.uri,
+      item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
+      item.command,
+      item.filePath,
+      item.guid
     );
-    enterpriseItem.iconPath = new vscode.ThemeIcon("file-code");
-    return enterpriseItem;
+
+    return newItem;
   }
 
   /**

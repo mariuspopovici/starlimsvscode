@@ -118,7 +118,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 		:CASE sItemType == "APPSS";
 			sAppName := sCategory + "." + sAppName;
 			sAppID := oUtils:GetItemGUID(sAppName, "APP");
-			sScriptLang := "SSL";
+			sScriptLang := "STARLIMS";
 			DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Add", {sAppID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
@@ -141,7 +141,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 
 		:CASE sItemType == "SS";
 			sCategoryID := oUtils:GetItemGUID(sCategory, "SSCAT");
-			sScriptLang := "SSL";
+			sScriptLang := "STARLIMS";
 			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
@@ -160,7 +160,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 
 		:CASE sItemType == "CS";
 			sCategoryID := oUtils:GetItemGUID(sCategory, "CSCAT");
-			sScriptLang := "SSL";			
+			sScriptLang := "JS";			
 			DoProc("Enterprise_Data_Providers.ClientScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 	:ENDCASE;

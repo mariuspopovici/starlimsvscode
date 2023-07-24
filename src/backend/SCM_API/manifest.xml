@@ -184,7 +184,7 @@
           <ItemContent>Server Scripts\SCM_API\TableCommand.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>SSL</ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ServerScript>

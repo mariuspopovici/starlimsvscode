@@ -191,8 +191,16 @@ bFolder := .T.;
 		:FOR i := 1 :TO Len(aDataSet);
 			AAdd(aItems, {aDataSet[i], sOutType, sOutType, sURI + "/" + aDataSet[i], "", NIL});
 		:NEXT;
-	:EXITCASE;
-
+	:EXITCASE; 
+	
+	:CASE AScanExact({"APPSS", "APPCS", "APPDS", "HTMLFORMXML", "HTMLFORMGUIDE", 
+			"HTMLFORMCODE", "XFDFORMXML", "XFDFORMCODE", "CS", "DS", "SERVERLOG"}, 
+			oEnterpriseItem:Type) > 0;
+		sOutType := oEnterpriseItem:Type;
+		bFolder := .F.;
+		AAdd(aItems, {oEnterpriseItem:Type, sOutType, sOutType, sURI, "", oUtils:GetItemGUID(sURI)});
+	:EXITCASE; 
+	
 	:CASE oEnterpriseItem:Type == "ENT_CAT_TABLES";
 		aItems := aTablesSubCategories;
 		sOutType := "CATEGORY";
@@ -201,7 +209,6 @@ bFolder := .T.;
 
 	:CASE oEnterpriseItem:Type == "TBLCATEGORY";
 		sOutType := "TABLE";
-		UsrMes(ToJson(oEnterpriseItem));
 		sDataSet := DoProc("Enterprise_Data_Providers.TableProvider.GetList", {Upper(oEnterpriseItem:Name)});
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
