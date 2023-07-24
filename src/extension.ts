@@ -142,8 +142,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // check if item is TreeEnterpriseItem
       if (!(item instanceof TreeEnterpriseItem)) {
         // if not, get the item from the tree data provider
-        item = enterpriseProvider.getTreeItemForDocument(
-          item
+        const document = vscode.window.activeTextEditor?.document;
+        item = await enterpriseProvider.getTreeItemForDocument(
+          document
         ) as TreeEnterpriseItem;
       }
 
@@ -274,7 +275,10 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand(
         "workbench.action.files.setActiveEditorReadonlyInSession"
       );
-      vscode.window.showInformationMessage("Please check out the item to make changes.");
+
+      if (item.type !== EnterpriseItemType.ServerLog) {
+        vscode.window.showInformationMessage("Please check out the item to make changes.");
+      }
     }
   }
 
@@ -930,7 +934,7 @@ export async function activate(context: vscode.ExtensionContext) {
           editBuilder.insert(activeTextEditor.selection.active, text);
         });
       }
-  }
+  };
 
   vscode.commands.registerCommand(
     "STARLIMS.GenerateTableSelect",
