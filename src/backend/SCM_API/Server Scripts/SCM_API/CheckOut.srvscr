@@ -84,7 +84,7 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 	:EXITCASE;
 	:CASE sType == "TABLE";
 		sItemID := oUtils:GetItemGUID(sItemName, sType);
-		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckOutItem", {sItemID, "Table"});
+		DoProc("Enterprise_Data_Providers.CheckOutProvider.CheckOutItem", {sItemID, "Table"});
 	:EXITCASE;
 :ENDCASE; 
 Response:StatusCode := 200;

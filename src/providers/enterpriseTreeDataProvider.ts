@@ -31,15 +31,40 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     this._onDidChangeTreeData.fire(null);
   }
 
-  /** Search for items in the tree.
-   * @param searchText The text to search for.
-   * @returns The items that match the search text.
+  /** Search for items on the server.
+   * @param itemName The text to search for.
+   * @param itemType The type of items to search for.
+   * @returns First item found.
    * */
-  async search(searchText: string): Promise<void> {
-    this.dataMode = "SEARCH";
-    this.treeItems = await this.service.searchForItems(searchText);
-    this._onDidChangeTreeData.fire(null);
-    //this.dataMode = "LOAD";
+  async search(itemName: string, itemType: string, bSilent: boolean): Promise<TreeEnterpriseItem | undefined> {
+    if(itemName === "") {
+      return;
+    }
+    var resultItems = await this.service.searchForItems(itemName, itemType);
+    if (resultItems === undefined || resultItems.length === 0) {
+      vscode.window.showErrorMessage("No items found!");
+      return;
+    }
+    else {
+      if (bSilent === false) {
+        this.dataMode = "SEARCH";
+        this.treeItems = resultItems;
+        this._onDidChangeTreeData.fire(null);
+
+        // wait for the tree to be refreshed
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+      return resultItems[0];
+    }
+  }
+
+  /**
+   * Get the first item in the tree.
+   * @returns The first item in the tree.
+   */
+  async getFirstItem(): Promise<TreeEnterpriseItem | undefined> {
+    const treeItems = await this.getChildren();
+    return treeItems[0];
   }
 
   /**
@@ -146,16 +171,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     );
 
     return newItem;
-  }
-
-  /**
-   * Search for tree item by its name and return first match
-   * @param name The name of the tree item to search for
-   * @returns The tree item for the document
-   */
-  async getTreeItemByName(name: string): Promise<TreeEnterpriseItem | undefined> {
-    const enterpriseItems: TreeEnterpriseItem[] = this.treeItems;
-    return enterpriseItems.find((item) => item.label === name);
   }
 
   /**

@@ -151,6 +151,22 @@
       {
         "command": "STARLIMS.GenerateTableDelete",
         "title": "Generate DELETE"
+      },
+      {
+        "command": "STARLIMS.GoToServerScript",
+        "title": "Go to Server Script"
+      },
+      {
+        "command": "STARLIMS.GoToClientScript",
+        "title": "Go to Client Script"
+      },
+      {
+        "command": "STARLIMS.GoToDataSource",
+        "title": "Go to Data Source"
+      },
+      {
+        "command": "STARLIMS.GoToForm",
+        "title": "Go to Form (Code Behind)"
       }
     ],
     "menus": {
@@ -307,6 +323,26 @@
         {
           "command": "STARLIMS.DebugForm",
           "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+        },
+        {
+          "command": "STARLIMS.GoToServerScript",
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log' && editorLangId != 'SLSQL'",
+          "group": "goto"
+        },
+        {
+          "command": "STARLIMS.GoToClientScript",
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log' && editorLangId != 'SLSQL'",
+          "group": "goto"
+        },
+        {
+          "command": "STARLIMS.GoToDataSource",
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log' && editorLangId != 'SLSQL'",
+          "group": "goto"
+        },
+        {
+          "command": "STARLIMS.GoToForm",
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log' && editorLangId != 'SLSQL'",
+          "group": "goto"
         }
       ]
     },
