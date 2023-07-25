@@ -25,10 +25,9 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 This is an unofficial, unsupported extension so use at your own risk. Maybe this will someday become officially supported or maybe not...
 
 ## Vision
-
-Implement a Git-like mechanism for managing versions. Extension can be used to explore the remote tree and download code to a local repo.
-Changes can be pushed back to the STARLIMS dictionary and merged with the remote version.
-Design HTML forms directly in VS Code via a HTML preview window.
+- Implement a Git-like mechanism for managing versions.
+- Design HTML forms directly in VS Code via a HTML preview window.
+- Implement more features from Starlims Designer
 
 ## Features
 
@@ -50,7 +49,6 @@ To Do:
 - Show all checked out items
 - Move forms and scripts
 - Edit form resources
-- Edit HTML forms visually
 - Global find function
 - Create a HTML form designer
 - Implement table support including a schema and ERD generator / viewer
@@ -113,3 +111,4 @@ New features:
 - Run data sources and server scripts
 - Support for exploring database and dictionary including tree commands for generating INSERT, DELETE, SELECT and UPDATE statements for the selected table.
 - Misc. bug fixes
+- Go to script/form under the cursor
