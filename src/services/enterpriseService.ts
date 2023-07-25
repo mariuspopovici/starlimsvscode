@@ -437,9 +437,10 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
-   * Search enterprise items by its names
+   * Search enterprise items by its name (and type)
    * @param itemName the name of the enterprise item
-   * @returns the uri of the enterprise item
+   * @param itemType the type of the enterprise item
+   * @returns the enterprise item found
    */
   public async searchForItems(itemName: string, itemType: string): Promise<any> {    
     let url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
