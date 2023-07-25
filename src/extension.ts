@@ -156,7 +156,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const handler : Function | undefined = getSelectItemHandler(item);
+      const handler: Function | undefined = getSelectItemHandler(item);
       if (handler !== undefined) {
         await handler(item);
       }
@@ -183,9 +183,9 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  function getSelectItemHandler(item: TreeEnterpriseItem) : Function | undefined {
+  function getSelectItemHandler(item: TreeEnterpriseItem): Function | undefined {
     const config = new Map([
-      [EnterpriseItemType.Table, handleSelectTableItem],      
+      [EnterpriseItemType.Table, handleSelectTableItem],
     ]);
 
     return config.has(item.type) ? config.get(item.type) : handleSelectCodeItem;
@@ -196,7 +196,7 @@ export async function activate(context: vscode.ExtensionContext) {
    * 
    * @param item the enterprise tree item to handle
    */
-  async function handleSelectTableItem(item:TreeEnterpriseItem) {
+  async function handleSelectTableItem(item: TreeEnterpriseItem) {
     // do nothing 
   }
 
@@ -395,7 +395,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the showTreeView command
   vscode.commands.registerCommand(
     "STARLIMS.ShowTreeView",
-    async (item: TreeEnterpriseItem) => {
+    async () => {
       enterpriseProvider.refresh();
     }
   );
@@ -626,7 +626,6 @@ export async function activate(context: vscode.ExtensionContext) {
       outputChannel.show();
     }
   );
-
 
   // register the add item command
   vscode.commands.registerCommand("STARLIMS.Add",
@@ -884,7 +883,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (result?.success) {
           DataViewPanel.render(context.extensionUri, {
             name: remoteUri.toString(),
-            data: result.data 
+            data: result.data
           });
         }
         outputChannel.appendLine(result.data);
@@ -930,11 +929,11 @@ export async function activate(context: vscode.ExtensionContext) {
   // insert text into the active editor
   const editorInsert = (text: string) => {
     const activeTextEditor = vscode.window.activeTextEditor;
-      if (activeTextEditor) {
-        activeTextEditor.edit(editBuilder => {
-          editBuilder.insert(activeTextEditor.selection.active, text);
-        });
-      }
+    if (activeTextEditor) {
+      activeTextEditor.edit(editBuilder => {
+        editBuilder.insert(activeTextEditor.selection.active, text);
+      });
+    }
   };
 
   // register the generate table select command
@@ -993,19 +992,37 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.GoToServerScript",
     async () => {
-      // get the server script name from editor selection
-      const editor = vscode.window.activeTextEditor;
+      var editor = vscode.window.activeTextEditor;
       if (editor) {
-        const selection = editor.selection;
-        const scriptName = editor.document.getText(selection);
+        // get the script name from editor cursor position
+        const position = editor.selection.active;
+        const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
-        // use search to find the script
+        // search on server to find the script
         const itemFound = await enterpriseProvider.search(scriptName, "SS", true);
 
         // open the first item found
         if (itemFound !== undefined) {
-          vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
-        }  
+          await vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
+
+          // get new editor
+          editor = vscode.window.activeTextEditor;
+
+          if (editor) {
+            // split the script name to get the procedure name
+            const aScriptName = scriptName.split(".");
+            if (aScriptName.length > 2) {
+              const procName = `:PROCEDURE ${aScriptName[2]};`;
+              // search the opened document for the procedure name and set cursor to the line of occurrence
+              const procPosition = editor.document.getText().indexOf(procName);
+              if (procPosition > 0) {
+                const position = editor.document.positionAt(procPosition);
+                editor.selection = new vscode.Selection(position, position);
+                editor.revealRange(new vscode.Range(position, position));
+              }
+            }
+          }
+        }
       }
     }
   );
@@ -1014,11 +1031,11 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.GoToDataSource",
     async () => {
-      // get the data source name from editor selection
-      const editor = vscode.window.activeTextEditor;
+      var editor = vscode.window.activeTextEditor;
       if (editor) {
-        const selection = editor.selection;
-        const scriptName = editor.document.getText(selection);
+        // get the script name from editor cursor position
+        const position = editor.selection.active;
+        const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
         const itemFound = await enterpriseProvider.search(scriptName, "DS", true);
@@ -1035,11 +1052,11 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.GoToClientScript",
     async () => {
-      // get the client script name from editor selection
-      const editor = vscode.window.activeTextEditor;
+      var editor = vscode.window.activeTextEditor;
       if (editor) {
-        const selection = editor.selection;
-        const scriptName = editor.document.getText(selection);
+        // get the script name from editor cursor position
+        const position = editor.selection.active;
+        const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
         const itemFound = await enterpriseProvider.search(scriptName, "CS", true);
@@ -1056,11 +1073,11 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.GoToForm",
     async () => {
-      // get the form name from editor selection
-      const editor = vscode.window.activeTextEditor;
+      var editor = vscode.window.activeTextEditor;
       if (editor) {
-        const selection = editor.selection;
-        const formName = editor.document.getText(selection);
+        // get the form name from editor cursor position
+        const position = editor.selection.active;
+        const formName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
         const itemFound = await enterpriseProvider.search(formName, "FORMCODEBEHIND", true);
@@ -1069,6 +1086,40 @@ export async function activate(context: vscode.ExtensionContext) {
         if (itemFound !== undefined) {
           vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
         }
+      }
+    }
+  );
+
+  // register the GoToItem command
+  vscode.commands.registerCommand(
+    "STARLIMS.GoToItem",
+    async () => {
+      var editor = vscode.window.activeTextEditor;
+      if (editor) {
+        // get the current line
+        const line = editor.document.lineAt(editor.selection.active.line).text;
+
+        if (line.includes("lims.CallServer")) {
+          vscode.commands.executeCommand("STARLIMS.GoToServerScript");
+          return;
+        }
+
+        if (line.includes("lims.GetData")) {
+          vscode.commands.executeCommand("STARLIMS.GoToDataSource");
+          return;
+        }
+
+        if (line.includes("Form")) {
+          vscode.commands.executeCommand("STARLIMS.GoToForm");
+          return;
+        }
+
+        if (line.includes("#include")) {
+          vscode.commands.executeCommand("STARLIMS.GoToClientScript");
+          return;
+        }
+
+        vscode.window.showErrorMessage("Could not find a STARLIMS item to navigate to.");
       }
     }
   );
