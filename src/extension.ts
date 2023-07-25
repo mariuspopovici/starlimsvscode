@@ -142,8 +142,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // check if item is TreeEnterpriseItem
       if (!(item instanceof TreeEnterpriseItem)) {
         // if not, get the item from the tree data provider
-        item = enterpriseProvider.getTreeItemForDocument(
-          item
+        const document = vscode.window.activeTextEditor?.document;
+        item = await enterpriseProvider.getTreeItemForDocument(
+          document
         ) as TreeEnterpriseItem;
       }
 
@@ -274,7 +275,10 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand(
         "workbench.action.files.setActiveEditorReadonlyInSession"
       );
-      vscode.window.showInformationMessage("Please check out the item to make changes.");
+
+      if (item.type !== EnterpriseItemType.ServerLog) {
+        vscode.window.showInformationMessage("Please check out the item to make changes.");
+      }
     }
   }
 
@@ -429,7 +433,23 @@ export async function activate(context: vscode.ExtensionContext) {
       if (confirm !== "Yes") {
         return;
       }
-      enterpriseService.clearLog(item.uri);
+
+      const rootPath: string = path.join(
+        config.get("rootPath") as string,
+        SLVSCODE_FOLDER
+      );
+      const editor = vscode.window.activeTextEditor;
+
+      if (editor && rootPath) {
+        var localUri = editor.document.uri;
+        if (localUri) {
+          let remotePath = localUri.path.slice(rootPath.length + 1);
+          remotePath = remotePath.slice(0, remotePath.lastIndexOf("."));
+          remotePath = remotePath.startsWith("/") ? remotePath : `/${remotePath}`;
+
+          await enterpriseService.clearLog(remotePath);
+        }
+      }
     }
   );
 

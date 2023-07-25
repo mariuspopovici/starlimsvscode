@@ -306,11 +306,11 @@
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
-          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'log'"
         },
         {
           "command": "STARLIMS.ClearLog",
-          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId == 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'log'"
         },
         {
           "command": "STARLIMS.OpenXFDForm",

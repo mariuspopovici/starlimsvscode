@@ -420,7 +420,7 @@ export class EnterpriseService implements Enterprise {
     filePath = filePath.replace(/\.[^/.]+$/, "");
 
     // remove workspace folder path from file path
-    filePath = filePath.replace(rootPath, "");
+    filePath = filePath.replace(new RegExp(rootPath, "ig"), "");
     return filePath;
   }
 
