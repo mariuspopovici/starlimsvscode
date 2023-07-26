@@ -286,22 +286,24 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.RunScript",
     async (item: TreeEnterpriseItem | any) => {
-      let remoteUri: string = "";
+      // get item from editor if no item is defined (shortcut key pressed)
+      if (item === undefined) {
+        let editor = vscode.window.activeTextEditor;
+        item = editor?.document.uri;
+      }
 
       // commands can originate from the enterprise tree or from an open editor window
-      const isTreeCommand = item instanceof TreeEnterpriseItem;
-
-      if (isTreeCommand) {
+      let remoteUri: string = "";
+      if (item instanceof TreeEnterpriseItem) {
         remoteUri = item.uri;
-      } else {
-        // command originates from a document context menu
-        const uri = item.path
-          ? item.path.slice(0, item.path.lastIndexOf("."))
-          : undefined;
-        if (config.has("rootPath")) {
-          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
-          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
+      }
+      else {
+        // no item defined (shortcut key pressed)
+        if (item === undefined) {
+          let editor = vscode.window.activeTextEditor;
+          item = editor?.document.uri;
         }
+        remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
 
       outputChannel.appendLine(
@@ -333,19 +335,12 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       if (localUri) {
-        if (config.has("rootPath")) {
-          const rootPath: string = path.join(
-            config.get("rootPath") as string,
-            SLVSCODE_FOLDER
-          );
-          let remotePath = localUri.path.slice(rootPath.length);
-          let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`);
-          vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
-        } else {
-          vscode.window.showErrorMessage(
-            "STARLIMS: Working folder not found, open a workspace folder an try again."
-          );
-        }
+        let remoteUri = enterpriseService.getUriFromLocalPath(localUri.path);
+        vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
+      } else {
+        vscode.window.showErrorMessage(
+          "STARLIMS: Working folder not found, open a workspace folder an try again."
+        );
       }
     }
   );
@@ -353,13 +348,15 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the checkout command
   vscode.commands.registerCommand(
     "STARLIMS.Checkout",
-    async (item: TreeEnterpriseItem) => {
+    async (item: TreeEnterpriseItem | any) => {
+      if (!(item instanceof TreeEnterpriseItem)) {
+        item = await enterpriseProvider.getTreeItemForDocument(vscode.window.activeTextEditor?.document);
+      }
+
       let bSuccess = await enterpriseService.CheckOut(item.uri);
       if (bSuccess) {
         item.checkedOutBy = user;
         enterpriseProvider.refresh();
-
-        // execute getlocal command
         vscode.commands.executeCommand("STARLIMS.GetLocal", item);
       }
     }
@@ -368,7 +365,11 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the check in command
   vscode.commands.registerCommand(
     "STARLIMS.Checkin",
-    async (item: TreeEnterpriseItem) => {
+    async (item: TreeEnterpriseItem | any) => {
+      if (!(item instanceof TreeEnterpriseItem)) {
+        item = await enterpriseProvider.getTreeItemForDocument(vscode.window.activeTextEditor?.document);
+      }
+
       let checkinReason: string =
         (await vscode.window.showInputBox({
           prompt: "Enter checkin reason",
@@ -404,19 +405,11 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Save",
     async () => {
-      const rootPath: string = path.join(
-        config.get("rootPath") as string,
-        SLVSCODE_FOLDER
-      );
       const editor = vscode.window.activeTextEditor;
 
-      if (editor && rootPath) {
-        var localUri = editor.document.uri;
-        if (localUri) {
-          let remotePath = localUri.path.slice(rootPath.length + 1);
-          remotePath = remotePath.startsWith("/") ? remotePath : `/${remotePath}`;
-          enterpriseService.saveEnterpriseItemCode(remotePath, editor.document.getText());
-        }
+      if (editor) {
+        let remoteUri = enterpriseService.getUriFromLocalPath(editor.document.uri.path);
+        enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText());
       }
     }
   );
@@ -434,21 +427,10 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const rootPath: string = path.join(
-        config.get("rootPath") as string,
-        SLVSCODE_FOLDER
-      );
       const editor = vscode.window.activeTextEditor;
-
-      if (editor && rootPath) {
-        var localUri = editor.document.uri;
-        if (localUri) {
-          let remotePath = localUri.path.slice(rootPath.length + 1);
-          remotePath = remotePath.slice(0, remotePath.lastIndexOf("."));
-          remotePath = remotePath.startsWith("/") ? remotePath : `/${remotePath}`;
-
-          await enterpriseService.clearLog(remotePath);
-        }
+      if (editor) {
+        let remoteUri = enterpriseService.getUriFromLocalPath(editor.document.uri.path);
+        await enterpriseService.clearLog(remoteUri);
       }
     }
   );
@@ -471,22 +453,23 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the open form command
   vscode.commands.registerCommand("STARLIMS.OpenForm",
     async (item: TreeEnterpriseItem | any) => {
-      var remotePath;
+      // get item from editor if no item is defined (shortcut key pressed)
+      if (item === undefined) {
+        let editor = vscode.window.activeTextEditor;
+        item = editor?.document.uri;
+      }
+
       // get remote path from local path if opened from editor context menu
+      let remoteUri;
       if (item.uri === undefined) {
-        const uri = item.path
-          ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
-        if (!uri) {
-          return;
-        }
-        remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+        remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
       else {
-        remotePath = item.uri;
+        remoteUri = item.uri;
       }
 
       // get the form GUID
-      const formGuid = await enterpriseService.getGUID(remotePath);
+      const formGuid = await enterpriseService.getGUID(remoteUri);
 
       // open form in default browser
       const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`;
@@ -497,22 +480,23 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the start debugging command
   vscode.commands.registerCommand("STARLIMS.DebugForm",
     async (item: TreeEnterpriseItem | any) => {
-      var remotePath;
+      // get item from editor if no item is defined (shortcut key pressed)
+      if (item === undefined) {
+        let editor = vscode.window.activeTextEditor;
+        item = editor?.document.uri;
+      }
+
       // get remote path from local path if opened from editor context menu
+      let remoteUri;
       if (item.uri === undefined) {
-        const uri = item.path
-          ? item.path.slice(0, item.path.lastIndexOf(".")) : undefined;
-        if (!uri) {
-          return;
-        }
-        remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
+        remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
       else {
-        remotePath = item.uri;
+        remoteUri = item.uri;
       }
 
       // get the form GUID
-      const formGuid = await enterpriseService.getGUID(remotePath);
+      const formGuid = await enterpriseService.getGUID(remoteUri);
 
       // read STARLIMS.browser configuration value (edge or chrome)
       const browserType = config.get("browser") as string;
@@ -566,8 +550,8 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       // get the form script name
-      const appName = remotePath.split("/")[3];
-      const fileName = remotePath.split("/").pop() + ".js";
+      const appName = remoteUri.split("/")[3];
+      const fileName = remoteUri.split("/").pop() + ".js";
       const scriptName = `${appName}.${fileName}`;
 
       // wait until the form script has been loaded
@@ -853,25 +837,22 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // show connection message
+  // register the run data source command
   vscode.commands.registerCommand(
     "STARLIMS.RunDataSource",
     async (item: TreeEnterpriseItem | any) => {
-      let remoteUri: string = "";
-      // commands can originate from the enterprise tree or from an open editor window
-      const isTreeCommand = item instanceof TreeEnterpriseItem;
+      // get item from editor if no item is defined (shortcut key pressed)
+      if (item === undefined) {
+        let editor = vscode.window.activeTextEditor;
+        item = editor?.document.uri;
+      }
 
-      if (isTreeCommand) {
+      // commands can originate from the enterprise tree or from an open editor window
+      let remoteUri: string = "";
+      if (item instanceof TreeEnterpriseItem) {
         remoteUri = item.uri;
       } else {
-        // command originates from a document context menu
-        const uri = item.path
-          ? item.path.slice(0, item.path.lastIndexOf("."))
-          : undefined;
-        if (config.has("rootPath")) {
-          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
-          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
-        }
+        remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
 
       outputChannel.appendLine(
@@ -896,22 +877,18 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.OpenXFDForm",
     async (item: TreeEnterpriseItem | any) => {
-      let remoteUri: string = "";
+      // get item from editor if no item is defined (shortcut key pressed)
+      if (item === undefined) {
+        let editor = vscode.window.activeTextEditor;
+        item = editor?.document.uri;
+      }
 
       // commands can originate from the enterprise tree or from an open editor window
-      const isTreeCommand = item instanceof TreeEnterpriseItem;
-
-      if (isTreeCommand) {
+      let remoteUri: string = "";
+      if (item instanceof TreeEnterpriseItem) {
         remoteUri = item.uri;
       } else {
-        // command originates from a document context menu
-        const uri = item.path
-          ? item.path.slice(0, item.path.lastIndexOf("."))
-          : undefined;
-        if (config.has("rootPath")) {
-          const remotePath = uri.slice(uri.lastIndexOf(SLVSCODE_FOLDER) + SLVSCODE_FOLDER.length);
-          remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
-        }
+        remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
 
       outputChannel.appendLine(

@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.26",
+  "version": "1.2.28",
   "publisher": "MariusPopovici",
   "author": {
     "name": "Marius Popovici, Christoph Döllinger, Jan Bouecke"
@@ -154,30 +154,55 @@
       },
       {
         "command": "STARLIMS.GoToServerScript",
-        "title": "Go to Server Script"
+        "title": "Server Script"
       },
       {
         "command": "STARLIMS.GoToClientScript",
-        "title": "Go to Client Script"
+        "title": "Client Script"
       },
       {
         "command": "STARLIMS.GoToDataSource",
-        "title": "Go to Data Source"
+        "title": "Data Source"
       },
       {
         "command": "STARLIMS.GoToForm",
-        "title": "Go to Form (Code Behind)"
+        "title": "Form (Code Behind)"
       },
       {
         "command": "STARLIMS.GoToItem",
-        "title": "Go to Script"
+        "title": "Autodetect Item Type"
       }
     ],
-    "keybindings":[
+    "keybindings": [
       {
         "command": "STARLIMS.GoToItem",
         "key": "f11",
         "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'"
+      },
+      {
+        "command": "STARLIMS.RunScript",
+        "key": "f5",
+        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL' && !(resourcePath =~ /DataSources/)"
+      },
+      {
+        "command": "STARLIMS.RunDataSource",
+        "key": "f5",
+        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && (editorLangId == 'SLSQL' || resourcePath =~ /DataSources/)"
+      },
+      {
+        "command": "STARLIMS.DebugForm",
+        "key": "f5",
+        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+      },
+      {
+        "command": "STARLIMS.OpenForm",
+        "key": "ctrl+f5",
+        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+      },
+      {
+        "command": "STARLIMS.Save",
+        "key": "ctrl+s",
+        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
       }
     ],
     "menus": {
@@ -287,29 +312,35 @@
       "explorer/context": [
         {
           "command": "STARLIMS.Compare",
-          "when": "view != STARLIMS"
+          "when": "view != STARLIMS",
+          "group": "sourceControl"
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS"
+          "when": "view == STARLIMS",
+          "group": "sourceControl"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS"
+          "when": "view == STARLIMS",
+          "group": "sourceControl"
         }
       ],
       "editor/context": [
         {
           "command": "STARLIMS.Compare",
-          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log'"
+          "when": "resourceDirname =~ /SLVSCODE/ && !editorReadonly && editorLangId != 'log'",
+          "group": "sourceControl"
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL' && !(resourcePath =~ /DataSources/)"
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId == 'SSL' && !(resourcePath =~ /DataSources/)",
+          "group": "run"
         },
         {
           "command": "STARLIMS.RunDataSource",
-          "when": "resourceDirname =~ /SLVSCODE/ && (editorLangId == 'SLSQL' || (editorLangId == 'SSL' && resourcePath =~ /DataSources/))"
+          "when": "resourceDirname =~ /SLVSCODE/ && (editorLangId == 'SLSQL' || (editorLangId == 'SSL' && resourcePath =~ /DataSources/))",
+          "group": "run"
         },
         {
           "command": "STARLIMS.Save",
@@ -329,39 +360,59 @@
         },
         {
           "command": "STARLIMS.OpenForm",
-          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/",
+          "group": "run"
         },
         {
           "command": "STARLIMS.DebugForm",
-          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+          "when": "resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/",
+          "group": "run"
         },
         {
-          "command": "STARLIMS.GoToItem",
+          "command": "STARLIMS.Checkout",
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'",
+          "group": "sourceControl"
+        },
+        {
+          "command": "STARLIMS.Checkin",
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'",
+          "group": "sourceControl"
+        },
+        {
+          "submenu": "STARLIMS.GoTo",
           "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'",
-          "group": "goto"
+          "group": "navigation"
+        }
+      ],
+      "STARLIMS.GoTo": [
+        {
+          "command": "STARLIMS.GoToItem",
+          "group": "navigation"
         },
         {
           "command": "STARLIMS.GoToServerScript",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'",
-          "group": "goto"
+          "group": "navigation"
         },
         {
           "command": "STARLIMS.GoToClientScript",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'",
-          "group": "goto"
+          "group": "navigation"
         },
         {
           "command": "STARLIMS.GoToDataSource",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'",
-          "group": "goto"
+          "group": "navigation"
         },
         {
           "command": "STARLIMS.GoToForm",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'",
-          "group": "goto"
+          "group": "navigation"
         }
       ]
     },
+    "submenus": [
+      {
+        "id": "STARLIMS.GoTo",
+        "label": "Go to"
+      }
+    ],
     "configuration": [
       {
         "type": "object",
