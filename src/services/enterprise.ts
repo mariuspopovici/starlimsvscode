@@ -15,4 +15,5 @@ export interface Enterprise {
   runXFDForm(uri: string): any;
   getGUID(uri: string): any;
   getTableCommand(uri: string, type: string): any;
+  getUriFromLocalPath(localPath: string): any;
 }
