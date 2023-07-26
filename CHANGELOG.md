@@ -87,3 +87,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added support for checkin and checkout of tables
 - added table commands in tree to generate SELECT, DELETE, INSERT and UPDATE SQL statements into the active editor
 - added table command to send the selected table name to the active editor
+
+## [1.2.29] - 2023-07-23
+
+- added support for navigating to the code item under the cursor (go to server script, data source, etc.)
+- reorganized context menu options for better usability
+- fixed misc. bugs
