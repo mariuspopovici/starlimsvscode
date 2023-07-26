@@ -516,8 +516,8 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "build": "run-script-os",
-    "build:darwin:linux": "(rm -rf out || true) && mkdir out && cp package.json out && cp ./src/backend/SCM_API.sdp out ",
-    "build:win32": "rmdir /S /Q out 2>nul & mkdir out & copy package.json out & copy .\\src\\backend\\SCM_API.sdp out ",
+    "build:darwin:linux": "(rm -rf out || true) && mkdir out && cp package.json out && cp ./src/backend/SCM_API.sdp out && vsce package",
+    "build:win32": "rmdir /S /Q out 2>nul & mkdir out & copy package.json out & copy .\\src\\backend\\SCM_API.sdp out & vsce package",
     "vsce": "vsce"
   },
   "devDependencies": {
