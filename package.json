@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.28",
+  "version": "1.2.29",
   "publisher": "MariusPopovici",
   "author": {
     "name": "Marius Popovici, Christoph Döllinger, Jan Bouecke"
@@ -514,7 +514,11 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "build": "run-script-os",
+    "build:darwin:linux": "(rm -rf out || true) && mkdir out && cp package.json out && cp ./src/backend/SCM_API.sdp out ",
+    "build:win32": "rmdir /S /Q out 2>nul & mkdir out & copy package.json out & copy .\\src\\backend\\SCM_API.sdp out ",
+    "vsce": "vsce"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
@@ -533,6 +537,7 @@
     "eslint": "^8.11.0",
     "glob": "^7.2.0",
     "mocha": "^9.2.2",
+    "run-script-os": "^1.1.6",
     "style-loader": "^3.3.3",
     "ts-loader": "^9.2.8",
     "typescript": "^4.5.5",
