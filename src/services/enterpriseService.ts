@@ -16,6 +16,7 @@ export class EnterpriseService implements Enterprise {
   private config: any;
   private baseUrl: string;
   private refreshSessionInterval: NodeJS.Timeout | undefined;
+  private readonly SLVSCODE_FOLDER = "SLVSCODE";
 
   /**
    * Constructor
@@ -637,4 +638,19 @@ export class EnterpriseService implements Enterprise {
       return null;
     }
   }
+
+  /** 
+   * Get uri from local path for documents opened in the editor
+   * @param localPath the local path of the enterprise item
+   * @returns the uri of the enterprise item
+   * */
+  public getUriFromLocalPath(localPath: string): string {
+      const uri = localPath ? localPath.slice(0, localPath.lastIndexOf(".")) : undefined;
+      if (!uri) {
+        return "";
+      }
+      let remotePath = uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length);
+      //let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
+      return remotePath;
+    }
 }
