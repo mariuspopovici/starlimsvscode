@@ -41,11 +41,13 @@ jobs:
       - name: Build VSIX package
         run: npm run build -- -o vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix
 
-      - name: Publish extension package
+      - uses: lannonbr/vsce-action@3.0.0
+        name: Publish extension package
+        with:
+          args: "publish -p $VSCODE_MARKETPLACE_TOKEN"
         env:
-          VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
-        run: npm run vsce -- publish -p $VSCODE_MARKETPLACE_TOKEN
-
+          VSCE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+        
       - uses: rickstaa/action-create-tag@v1
         name: Create tag
         with:
