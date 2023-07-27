@@ -430,21 +430,20 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register the clear log command
   vscode.commands.registerCommand("STARLIMS.ClearLog",
-    async (item: TreeEnterpriseItem) => {
+    async (uri : vscode.Uri) => {
+
       // ask for confirmation
+      let name = path.parse(uri.path).name;
+      
       const confirm = await vscode.window.showWarningMessage(
-        `Are you sure you want to clear the log for ${item.label}?`,
+        `Are you sure you want to clear the log for ${name}?`,
         { modal: true },
         "Yes"
       );
-      if (confirm !== "Yes") {
-        return;
-      }
-
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        let remoteUri = enterpriseService.getUriFromLocalPath(editor.document.uri.path);
-        await enterpriseService.clearLog(remoteUri);
+      
+      if (confirm === "Yes") {
+        let remoteUri = enterpriseService.getUriFromLocalPath(uri.path);
+        await enterpriseService.clearLog(remoteUri);  
       }
     }
   );
