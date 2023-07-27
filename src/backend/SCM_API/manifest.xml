@@ -98,20 +98,6 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-        <ServerScript>
-          <ItemID>313EF809-5DDC-4DB7-9802-4E75A977F60F</ItemID>
-          <ItemName>GetCheckedOutItems</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>SCM_API</ItemCategory>
-          <ItemContent>Server Scripts\SCM_API\GetCheckedOutItems.srvscr</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ServerScript>
-        <ServerScript>
           <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
