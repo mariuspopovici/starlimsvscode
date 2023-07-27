@@ -1,6 +1,10 @@
 # STARLIMS VS Code
 
-Extension provides Visual Studio Code integration with STARLIMS Enterprise Designer. Started as a fun project to brush up on Typescript and learn the Visual Studio Code extensibility API. At this moment the extension is not published in the VS Marketplace as I'm continuing to add new features that will bring it closer to offering some actual value.
+Extension provides Visual Studio Code integration with STARLIMS Enterprise Designer. Started as a fun project to brush up on Typescript and learn the Visual Studio Code extensibility API.
+
+## Disclaimer
+
+This is an unofficial, unsupported, extension so use at your own risk.
 
 ![STARLIMS VS Code Screenshot](resources/screenshot.png)
 
@@ -20,11 +24,8 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 <add key="HTTPServices" value="SCM_API.*"/>
 ```
 
-## Disclaimer
-
-This is an unofficial, unsupported extension so use at your own risk. Maybe this will someday become officially supported or maybe not...
-
 ## Vision
+
 - Implement a Git-like mechanism for managing versions.
 - Design HTML forms directly in VS Code via a HTML preview window.
 - Implement more features from Starlims Designer
