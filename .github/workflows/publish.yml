@@ -52,6 +52,8 @@ jobs:
         name: Create tag
         with:
           tag: v${{ steps.calculateVersion.outputs.AppVersion }}
+          tag_exists_error: false
+          message: "Latest release"
 
       - name: Create Release
         uses: ncipollo/release-action@v1
