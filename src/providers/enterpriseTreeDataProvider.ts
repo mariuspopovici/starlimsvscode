@@ -37,7 +37,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @returns First item found.
    * */
   async search(itemName: string, itemType: string, bSilent: boolean): Promise<TreeEnterpriseItem | undefined> {
-    if(itemName === "") {
+    if (itemName === "") {
       return;
     }
     var resultItems = await this.service.searchForItems(itemName, itemType);
@@ -218,6 +218,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
       switch (item.type) {
         case EnterpriseItemType.DataSource:
         case EnterpriseItemType.AppDataSource:
+        case EnterpriseItemType.Table:
           return new vscode.ThemeIcon("database");
         case EnterpriseItemType.ServerScript:
         case EnterpriseItemType.AppServerScript:
@@ -232,8 +233,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           return new vscode.ThemeIcon("list-flat");
         case EnterpriseItemType.ServerLog:
           return new vscode.ThemeIcon("output");
-        case EnterpriseItemType.Table:
-          return new vscode.ThemeIcon("database");
         default:
           return new vscode.ThemeIcon("file-code");
       }
@@ -251,7 +250,12 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   filePath: string | undefined;
   checkedOutBy: string | undefined;
   guid: string | undefined;
-
+  label?: string | vscode.TreeItemLabel | undefined;
+  children?: TreeEnterpriseItem[];
+  tooltip?: string | vscode.MarkdownString | undefined;
+  isSystem?: boolean | undefined;
+  iconPath?: string | vscode.Uri | { light: string | vscode.Uri; dark: string | vscode.Uri; } | vscode.ThemeIcon | undefined;
+  
   constructor(
     type: EnterpriseItemType,
     label: string,
@@ -263,6 +267,7 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
     guid?: string
   ) {
     super(label, collapsibleState);
+    this.label = label;
     this.type = type;
     this.language = language;
     this.command = command;
