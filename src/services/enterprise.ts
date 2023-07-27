@@ -16,4 +16,5 @@ export interface Enterprise {
   getGUID(uri: string): any;
   getTableCommand(uri: string, type: string): any;
   getUriFromLocalPath(localPath: string): any;
+  getCheckedOutItems(): any;
 }

@@ -42,8 +42,12 @@
     "views": {
       "STARLIMSVSCode": [
         {
-          "id": "STARLIMS",
+          "id": "STARLIMSMainTree",
           "name": "STARLIMS Enterprise"
+        },
+        {
+          "id": "STARLIMSCheckedOutTree",
+          "name": "Checked Out Items"
         }
       ]
     },
@@ -171,6 +175,22 @@
       {
         "command": "STARLIMS.GoToItem",
         "title": "Autodetect Item Type"
+      },
+      {
+        "command": "STARLIMS.GetCheckedOutItems",
+        "title": "Refresh",
+        "icon": {
+          "dark": "resources/dark/refresh.svg",
+          "light": "resources/light/refresh.svg"
+        }
+      },
+      {
+        "command": "STARLIMS.CheckInAllItems",
+        "title": "Check In All items",
+        "icon": {
+          "dark": "resources/dark/checkinall.svg",
+          "light": "resources/light/checkinall.svg"
+        }
       }
     ],
     "keybindings": [
@@ -209,103 +229,113 @@
       "view/title": [
         {
           "command": "STARLIMS.ShowTreeView",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
           "group": "navigation"
         },
         {
           "command": "STARLIMS.Search",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
           "group": "navigation"
         },
         {
           "command": "STARLIMS.Add",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
           "group": "navigation"
         },
         {
           "command": "STARLIMS.Delete",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
+          "group": "navigation"
+        },
+        {
+          "command": "STARLIMS.GetCheckedOutItems",
+          "when": "view == STARLIMSCheckedOutTree",
+          "group": "navigation"
+        },
+        {
+          "command": "STARLIMS.CheckInAllItems",
+          "when": "view == STARLIMSCheckedOutTree",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "STARLIMS.Refresh",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
           "group": "z_navigation"
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMS && (viewItem == SS || viewItem == APPSS)",
+          "when": "view == STARLIMSMainTree && (viewItem == SS || viewItem == APPSS)",
           "group": "run"
         },
         {
           "command": "STARLIMS.RunDataSource",
-          "when": "view == STARLIMS && (viewItem == DS || viewItem == APPDS)",
+          "when": "view == STARLIMSMainTree && (viewItem == DS || viewItem == APPDS)",
           "group": "run"
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
           "group": "sourceControl"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
           "group": "sourceControl"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
-          "when": "view == STARLIMS && viewItem == SERVERLOG"
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem == SERVERLOG"
         },
         {
           "command": "STARLIMS.OpenForm",
-          "when": "view == STARLIMS && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
+          "when": "view == STARLIMSMainTree && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
           "group": "run"
         },
         {
           "command": "STARLIMS.DebugForm",
-          "when": "view == STARLIMS && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
+          "when": "view == STARLIMSMainTree && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
           "group": "run"
         },
         {
           "command": "STARLIMS.Delete",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != CATEGORY",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY",
           "group": "addRemove"
         },
         {
           "command": "STARLIMS.Add",
-          "when": "view == STARLIMS && viewItem != SERVERLOG && viewItem != APP",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != APP",
           "group": "addRemove"
         },
         {
           "command": "STARLIMS.OpenXFDForm",
-          "when": "view == STARLIMS && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)",
+          "when": "view == STARLIMSMainTree && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)",
           "group": "run"
         },
         {
           "command": "STARLIMS.SendNameToEditor",
-          "when": "view == STARLIMS && viewItem == TABLE",
+          "when": "view == STARLIMSMainTree && viewItem == TABLE",
           "group": "all"
         },
         {
           "command": "STARLIMS.GenerateTableSelect",
-          "when": "view == STARLIMS && viewItem == TABLE",
+          "when": "view == STARLIMSMainTree && viewItem == TABLE",
           "group": "table"
         },
         {
           "command": "STARLIMS.GenerateTableInsert",
-          "when": "view == STARLIMS && viewItem == TABLE",
+          "when": "view == STARLIMSMainTree && viewItem == TABLE",
           "group": "table"
         },
         {
           "command": "STARLIMS.GenerateTableUpdate",
-          "when": "view == STARLIMS && viewItem == TABLE",
+          "when": "view == STARLIMSMainTree && viewItem == TABLE",
           "group": "table"
         },
         {
           "command": "STARLIMS.GenerateTableDelete",
-          "when": "view == STARLIMS && (viewItem == TABLE)",
+          "when": "view == STARLIMSMainTree && (viewItem == TABLE)",
           "group": "table"
         }
       ],
@@ -317,12 +347,12 @@
         },
         {
           "command": "STARLIMS.Checkout",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
           "group": "sourceControl"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMS",
+          "when": "view == STARLIMSMainTree",
           "group": "sourceControl"
         }
       ],
@@ -524,6 +554,7 @@
     "@types/node-fetch": "^2.6.4",
     "@types/vscode": "^1.65.0",
     "@types/vscode-webview": "^1.57.0",
+    "@types/xmldom": "^0.1.31",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "@vscode/test-electron": "^2.1.3",
@@ -542,6 +573,7 @@
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "jsdom": "^22.1.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "xmldom": "^0.6.0"
   }
 }
