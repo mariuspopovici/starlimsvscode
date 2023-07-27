@@ -46,7 +46,7 @@ jobs:
         with:
           args: "publish -p $VSCODE_MARKETPLACE_TOKEN"
         env:
-          VSCE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+          VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
         
       - uses: rickstaa/action-create-tag@v1
         name: Create tag
