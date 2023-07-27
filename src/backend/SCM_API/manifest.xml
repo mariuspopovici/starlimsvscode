@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>02E43D1E-BC2E-4873-85F9-5D6AC9029F12</ItemID>
+  <ItemID>DA80FB9F-178D-423C-9C77-4517450AB0FF</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-07-23T11:45:11.0953607-04:00</PackageDate>
+  <PackageDate>2023-07-27T16:14:11.0135418+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
   <OverwriteLayer>false</OverwriteLayer>
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>069AD641-5BC8-4D98-84CD-8B1B1D3E6C95</ItemID>
+      <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
       <LayerId>300</LayerId>
       <ItemDescription />
@@ -46,7 +46,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>55796A78-5B64-4CF4-A11D-662C95991EDC</ItemID>
+          <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
           <ItemName>CheckOut</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -85,7 +85,34 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>2125F634-42D7-4E95-B40D-B376A7F2F87F</ItemID>
+          <ItemID>313EF809-5DDC-4DB7-9802-4E75A977F60F</ItemID>
+          <ItemName>GetCheckedOutItems</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\GetCheckedOutItems.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+        <ServerScript>
+          <ItemID>313EF809-5DDC-4DB7-9802-4E75A977F60F</ItemID>
+          <ItemName>GetCheckedOutItems</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\GetCheckedOutItems.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -98,7 +125,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>C70E01EB-5FBA-46E6-912B-A04C6127A0C8</ItemID>
+          <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -137,7 +164,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
+          <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
           <ItemName>RunScript</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -189,7 +216,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
+          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
           <ItemName>Utils</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
