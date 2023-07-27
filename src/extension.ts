@@ -1081,36 +1081,40 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  
   // register the GoToItem command
   vscode.commands.registerCommand(
     "STARLIMS.GoToItem",
     async () => {
+      const autoDetectConfig = [
+        {
+          command: "STARLIMS.GoToServerScript",
+          keywords: ["lims.CallServer", "ExecFunction", "CreateUDObject", "SubmitToBatch"]
+        },
+        {
+          command: "STARLIMS.GoToDataSource",
+          keywords: ["lims.GetData"]
+        },
+        {
+          command: "STARLIMS.GoToForm",
+          keywords: ["Form"]
+        },
+        {
+          command: "STARLIMS.GoToClientScript",
+          keywords: ["#include"]
+        }
+      ];
+           
       var editor = vscode.window.activeTextEditor;
       if (editor) {
         // get the current line
         const line = editor.document.lineAt(editor.selection.active.line).text;
-
-        if (line.includes("lims.CallServer")) {
-          vscode.commands.executeCommand("STARLIMS.GoToServerScript");
-          return;
-        }
-
-        if (line.includes("lims.GetData")) {
-          vscode.commands.executeCommand("STARLIMS.GoToDataSource");
-          return;
-        }
-
-        if (line.includes("Form")) {
-          vscode.commands.executeCommand("STARLIMS.GoToForm");
-          return;
-        }
-
-        if (line.includes("#include")) {
-          vscode.commands.executeCommand("STARLIMS.GoToClientScript");
-          return;
-        }
-
-        vscode.window.showErrorMessage("Could not find a STARLIMS item to navigate to.");
+        const match = autoDetectConfig.find(config => new RegExp(config.keywords.join("|"), "i").test(line));
+        if (match) {
+          vscode.commands.executeCommand(match.command);
+        } else {
+          vscode.window.showErrorMessage("Could not find a STARLIMS item to navigate to.");
+        }       
       }
     }
   );

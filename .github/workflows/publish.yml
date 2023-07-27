@@ -1,0 +1,63 @@
+name: "publish"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to branch
+        uses: actions/checkout@v2
+
+      - name: setup git config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install packages
+        run: npm ci
+        
+      - name: Install vsce
+        run: npm i -g  @vscode/vsce
+
+      - name: Bump version
+        run: npm version patch
+
+      - name: Calculate version
+        id: calculateVersion
+        run: |
+          APP_VERSION=`cat package.json | jq ".version" -M | sed 's/\"//g'`
+          echo "::set-output name=AppVersion::$APP_VERSION"
+          echo "app version = v$APP_VERSION"
+      - name: Build VSIX package
+        run: npm run build -- -o vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix
+
+      - uses: lannonbr/vsce-action@3.0.0
+        name: Publish extension package
+        with:
+          args: "publish -p $VSCODE_MARKETPLACE_TOKEN"
+        env:
+          VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+        
+      - uses: rickstaa/action-create-tag@v1
+        name: Create tag
+        with:
+          tag: v${{ steps.calculateVersion.outputs.AppVersion }}
+          tag_exists_error: false
+          message: "Latest release"
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.calculateVersion.outputs.AppVersion }}
+          release: v${{ steps.calculateVersion.outputs.AppVersion }}
+          artifacts: "vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix,src/backend/SCM_API.sdp"

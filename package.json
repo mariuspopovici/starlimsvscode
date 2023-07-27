@@ -3,7 +3,7 @@
   "displayName": "Starlims VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.28",
+  "version": "1.2.34",
   "publisher": "MariusPopovici",
   "author": {
     "name": "Marius Popovici, Christoph Döllinger, Jan Bouecke"
@@ -539,12 +539,14 @@
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
     "watch": "webpack --watch",
-    "package": "npm version patch && webpack --mode production --devtool hidden-source-map",
+    "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "build": "(rm -rf out || true) && mkdir out && cp package.json out && ./src/backend/create-packages.sh && vsce package",
+    "vsce": "vsce"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
@@ -564,6 +566,7 @@
     "eslint": "^8.11.0",
     "glob": "^7.2.0",
     "mocha": "^9.2.2",
+    "run-script-os": "^1.1.6",
     "style-loader": "^3.3.3",
     "ts-loader": "^9.2.8",
     "typescript": "^4.5.5",
