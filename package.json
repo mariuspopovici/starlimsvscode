@@ -575,8 +575,8 @@
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.2.2",
+    "@xmldom/xmldom": "^0.7.13",
     "jsdom": "^22.1.0",
-    "node-fetch": "^2.6.7",
-    "@xmldom/xmldom": "^0.7.7"
+    "node-fetch": "^2.6.7"
   }
 }
