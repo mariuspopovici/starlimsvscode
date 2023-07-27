@@ -60,4 +60,4 @@ jobs:
         with:
           tag: v${{ steps.calculateVersion.outputs.AppVersion }}
           release: v${{ steps.calculateVersion.outputs.AppVersion }}
-          artifacts: "vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix,SCM_API.sdp"
+          artifacts: "vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix,src/backend/SCM_API.sdp"
