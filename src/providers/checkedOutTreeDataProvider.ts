@@ -186,7 +186,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
               command: {
                 command: "STARLIMS.selectEnterpriseItem",
                 title: "Select Node",
-                arguments: [self]
+                arguments: [this]
               }
             };
             appNode.children?.push(htmlFormsNode);

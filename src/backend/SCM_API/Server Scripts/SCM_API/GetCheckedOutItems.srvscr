@@ -1,0 +1,20 @@
+/******************************************************************************
+Description.. :	Get all currently checked out items of the user
+Author....... :	DC
+Date......... : 2023-07-26
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, aResult;
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+aResult := DoProc("Enterprise_Data_Providers.CheckInProvider.GetPendingCheckins", {.F.});
+usrmes(aResult);
+Response:StatusCode := 200;
+oResponse:success := .T.;
+oResponse:data := aResult;
+:RETURN oResponse;
