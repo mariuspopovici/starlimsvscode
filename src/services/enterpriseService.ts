@@ -16,7 +16,7 @@ export class EnterpriseService implements Enterprise {
   private config: any;
   private baseUrl: string;
   private refreshSessionInterval: NodeJS.Timeout | undefined;
-  private readonly SLVSCODE_FOLDER = "SLVSCODE";
+  private SLVSCODE_FOLDER: string = "SLVSCODE";
 
   /**
    * Constructor
@@ -650,7 +650,35 @@ export class EnterpriseService implements Enterprise {
         return "";
       }
       let remotePath = uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length);
-      //let remoteUri = vscode.Uri.parse(`starlims://${remotePath}`).toString();
       return remotePath;
+    }
+
+    /**
+     * Get checked out items
+     * @returns the checked out items
+     */
+    public async getCheckedOutItems() {
+      const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.lims`;
+      const headers = new Headers(this.getAPIHeaders());
+      const options: any = {
+        method: "GET",
+        headers
+      };
+  
+      try {
+        const response = await fetch(url, options);
+        const { success, data }: { success: boolean; data: any } = await response.json();
+        if (success) {
+          return data;
+        } else {
+          vscode.window.showErrorMessage("Could not retrieve checked out items.");
+          console.log(data);
+          return [];
+        }
+      } catch (e: any) {
+        console.error(e);
+        vscode.window.showErrorMessage("Could not retrieve checked out items.");
+        return [];
+      }
     }
 }

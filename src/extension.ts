@@ -9,6 +9,7 @@ import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTex
 import path = require("path");
 import { DataViewPanel } from "./panels/DataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
+import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
 
 const SLVSCODE_FOLDER = "SLVSCODE";
 
@@ -91,6 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
+  // create the root path for the extension
   rootPath = path.join(config.get("rootPath") as string, SLVSCODE_FOLDER);
 
   // reload the configuration if it was updated
@@ -116,7 +118,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
   const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
-  vscode.window.registerTreeDataProvider("STARLIMS", enterpriseProvider);
+  vscode.window.registerTreeDataProvider("STARLIMSMainTree", enterpriseProvider);
+
+  // register a custom tree data provider for the STARLIMS checked out items
+  const checkedOutProvider = vscode.commands.registerCommand(
+    "STARLIMS.GetCheckedOutItems",
+    async () => {
+      let checkedOutItems = await enterpriseService.getCheckedOutItems();
+      vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree",
+        new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService));
+    }
+  );
+  context.subscriptions.push(checkedOutProvider);
 
   // register a decoration provider for the STARLIMS enterprise tree
   const fileDecorationProvider = new EnterpriseFileDecorationProvider();
@@ -156,6 +169,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      // open the item
       const handler: Function | undefined = getSelectItemHandler(item);
       if (handler !== undefined) {
         await handler(item);
@@ -1104,7 +1118,11 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }
   );
+  
+  // refresh the checked out items tree
+  vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
 
+  // show the connection message
   vscode.window.showInformationMessage(
     `Connected to STARLIMS on ${config.url}.`
   );
