@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
 import { EnterpriseItemType, TreeEnterpriseItem } from "./enterpriseTreeDataProvider";
-import { DOMParser } from "xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 import { EnterpriseService } from "../services/enterpriseService";
 
 /**
@@ -13,13 +13,13 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
     private _onDidChangeTreeData: vscode.EventEmitter<TreeEnterpriseItem | null> = new vscode.EventEmitter<TreeEnterpriseItem | null>();
     readonly onDidChangeTreeData: vscode.Event<TreeEnterpriseItem | null> = this._onDidChangeTreeData.event;
 
-    constructor(xmlDS: string, private service: EnterpriseService) {
-        this.data = this.getDataObject(xmlDS);
-    }
+  constructor(xmlDS: string, private service: EnterpriseService) {
+    this.data = this.getDataObject(xmlDS);
+  }
 
-    refresh(): void {
-        this._onDidChangeTreeData.fire(null);
-    }
+  refresh(): void {
+    this._onDidChangeTreeData.fire(null);
+  }
 
     getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
         const treeItem = new vscode.TreeItem(
@@ -32,19 +32,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         treeItem.contextValue = item.type;
         treeItem.label = item.checkedOutBy ? `${item.label} (Checked out by ${item.checkedOutBy})` : item.label;
         treeItem.resourceUri = this.getItemResource(item);
-        treeItem.tooltip = item.tooltip ?? item.label?.toString() ?? "";
-        treeItem.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [item]
-        };
+        treeItem.tooltip = item.tooltip;
+        treeItem.command = item.command;
         return treeItem;
     }
 
-    getChildren(item?: TreeEnterpriseItem): Thenable<TreeEnterpriseItem[] | undefined> {
-        return item && Promise.resolve(item.children ?? [])
-            || Promise.resolve(this.data);
-    }
+  getChildren(item?: TreeEnterpriseItem): Thenable<TreeEnterpriseItem[] | undefined> {
+    return (item && Promise.resolve(item.children ?? [])) || Promise.resolve(this.data);
+  }
 
     /**
      * Get the icon path for the tree view item.
@@ -60,20 +55,20 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             case EnterpriseItemType.XFDFormCode:
                 return new vscode.ThemeIcon("file-code");
 
-            case EnterpriseItemType.XFDFormXML:
-            case EnterpriseItemType.HTMLFormXML:
-                return new vscode.ThemeIcon("preview");
+      case EnterpriseItemType.XFDFormXML:
+      case EnterpriseItemType.HTMLFormXML:
+        return new vscode.ThemeIcon("preview");
 
-            case EnterpriseItemType.HTMLFormGuide:
-                return new vscode.ThemeIcon("list-flat");
+      case EnterpriseItemType.HTMLFormGuide:
+        return new vscode.ThemeIcon("list-flat");
 
-            case EnterpriseItemType.ServerLog:
-                return new vscode.ThemeIcon("output");
+      case EnterpriseItemType.ServerLog:
+        return new vscode.ThemeIcon("output");
 
-            case EnterpriseItemType.AppDataSource:
-            case EnterpriseItemType.DataSource:
-            case EnterpriseItemType.Table:
-                return new vscode.ThemeIcon("database");
+      case EnterpriseItemType.AppDataSource:
+      case EnterpriseItemType.DataSource:
+      case EnterpriseItemType.Table:
+        return new vscode.ThemeIcon("database");
 
             case EnterpriseItemType.EnterpriseCategory:
             case EnterpriseItemType.AppCategory:
@@ -82,7 +77,6 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
                 return new vscode.ThemeIcon("folder-opened");
         }
     }
-    
     /**
      *  Returns a URI for the item if it is checked out by the current user.
      * @param item The item to check
@@ -91,20 +85,17 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
     private getItemResource(item: any): vscode.Uri | undefined {
         const config = this.service.getConfig();
         let resourceUri = vscode.Uri.parse(`starlims:${item.tooltip}`);
-
-        // If the item is checked out by the current user, change the icon color to green.
         if (item.checkedOutBy && item.checkedOutBy === config.get("user")) {
-            resourceUri = vscode.Uri.parse("checkedOutByMe");
+            // change the color of the item
+            resourceUri = vscode.Uri.parse("starlims:/checkedOutByMe");
             item.color = new vscode.ThemeColor("gitDecoration.modifiedResourceForeground");
-        }
-        // If the item is checked out by another user, change the icon color to red.
-        else if (item.checkedOutBy) {
-            resourceUri = vscode.Uri.parse("checkedOutByOtherUser");
+        } else if (item.checkedOutBy) {
+            // change the color of the item
+            resourceUri = vscode.Uri.parse("starlims:/checkedOutByOtherUser");
             item.color = new vscode.ThemeColor("gitDecoration.untrackedResourceForeground");
         }
         return resourceUri;
     }
-
     /**
     * Parse XML dataset string to create array of tree view data.
     * @param checkedOutItems XML dataset as string

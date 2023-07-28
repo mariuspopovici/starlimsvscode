@@ -25,7 +25,7 @@ jobs:
 
       - name: Install packages
         run: npm ci
-        
+
       - name: Install vsce
         run: npm i -g  @vscode/vsce
 
@@ -36,7 +36,7 @@ jobs:
         id: calculateVersion
         run: |
           APP_VERSION=`cat package.json | jq ".version" -M | sed 's/\"//g'`
-          echo "::set-output name=AppVersion::$APP_VERSION"
+          echo "AppVersion=$APP_VERSION" >> $GITHUB_OUTPUT
           echo "app version = v$APP_VERSION"
       - name: Build VSIX package
         run: npm run build -- -o vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix
@@ -47,7 +47,7 @@ jobs:
           args: "publish -p $VSCODE_MARKETPLACE_TOKEN"
         env:
           VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
-        
+
       - uses: rickstaa/action-create-tag@v1
         name: Create tag
         with:
