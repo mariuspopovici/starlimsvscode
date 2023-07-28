@@ -124,12 +124,41 @@ export async function activate(context: vscode.ExtensionContext) {
   const checkedOutProvider = vscode.commands.registerCommand(
     "STARLIMS.GetCheckedOutItems",
     async () => {
-      let checkedOutItems = await enterpriseService.getCheckedOutItems();
+      let checkedOutItems = await enterpriseService.getCheckedOutItems(false);
       vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree",
         new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService));
     }
   );
   context.subscriptions.push(checkedOutProvider);
+
+  // register the GetAllCheckedOutItems command
+  vscode.commands.registerCommand(
+    "STARLIMS.GetAllCheckedOutItems",
+    async () => {
+      let checkedOutItems = await enterpriseService.getCheckedOutItems(true);
+      vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree",
+        new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService));
+    }
+  );
+
+  // register the CheckInAllItems command
+  vscode.commands.registerCommand(
+    "STARLIMS.CheckInAllItems",
+    async () => {
+      // ask for confirmation
+      const confirm = await vscode.window.showWarningMessage(
+        `Are you sure you want to check in all items?`,
+        { modal: true },
+        "Yes"
+      );
+      if (confirm !== "Yes") {
+        return;
+      }
+      await enterpriseService.checkInAllItems();
+      // refresh tree
+      vscode.commands.executeCommand("STARLIMS.GetAllCheckedOutItems");
+    }
+  );
 
   // register a decoration provider for the STARLIMS enterprise tree
   const fileDecorationProvider = new EnterpriseFileDecorationProvider();
@@ -372,6 +401,9 @@ export async function activate(context: vscode.ExtensionContext) {
         item.checkedOutBy = user;
         enterpriseProvider.refresh();
         vscode.commands.executeCommand("STARLIMS.GetLocal", item);
+
+        // refresh checked out items
+        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
       }
     }
   );
@@ -395,6 +427,9 @@ export async function activate(context: vscode.ExtensionContext) {
         item.checkedOutBy = "";
         enterpriseProvider.refresh();
         setReadWrite(item);
+
+        // refresh checked out items
+        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
       }
     }
   );
@@ -1081,7 +1116,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  
+
   // register the GoToItem command
   vscode.commands.registerCommand(
     "STARLIMS.GoToItem",
@@ -1104,7 +1139,7 @@ export async function activate(context: vscode.ExtensionContext) {
           keywords: ["#include"]
         }
       ];
-           
+
       var editor = vscode.window.activeTextEditor;
       if (editor) {
         // get the current line
@@ -1114,11 +1149,11 @@ export async function activate(context: vscode.ExtensionContext) {
           vscode.commands.executeCommand(match.command);
         } else {
           vscode.window.showErrorMessage("Could not find a STARLIMS item to navigate to.");
-        }       
+        }
       }
     }
   );
-  
+
   // refresh the checked out items tree
   vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
 
