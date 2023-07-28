@@ -33,7 +33,11 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         treeItem.label = item.checkedOutBy ? `${item.label} (Checked out by ${item.checkedOutBy})` : item.label;
         treeItem.resourceUri = this.getItemResource(item);
         treeItem.tooltip = item.tooltip;
-        treeItem.command = item.command;
+        treeItem.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open File",
+            arguments: [item]
+            };
         return treeItem;
     }
 
