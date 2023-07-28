@@ -1,1 +1,1 @@
-update limsSOURCECONTROL set REASONFORCHECKOUT = '(DC - 06.07.2023 16:29:20) - Checked in without any comments.' where versionID = ?
+update limsSOURCECONTROL set REASONFORCHECKOUT = 'Checked in by DC from VSCODE' where versionID = ?
