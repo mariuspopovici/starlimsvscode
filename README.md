@@ -111,5 +111,6 @@ New features:
 - Debug HTML forms directly in VS Code
 - Run data sources and server scripts
 - Support for exploring database and dictionary including tree commands for generating INSERT, DELETE, SELECT and UPDATE statements for the selected table.
-- Misc. bug fixes
 - Go to script/form under the cursor
+- View checked out items, check in pending, undo check out, view checked out items from all uses, refresh checked out items tree
+- Misc. bug fixes

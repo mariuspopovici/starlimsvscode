@@ -378,7 +378,8 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       if (localUri) {
-        let remoteUri = enterpriseService.getUriFromLocalPath(localUri.path);
+        let remoteUriPath = enterpriseService.getUriFromLocalPath(localUri.path);
+        let remoteUri = vscode.Uri.parse(`starlims://${remoteUriPath}`);
         vscode.commands.executeCommand("vscode.diff", remoteUri, localUri);
       } else {
         vscode.window.showErrorMessage(
