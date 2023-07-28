@@ -341,16 +341,16 @@ export async function activate(context: vscode.ExtensionContext) {
         remoteUri = item.uri;
       }
       else {
-        // no item defined (shortcut key pressed)
-        if (item === undefined) {
-          let editor = vscode.window.activeTextEditor;
-          item = editor?.document.uri;
-        }
         remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
 
+      if(item.checkedOutBy === user) {
+        // save item before running script
+        await vscode.commands.executeCommand("STARLIMS.Save", item);
+      }
+      
       outputChannel.appendLine(
-        `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
+        `\n${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
       );
 
       executeWithProgress(async () => {
