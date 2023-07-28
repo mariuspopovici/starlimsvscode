@@ -350,7 +350,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
       
       outputChannel.appendLine(
-        `\n${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
+        `\n${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}\n`
       );
 
       executeWithProgress(async () => {
