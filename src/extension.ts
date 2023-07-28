@@ -434,6 +434,37 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the UndoCheckOut command
+  vscode.commands.registerCommand(
+    "STARLIMS.UndoCheckOut",
+    async (item: TreeEnterpriseItem | any) => {
+      if (!(item instanceof TreeEnterpriseItem)) {
+        item = await enterpriseProvider.getTreeItemForDocument(vscode.window.activeTextEditor?.document);
+      }
+
+      // ask for confirmation
+      const confirm = await vscode.window.showWarningMessage(
+        `Are you sure you want to undo checkout of '${item.label}' and loose all changes?`,
+        { modal: true },
+        "Yes"
+      );
+
+      if (confirm !== "Yes") {
+        return;
+      }
+
+      let bSuccess = await enterpriseService.undoCheckOut(item.uri);
+      if (bSuccess) {
+        item.checkedOutBy = "";
+        enterpriseProvider.refresh();
+        setReadWrite(item);
+
+        // refresh checked out items
+        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+      }
+    }
+  );
+
   // register the refresh command
   vscode.commands.registerCommand(
     "STARLIMS.Refresh",

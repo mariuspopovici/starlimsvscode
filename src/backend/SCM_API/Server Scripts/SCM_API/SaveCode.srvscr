@@ -3,9 +3,9 @@ Description.. :	Script to save code of an Enterprise item
 Author....... :	DC, MARIUS
 Date......... : 2023-06-02
 *******************************************************************************/;
-:DECLARE oPayload;
+:DECLARE oPayload, oResponse, oResult, sURI, String, oUtils, sRequestAsFile, oEnterpriseItem, sCode;
+String := "";
 
-:DECLARE oResponse, oResult;
 oResult := CreateUDObject();
 oResponse := CreateUDObject({
 	{"success", .T.},
@@ -13,7 +13,6 @@ oResponse := CreateUDObject({
 });
 
 :TRY;
-	:DECLARE sRequestAsFile;
 	sRequestAsFile := Request:SaveInputStream();
 	oPayload := FromJSON(ReadText(sRequestAsFile));
 	FileSupport(sRequestAsFile, "DELETE");
@@ -26,15 +25,10 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDTRY;
 
-:DECLARE sURI, String;
-String := "";
-
 /* check for uri;
 :IF !Empty(oPayload) .AND. oPayload:IsProperty("URI");
-	:DECLARE oUtils;
     sURI := oPayload:URI;
 	oUtils := CreateUDObject("SCM_API.Utils", {});
-	:DECLARE oEnterpriseItem;
 	oEnterpriseItem := oUtils:ParseURI(sURI);
 :ELSE;
     Response:StatusCode := 400;
@@ -44,7 +38,6 @@ String := "";
 :ENDIF;
 
 /* check for code;
-:DECLARE sCode;
 sCode := "";
 :IF !Empty(oPayload) .AND. oPayload:IsProperty("Code");
     sCode := oPayload:Code;

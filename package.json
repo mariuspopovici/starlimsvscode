@@ -199,6 +199,10 @@
           "dark": "resources/dark/checkinall.svg",
           "light": "resources/light/checkinall.svg"
         }
+      },
+      {
+        "command": "STARLIMS.UndoCheckOut",
+        "title": "Undo Check Out"
       }
     ],
     "keybindings": [
@@ -279,12 +283,12 @@
         },
         {
           "command": "STARLIMS.RunScript",
-          "when": "view == STARLIMSMainTree && (viewItem == SS || viewItem == APPSS)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem == SS || viewItem == APPSS)",
           "group": "run"
         },
         {
           "command": "STARLIMS.RunDataSource",
-          "when": "view == STARLIMSMainTree && (viewItem == DS || viewItem == APPDS)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem == DS || viewItem == APPDS)",
           "group": "run"
         },
         {
@@ -294,7 +298,12 @@
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /CAT/) && viewItem != APP",
+          "group": "sourceControl"
+        },
+        {
+          "command": "STARLIMS.UndoCheckOut",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /CAT/) && viewItem != APP",
           "group": "sourceControl"
         },
         {
@@ -303,27 +312,27 @@
         },
         {
           "command": "STARLIMS.OpenForm",
-          "when": "view == STARLIMSMainTree && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
           "group": "run"
         },
         {
           "command": "STARLIMS.DebugForm",
-          "when": "view == STARLIMSMainTree && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem == HTMLFORMXML || viewItem == HTMLFORMCODE)",
           "group": "run"
         },
         {
           "command": "STARLIMS.Delete",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY",
+            "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /cat/i) && viewItem != APPLICATION",
           "group": "addRemove"
         },
         {
           "command": "STARLIMS.Add",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != APP",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem =~ /cat/i || viewItem == APPLICATION)",
           "group": "addRemove"
         },
         {
           "command": "STARLIMS.OpenXFDForm",
-          "when": "view == STARLIMSMainTree && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem == XFDFORMXML || viewItem == XFDFORMCODE)",
           "group": "run"
         },
         {

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>DA80FB9F-178D-423C-9C77-4517450AB0FF</ItemID>
+  <ItemID>45A8C315-B30D-450D-974A-049B378B68D7</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-07-27T16:14:11.0135418+02:00</PackageDate>
+  <PackageDate>2023-07-28T14:00:03.1453863+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -13,7 +13,7 @@
     <ServerScriptCategory>
       <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>300</LayerId>
+      <LayerId>200</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
@@ -39,6 +39,19 @@
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\CheckIn.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>7C6706EE-6D73-4AE3-98A7-B3F8CD549588</ItemID>
+          <ItemName>CheckInAll</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\CheckInAll.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -195,6 +208,19 @@
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
           <ItemContent>Server Scripts\SCM_API\TableCommand.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>1AA29CAF-8AD0-4707-BC7D-35F8E040D11F</ItemID>
+          <ItemName>UndoCheckOut</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\UndoCheckOut.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>

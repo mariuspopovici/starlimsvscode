@@ -711,4 +711,35 @@ export class EnterpriseService implements Enterprise {
         return false;
       }
     }
+
+    /**
+     * Undo check out of enterprise item
+     * @param uri the URI of the enterprise item
+     * @returns true if the item was checked in successfully, false otherwise
+     */
+    public async undoCheckOut(uri: string) {
+      const url = `${this.baseUrl}/SCM_API.UndoCheckOut.lims?URI=${uri}`;
+      const headers = new Headers(this.getAPIHeaders());
+      const options: any = {
+        method: "GET",
+        headers
+      };
+  
+      try {
+        const response = await fetch(url, options);
+        const { success, data }: { success: boolean; data: any } = await response.json();
+        if (success) {
+          vscode.window.showInformationMessage("Check out of item undone successfully.");
+          return true;
+        } else {
+          vscode.window.showErrorMessage(data);
+          console.error(data);
+          return false;
+        }
+      } catch (e: any) {
+        vscode.window.showErrorMessage("Could not undo check out of item.");
+        console.error(e);
+        return false;
+      }
+    }
 }
