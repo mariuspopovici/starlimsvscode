@@ -657,8 +657,8 @@ export class EnterpriseService implements Enterprise {
      * Get checked out items
      * @returns the checked out items
      */
-    public async getCheckedOutItems() {
-      const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.lims`;
+    public async getCheckedOutItems(bAllUsers : boolean = false ) {
+      const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.lims${(bAllUsers ? "?allUsers=true" : "")}`;
       const headers = new Headers(this.getAPIHeaders());
       const options: any = {
         method: "GET",
@@ -679,6 +679,67 @@ export class EnterpriseService implements Enterprise {
         console.error(e);
         vscode.window.showErrorMessage("Could not retrieve checked out items.");
         return [];
+      }
+    }
+
+    /**
+     * Check in all checked out items
+     * @returns true if all items were checked in successfully, false otherwise
+     */
+    public async checkInAllItems() {
+      const url = `${this.baseUrl}/SCM_API.CheckInAll.lims`;
+      const headers = new Headers(this.getAPIHeaders());
+      const options: any = {
+        method: "GET",
+        headers
+      };
+  
+      try {
+        const response = await fetch(url, options);
+        const { success, data }: { success: boolean; data: any } = await response.json();
+        if (success) {
+          vscode.window.showInformationMessage("All items checked in successfully.");
+          return true;
+        } else {
+          vscode.window.showErrorMessage(data);
+          console.error(data);
+          return false;
+        }
+      } catch (e: any) {
+        vscode.window.showErrorMessage("Could not check in all items.");
+        console.error(e);
+        return false;
+      }
+    }
+
+    /**
+     * Undo check out of enterprise item
+     * @param uri the URI of the enterprise item
+     * @returns true if the item was checked in successfully, false otherwise
+     */
+    public async undoCheckOut(uri: string) {
+      const url = `${this.baseUrl}/SCM_API.UndoCheckOut.lims?URI=${uri}`;
+      const headers = new Headers(this.getAPIHeaders());
+      const options: any = {
+        method: "GET",
+        headers
+      };
+  
+      try {
+        const response = await fetch(url, options);
+        const { success, data }: { success: boolean; data: any } = await response.json();
+        if (success) {
+          vscode.window.showInformationMessage("Check out of item undone successfully.");
+          return true;
+        } else {
+          vscode.window.showErrorMessage(data);
+          console.error(data);
+          return false;
+        }
+      } catch (e: any) {
+        vscode.window.showErrorMessage("Could not undo check out of item.");
+        console.error(e);
+        return false;
       }
     }
 }

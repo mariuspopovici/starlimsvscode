@@ -1,0 +1,92 @@
+/******************************************************************************
+Description.. :	Undo check out the selected item
+Author....... :	DC
+Date......... : 2023-07-28
+*******************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils, oEnterpriseItem, sItemID, sItemName, sType, sCategory, sAppName;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oEnterpriseItem := oUtils:ParseURI(sURI);
+sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
+sType := oEnterpriseItem:Type;
+
+:IF oEnterpriseItem:IsProperty("CategoryName");
+	sCategory := oEnterpriseItem:CategoryName;
+:ENDIF;
+
+:IF oEnterpriseItem:IsProperty("AppName");
+	sAppName := oEnterpriseItem:AppName;
+:ENDIF;
+
+sLang := GetSetting("DEFAULTLANGUAGE");
+
+:BEGINCASE;
+	:CASE sType == "SS";
+		sItemName := sCategory + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "ServerScript"});
+	:EXITCASE;
+	:CASE sType == "APPSS";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "AppServerScript"});
+	:EXITCASE;
+	:CASE sType == "CS";
+		sItemName := sCategory + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "ClientScript"});
+	:EXITCASE;
+	:CASE sType == "APPCS";
+		sItemName := sAppName + "." + sItemName; 
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "AppClientScript"});
+	:EXITCASE;
+	:CASE sType == "DS";
+		sItemName := sCategory + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "DataSourceScript"});
+	:EXITCASE;
+	:CASE sType == "APPDS";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+    	DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "AppDataSourceScript"});
+	:EXITCASE;
+	:CASE sType == "HTMLFORMXML" .OR. sType == "HTMLFORMCODE";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "Form"});
+	:EXITCASE;
+	:CASE sType == "XFDFORMXML" .OR. sType == "XFDFORMCODE";
+		sItemName := sAppName + "." + sItemName;
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "Form"});
+	:EXITCASE;
+	:CASE sType == "TABLE";
+		sItemID := oUtils:GetItemGUID(sItemName, sType);
+		DoProc("Enterprise_Data_Providers.UndoCheckOutProvider.UndoCheckOutItem", {sItemID, "Table"});
+	:EXITCASE;
+:ENDCASE; 
+Response:StatusCode := 200;
+oResponse:success := .T.;
+:RETURN oResponse;

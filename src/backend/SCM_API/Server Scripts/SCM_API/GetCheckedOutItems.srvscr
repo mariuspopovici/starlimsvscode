@@ -3,17 +3,21 @@ Description.. :	Get all currently checked out items of the user
 Author....... :	DC
 Date......... : 2023-07-26
 *******************************************************************************/;
-:DECLARE String;
+:DECLARE String, oResponse, aResult, bAllUsers;
 String := "";
-
-:DECLARE oResponse, aResult;
 oResponse := CreateUDObject({
 	{"success", .T.},
 	{"data", NIL}
 });
 
-aResult := DoProc("Enterprise_Data_Providers.CheckInProvider.GetPendingCheckins", {.F.});
-usrmes(aResult);
+:IF Request:QueryString:IsProperty("allUsers");
+	bAllUsers := .T.;
+:ELSE;
+	bAllUsers := .F.;
+:ENDIF;
+
+aResult := DoProc("Enterprise_Data_Providers.CheckInProvider.GetPendingCheckins", {bAllUsers});
+
 Response:StatusCode := 200;
 oResponse:success := .T.;
 oResponse:data := aResult;

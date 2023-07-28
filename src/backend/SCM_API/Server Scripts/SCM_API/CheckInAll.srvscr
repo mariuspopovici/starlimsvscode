@@ -1,0 +1,27 @@
+/******************************************************************************
+Description.. :	Check in all items currently checked out by current user
+Author....... :	DC
+Date......... : 2023-07-28
+*******************************************************************************/;
+:DECLARE oResponse, bAllUsers, aResult, ds, sReason, sItemID, i;
+oResponse := CreateUDObject({
+	{"success", .T.}
+});
+
+bAllUsers := .F.;
+sReason := "Checked in by " + MYUSERNAME + " from VSCODE";
+
+aResult := DoProc("Enterprise_Data_Providers.CheckInProvider.GetPendingCheckins", {bAllUsers});
+ds := DoProc("Enterprise_Data_Providers.Utils.ConvertXMLStringToDataset", {aResult});
+
+:FOR i:=0 :TO ds:Tables[0]:Rows:Count - 1;
+	:DECLARE row;
+	row := ds:Tables[0]:Rows[i];
+    sItemID := row["CHILDID"];
+    sItemType := row["CHILDTYPE"];
+    DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, sItemType, NIL, sReason, NIL, .F.});
+:NEXT;
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+:RETURN oResponse;

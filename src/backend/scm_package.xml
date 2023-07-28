@@ -43,6 +43,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>7C6706EE-6D73-4AE3-98A7-B3F8CD549588</ItemID>
+          <ItemName>CheckInAll</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
           <ItemName>CheckOut</ItemName>
           <LayerId>300</LayerId>
@@ -177,6 +189,18 @@
         <ServerScript>
           <ItemID>54C5B39D-6591-4DA0-8027-6DD20DA21F93</ItemID>
           <ItemName>TableCommand</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>1AA29CAF-8AD0-4707-BC7D-35F8E040D11F</ItemID>
+          <ItemName>UndoCheckOut</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
