@@ -178,7 +178,7 @@
       },
       {
         "command": "STARLIMS.GetCheckedOutItems",
-        "title": "Refresh",
+        "title": "Refresh checked out items",
         "icon": {
           "dark": "resources/dark/refresh.svg",
           "light": "resources/light/refresh.svg"
