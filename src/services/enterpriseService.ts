@@ -28,6 +28,41 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
+   * Gets the table schema definition from STARLIMS
+   * @param uri the URI of the table item
+   */
+  async getTableDefinition(uri: string) {
+    const params = new URLSearchParams([["URI", uri]]);
+    const url = `${this.baseUrl}/SCM_API.TableDefinition.lims?${params}`;
+    const headers = new Headers(this.getAPIHeaders());
+
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        const newData = [
+          ["Field Name", "Caption", "Data Type", "Field Size", "Allow Nulls", "Default", "Notes", "Sorter"],
+          ...data
+        ];
+        return JSON.stringify(newData, null, 2);
+      } else {
+        vscode.window.showErrorMessage("Could not retrieve table definition.");
+        console.log(data);
+        return null;
+      }
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage("Could not retrieve table definition.");
+      return null;
+    }
+  }
+
+  /**
    * Gets a SQL command for the specified table.
    * @param uri
    */
@@ -443,9 +478,9 @@ export class EnterpriseService implements Enterprise {
    * @param itemType the type of the enterprise item
    * @returns the enterprise item found
    */
-  public async searchForItems(itemName: string, itemType: string): Promise<any> {    
+  public async searchForItems(itemName: string, itemType: string): Promise<any> {
     let url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
-    if(itemType !== "") {
+    if (itemType !== "") {
       url += `&itemType=${itemType}`;
     }
     const headers = new Headers(this.getAPIHeaders());
@@ -639,107 +674,107 @@ export class EnterpriseService implements Enterprise {
     }
   }
 
-  /** 
+  /**
    * Get uri from local path for documents opened in the editor
    * @param localPath the local path of the enterprise item
    * @returns the uri of the enterprise item
    * */
   public getUriFromLocalPath(localPath: string): string {
-      const uri = localPath ? localPath.slice(0, localPath.lastIndexOf(".")) : undefined;
-      if (!uri) {
-        return "";
-      }
-      let remotePath = uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length);
-      return remotePath;
+    const uri = localPath ? localPath.slice(0, localPath.lastIndexOf(".")) : undefined;
+    if (!uri) {
+      return "";
     }
+    let remotePath = uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length);
+    return remotePath;
+  }
 
-    /**
-     * Get checked out items
-     * @returns the checked out items
-     */
-    public async getCheckedOutItems(bAllUsers : boolean = false ) {
-      const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.lims${(bAllUsers ? "?allUsers=true" : "")}`;
-      const headers = new Headers(this.getAPIHeaders());
-      const options: any = {
-        method: "GET",
-        headers
-      };
-  
-      try {
-        const response = await fetch(url, options);
-        const { success, data }: { success: boolean; data: any } = await response.json();
-        if (success) {
-          return data;
-        } else {
-          vscode.window.showErrorMessage("Could not retrieve checked out items.");
-          console.log(data);
-          return [];
-        }
-      } catch (e: any) {
-        console.error(e);
+  /**
+   * Get checked out items
+   * @returns the checked out items
+   */
+  public async getCheckedOutItems(bAllUsers: boolean = false) {
+    const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.lims${bAllUsers ? "?allUsers=true" : ""}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data;
+      } else {
         vscode.window.showErrorMessage("Could not retrieve checked out items.");
+        console.log(data);
         return [];
       }
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage("Could not retrieve checked out items.");
+      return [];
     }
+  }
 
-    /**
-     * Check in all checked out items
-     * @returns true if all items were checked in successfully, false otherwise
-     */
-    public async checkInAllItems() {
-      const url = `${this.baseUrl}/SCM_API.CheckInAll.lims`;
-      const headers = new Headers(this.getAPIHeaders());
-      const options: any = {
-        method: "GET",
-        headers
-      };
-  
-      try {
-        const response = await fetch(url, options);
-        const { success, data }: { success: boolean; data: any } = await response.json();
-        if (success) {
-          vscode.window.showInformationMessage("All items checked in successfully.");
-          return true;
-        } else {
-          vscode.window.showErrorMessage(data);
-          console.error(data);
-          return false;
-        }
-      } catch (e: any) {
-        vscode.window.showErrorMessage("Could not check in all items.");
-        console.error(e);
+  /**
+   * Check in all checked out items
+   * @returns true if all items were checked in successfully, false otherwise
+   */
+  public async checkInAllItems() {
+    const url = `${this.baseUrl}/SCM_API.CheckInAll.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("All items checked in successfully.");
+        return true;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
         return false;
       }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not check in all items.");
+      console.error(e);
+      return false;
     }
+  }
 
-    /**
-     * Undo check out of enterprise item
-     * @param uri the URI of the enterprise item
-     * @returns true if the item was checked in successfully, false otherwise
-     */
-    public async undoCheckOut(uri: string) {
-      const url = `${this.baseUrl}/SCM_API.UndoCheckOut.lims?URI=${uri}`;
-      const headers = new Headers(this.getAPIHeaders());
-      const options: any = {
-        method: "GET",
-        headers
-      };
-  
-      try {
-        const response = await fetch(url, options);
-        const { success, data }: { success: boolean; data: any } = await response.json();
-        if (success) {
-          vscode.window.showInformationMessage("Check out of item undone successfully.");
-          return true;
-        } else {
-          vscode.window.showErrorMessage(data);
-          console.error(data);
-          return false;
-        }
-      } catch (e: any) {
-        vscode.window.showErrorMessage("Could not undo check out of item.");
-        console.error(e);
+  /**
+   * Undo check out of enterprise item
+   * @param uri the URI of the enterprise item
+   * @returns true if the item was checked in successfully, false otherwise
+   */
+  public async undoCheckOut(uri: string) {
+    const url = `${this.baseUrl}/SCM_API.UndoCheckOut.lims?URI=${uri}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Check out of item undone successfully.");
+        return true;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
         return false;
       }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not undo check out of item.");
+      console.error(e);
+      return false;
     }
+  }
 }
