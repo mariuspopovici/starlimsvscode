@@ -211,7 +211,7 @@ oResponse:data := DoProc("RetrieveTableDefinition", {sTableName});
 	:PARAMETERS sSQL;
 	
 	:DECLARE sSqlFinal;
-	sSqlFinal := DoProc("Utilities.SQLFunctions.PrepareSqlStatement", {sSQL});
+	sSqlFinal := DoProc("PrepareSqlStatement", {sSQL});
 	
 	/*$to_string;
 	:DECLARE nStartPos, nEndPos, sVariable, sSqlFinalPre, sSqlFinalPost;
