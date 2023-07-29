@@ -4,7 +4,7 @@ import {
   vsCodeDataGrid,
   vsCodeDataGridCell,
   vsCodeDataGridRow,
-  DataGrid,
+  DataGrid
 } from "@vscode/webview-ui-toolkit";
 
 // In order to use the Webview UI Toolkit web components they
@@ -25,12 +25,7 @@ import {
 //
 // provideVSCodeDesignSystem().register(allComponents);
 //
-provideVSCodeDesignSystem().register(
-  vsCodeButton(),
-  vsCodeDataGrid(),
-  vsCodeDataGridCell(),
-  vsCodeDataGridRow()
-);
+provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeDataGrid(), vsCodeDataGridCell(), vsCodeDataGridRow());
 
 // Get access to the VS Code API from within the webview context
 const vscode = acquireVsCodeApi();
@@ -48,7 +43,7 @@ function main() {
   setVSCodeMessageListener();
 
   // request data
-  vscode.postMessage({ command: "requestDataSourceResultsData" });
+  vscode.postMessage({ command: "requestData" });
 }
 
 function setVSCodeMessageListener() {
@@ -58,13 +53,13 @@ function setVSCodeMessageListener() {
 
     // handle messages
     switch (command) {
-      case "receiveDataSourceResultData":
+      case "receiveData":
         // load fresh data in the data grid
-        const grid = document.getElementById("data-source-grid") as DataGrid;
+        const grid = document.getElementById("data-grid") as DataGrid;
         const title = document.getElementById("title") as HTMLElement;
 
         if (title) {
-          title.innerHTML = event.data.name;
+          title.innerHTML = `${event.data.name}`;
         }
 
         if (grid) {
@@ -73,16 +68,13 @@ function setVSCodeMessageListener() {
             const rowObject = {};
             columns.forEach((col: string, colIndex: number) => {
               Object.defineProperty(rowObject, col, {
-                value: row[colIndex] === null ? "NULL" : row[colIndex],
+                value: row[colIndex] === null ? "NULL" : row[colIndex]
               });
             });
 
             // set grid column widths
             //TODO: replace 150px below with max-content when this is fixed: https://github.com/microsoft/vscode-webview-ui-toolkit/issues/473
-            grid.setAttribute(
-              "grid-template-columns",
-              columns.map(() => `150px`).join(` `)
-            );
+            grid.setAttribute("grid-template-columns", columns.map(() => `150px`).join(` `));
 
             return rowObject;
           });

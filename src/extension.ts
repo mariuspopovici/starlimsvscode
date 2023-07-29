@@ -240,7 +240,15 @@ export async function activate(context: vscode.ExtensionContext) {
    * @param item the enterprise tree item to handle
    */
   async function handleSelectTableItem(item: TreeEnterpriseItem) {
-    // do nothing 
+    const result = await enterpriseService.getTableDefinition(item.uri);
+    const tableName = item.uri.split('/').pop();
+    if (result) {
+      DataViewPanel.render(context.extensionUri, {
+        name: tableName,
+        data: result,
+        title: `Table Definition: ${tableName}` 
+      });
+    }
   }
 
   /**
@@ -942,9 +950,11 @@ export async function activate(context: vscode.ExtensionContext) {
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri);
         if (result?.success) {
+          const dataSourceName = remoteUri.split('/').pop();
           DataViewPanel.render(context.extensionUri, {
-            name: remoteUri.toString(),
-            data: result.data
+            name: dataSourceName,
+            data: result.data,
+            title: `Data Source Output: ${dataSourceName}`
           });
         }
         outputChannel.appendLine(result.data);

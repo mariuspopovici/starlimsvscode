@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
 import { getUri } from "../utilities/getUri";
+import { platform } from "os";
 
 export class DataViewPanel {
   public static currentPanel: DataViewPanel | undefined;
@@ -8,52 +9,32 @@ export class DataViewPanel {
   private _disposables: vscode.Disposable[] = [];
   private _data: string;
   private _name: string;
+  private _title: string;
 
-  private constructor(
-    panel: vscode.WebviewPanel,
-    extensionUri: vscode.Uri,
-    payload: any
-  ) {
+  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, payload: any) {
     this._panel = panel;
     this._data = payload.data;
-    this._name = payload.name.slice("starlims:".length);
+    this._name = payload.name;
+    this._title = payload.title;
 
     // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
     // the panel or when the panel is closed programmatically)
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
     // Set the HTML content for the webview panel
-    this._panel.webview.html = this._getWebviewContent(
-      this._panel.webview,
-      extensionUri
-    );
+    this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
 
     // Set an event listener to listen for messages passed from the webview context
     this._setWebviewMessageListener(this._panel.webview);
   }
 
   public static render(extensionUri: vscode.Uri, payload: any) {
-    if (DataViewPanel.currentPanel) {
-      DataViewPanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
-      DataViewPanel.currentPanel._name = payload.name.slice("starlims:".length);
-      DataViewPanel.currentPanel._data = payload.data;
-    } else {
-      const panel = vscode.window.createWebviewPanel(
-        "data-source-results",
-        "Data Source Results",
-        vscode.ViewColumn.One,
-        {
-          enableScripts: true,
-          localResourceRoots: [vscode.Uri.joinPath(extensionUri, "dist")],
-        }
-      );
+    const panel = vscode.window.createWebviewPanel("data-results", payload.title, vscode.ViewColumn.One, {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(extensionUri, "dist")]
+    });
 
-      DataViewPanel.currentPanel = new DataViewPanel(
-        panel,
-        extensionUri,
-        payload
-      );
-    }
+    DataViewPanel.currentPanel = new DataViewPanel(panel, extensionUri, payload);
   }
 
   public dispose() {
@@ -80,10 +61,7 @@ export class DataViewPanel {
    * @returns A template string literal containing the HTML that should be
    * rendered within the webview panel
    */
-  private _getWebviewContent(
-    webview: vscode.Webview,
-    extensionUri: vscode.Uri
-  ) {
+  private _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
     const nonce = getNonce();
     const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
     const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
@@ -97,12 +75,12 @@ export class DataViewPanel {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; font-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" href="${styleUri}">
-          <title>Data Source Results</title>
+          <title>Data</title>
         </head>
         <body>
           <h1 id="title"></h1>
           <section>
-            <vscode-data-grid id="data-source-grid" generate-header="sticky" aria-label="Data Source Results"></vscode-data-grid>
+            <vscode-data-grid id="data-grid" generate-header="sticky" aria-label="Data Source Results"></vscode-data-grid>
           </section>
           
           <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
@@ -125,13 +103,14 @@ export class DataViewPanel {
         const command = message.command;
         const data = message.data;
         switch (command) {
-          case "requestDataSourceResultsData":
-            // the webview controller (main.ts) sends a requestDataSourceResultsData message after initializing
-            // we send it the data using a receiveDataSourceResultsData message
+          case "requestData":
+            // the webview controller (main.ts) sends a requestData message after initializing
+            // we send it the data using a receiveData message
             webview.postMessage({
-              command: "receiveDataSourceResultData",
+              command: "receiveData",
               payload: this._data,
               name: this._name,
+              title: this._title
             });
             break;
         }

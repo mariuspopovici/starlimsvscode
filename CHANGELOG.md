@@ -101,3 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.41] - 2023-07-28
 
 - added pending checkin operations
+
+## [1.2.42] - 2023-07-29
+
+- added table definition view

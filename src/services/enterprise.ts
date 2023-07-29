@@ -18,4 +18,5 @@ export interface Enterprise {
   getUriFromLocalPath(localPath: string): any;
   getCheckedOutItems(): any;
   checkInAllItems(): any;
+  getTableDefinition(uri: string): any;
 }
