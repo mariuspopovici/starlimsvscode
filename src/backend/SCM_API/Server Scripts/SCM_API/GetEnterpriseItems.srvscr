@@ -194,7 +194,7 @@ bFolder := .T.;
 	:EXITCASE; 
 	
 	:CASE AScanExact({"APPSS", "APPCS", "APPDS", "HTMLFORMXML", "HTMLFORMGUIDE", 
-			"HTMLFORMCODE", "XFDFORMXML", "XFDFORMCODE", "CS", "DS", "SERVERLOG"}, 
+			"HTMLFORMCODE", "XFDFORMXML", "XFDFORMCODE", "CS", "DS", "SERVERLOG", "SS", "APPSS"}, 
 			oEnterpriseItem:Type) > 0;
 		sOutType := oEnterpriseItem:Type;
 		bFolder := .F.;
