@@ -230,12 +230,7 @@
         "command": "STARLIMS.OpenForm",
         "key": "ctrl+f5",
         "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
-      },
-      {
-        "command": "STARLIMS.Save",
-        "key": "ctrl+s",
-        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
-      }
+      }  
     ],
     "menus": {
       "view/title": [
@@ -393,10 +388,6 @@
           "command": "STARLIMS.RunDataSource",
           "when": "resourceDirname =~ /SLVSCODE/ && (editorLangId == 'SLSQL' || (editorLangId == 'SSL' && resourcePath =~ /DataSources/))",
           "group": "run"
-        },
-        {
-          "command": "STARLIMS.Save",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
