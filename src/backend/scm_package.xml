@@ -10,9 +10,9 @@
   <OverwriteLayer>false</OverwriteLayer>
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
+      <ItemID>069AD641-5BC8-4D98-84CD-8B1B1D3E6C95</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>200</LayerId>
+      <LayerId>300</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
@@ -55,7 +55,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
+          <ItemID>55796A78-5B64-4CF4-A11D-662C95991EDC</ItemID>
           <ItemName>CheckOut</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -103,7 +103,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
+          <ItemID>2125F634-42D7-4E95-B40D-B376A7F2F87F</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -115,7 +115,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
+          <ItemID>C70E01EB-5FBA-46E6-912B-A04C6127A0C8</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -151,7 +151,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
+          <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
           <ItemName>RunScript</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -199,6 +199,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>E603D755-1DA3-48FF-96CF-A7C2E7329BC0</ItemID>
+          <ItemName>TableDefinition</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>1AA29CAF-8AD0-4707-BC7D-35F8E040D11F</ItemID>
           <ItemName>UndoCheckOut</ItemName>
           <LayerId>300</LayerId>
@@ -211,7 +223,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
+          <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
           <ItemName>Utils</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />

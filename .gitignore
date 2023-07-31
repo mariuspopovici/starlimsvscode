@@ -9,6 +9,5 @@ dist/*
 .vscode/*
 .DS_Store
 .vs/*
-*.sdp
 *.js
 *.js.map

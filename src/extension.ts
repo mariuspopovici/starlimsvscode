@@ -240,7 +240,15 @@ export async function activate(context: vscode.ExtensionContext) {
    * @param item the enterprise tree item to handle
    */
   async function handleSelectTableItem(item: TreeEnterpriseItem) {
-    // do nothing 
+    const result = await enterpriseService.getTableDefinition(item.uri);
+    const tableName = item.uri.split('/').pop();
+    if (result) {
+      DataViewPanel.render(context.extensionUri, {
+        name: tableName,
+        data: result,
+        title: `Table Definition: ${tableName}` 
+      });
+    }
   }
 
   /**
@@ -942,9 +950,11 @@ export async function activate(context: vscode.ExtensionContext) {
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri);
         if (result?.success) {
+          const dataSourceName = remoteUri.split('/').pop();
           DataViewPanel.render(context.extensionUri, {
-            name: remoteUri.toString(),
-            data: result.data
+            name: dataSourceName,
+            data: result.data,
+            title: `Data Source Output: ${dataSourceName}`
           });
         }
         outputChannel.appendLine(result.data);
@@ -1050,36 +1060,80 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.GoToServerScript",
     async () => {
       var editor = vscode.window.activeTextEditor;
-      if (editor) {
-        // get the script name from editor cursor position
-        const position = editor.selection.active;
-        const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
+      if (!editor) {
+        return;
+      } 
 
-        // search on server to find the script
-        const itemFound = await enterpriseProvider.search(scriptName, "SS", true);
+      // get the script name from editor cursor position
+      const position = editor.selection.active;
+      const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
+      const aScriptNameComponents = scriptName.split(".");
+      let found = false;
 
-        // open the first item found
-        if (itemFound !== undefined) {
-          await vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
-
-          // get new editor
-          editor = vscode.window.activeTextEditor;
-
-          if (editor) {
-            // split the script name to get the procedure name
-            const aScriptName = scriptName.split(".");
-            if (aScriptName.length > 2) {
-              const procName = `:PROCEDURE ${aScriptName[2]};`;
-              // search the opened document for the procedure name and set cursor to the line of occurrence
-              const procPosition = editor.document.getText().indexOf(procName);
-              if (procPosition > 0) {
-                const position = editor.document.positionAt(procPosition);
-                editor.selection = new vscode.Selection(position, position);
-                editor.revealRange(new vscode.Range(position, position));
-              }
-            }
+      if (aScriptNameComponents.length === 0) {
+        found = false;
+      } 
+      else if (aScriptNameComponents.length === 1) {
+        // this is probably a procedure in the current script
+        found = findProcedureInEditor(scriptName, editor);
+        if (!found) {
+          // it could be in an :INCLUDEd library
+          const libraryNames = findIncludedScripts(editor);
+          for (const library of libraryNames) {
+            found = await findScriptOnServer(library, scriptName);
+            if (found) { break; }
           }
         }
+      } else {
+        // this is a server script or external script procedure, search on server to find the main script
+        const procedureName = aScriptNameComponents.length > 2 ? aScriptNameComponents[2] : undefined;
+        found = await findScriptOnServer(scriptName, procedureName);  
+      }
+
+      if (!found) {
+        vscode.window.showErrorMessage("Couldn't find selected item.");
+      }
+      
+      async function findScriptOnServer(scriptName: string, procedureName: string | undefined) {
+        let itemFound = await enterpriseProvider.search(scriptName, "SS", true);
+        if (itemFound) {
+          await vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
+          // get new editor
+          editor = vscode.window.activeTextEditor;
+          if (editor && procedureName) {
+            // find procedure in the newly opened editor
+            return findProcedureInEditor(procedureName, editor);
+          } 
+          return true;
+        } {
+          return false;
+        }
+      }
+
+      function findProcedureInEditor(procedureName: string, editor: vscode.TextEditor) : boolean {
+        const procName = `:PROCEDURE ${[procedureName]};`;
+        // search the opened document for the procedure name and set cursor to the line of occurrence
+        const procPosition = editor.document.getText().indexOf(procName);
+        if (procPosition > 0) {
+          const position = editor.document.positionAt(procPosition);
+          editor.selection = new vscode.Selection(position, position);
+          editor.revealRange(new vscode.Range(position, position));
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      function findIncludedScripts(editor: vscode.TextEditor) {
+        // find all included scripts in the current document
+        let regex = /:INCLUDE\s+"([^"]*)";/g;
+        let matches;
+        let libraryNames = [];
+        while ((matches = regex.exec(editor.document.getText())) !== null) {
+          libraryNames.push(matches[1]); // Add the captured group to the array
+        }
+
+        return libraryNames;
       }
     }
   );
@@ -1155,7 +1209,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const autoDetectConfig = [
         {
           command: "STARLIMS.GoToServerScript",
-          keywords: ["lims.CallServer", "ExecFunction", "CreateUDObject", "SubmitToBatch"]
+          keywords: ["lims.CallServer", "ExecFunction", "CreateUDObject", "SubmitToBatch", "DoProc"]
         },
         {
           command: "STARLIMS.GoToDataSource",

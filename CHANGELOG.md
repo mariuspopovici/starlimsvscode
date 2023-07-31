@@ -101,3 +101,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.41] - 2023-07-28
 
 - added pending checkin operations
+
+## [1.2.42] - 2023-07-29
+
+- added table definition view
+
+## [1.2.43] - 2023-07-29
+
+- improved "Go to Item" autodetection to include procedure
+- added local, external and included procedure support in go to server script
+
+## [1.2.44] - 2023-07-29
+
+- fixed bug that prevented check in / check out from document of server scripts

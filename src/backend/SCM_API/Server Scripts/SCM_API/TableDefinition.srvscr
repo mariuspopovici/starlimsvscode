@@ -1,0 +1,299 @@
+/********************************************************************************
+Description.. :	Get table schema for display
+Author....... :	MARIUS
+********************************************************************************;
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils, oEnterpriseItem, sTableName;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oEnterpriseItem := oUtils:ParseURI(sURI);
+
+:IF oEnterpriseItem:Type != "TABLE";
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Invalid URI, expected a table URI: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+
+sTableName := oEnterpriseItem:Name;
+oResponse:data := DoProc("RetrieveTableDefinition", {sTableName});
+
+:RETURN oResponse;
+
+:PROCEDURE RetrieveTableDefinition;
+:PARAMETERS sTableName;
+:DEFAULT sTableName, "";
+	
+  :DECLARE aTableDefinition, nCounter, nCounter2, aIndexes, sLastIndex, nLastIndexCounter, sSQL;
+	
+  sSQL := "
+    select 
+      LTF.NAME as FIELD_NAME, 
+      coalesce(LTR.CAPTION, LTF.DESCRIPTION) as CAPTION,  
+      LTF.TYPE as DATA_TYPE, 
+      $to_string(coalesce(LTF.LENGTH, 0))$ $+
+        case 
+          when LTF.TYPE = 'DECIMAL' and SCALE is not null then ',' $+ $to_string(LTF.SCALE)$
+        end as FIELD_SIZE, 
+      case 
+        when LTF.ISNULLABLE = 'Y' then 'YES'
+        when LTF.ISNULLABLE = 'N' then 'NO'
+        else ''
+      end as ALLOW_NULLS, 
+      LTF.DEFAULTVALUE, 
+      case
+        when exists (select 
+                1 
+              from 
+                LIMSTABLEINDEXES LTI 
+              inner join LIMSTABLEINDEXFIELDS LTIF on
+                LTIF.TABLEID = LTI.TABLEID
+                and LTI.INDEXID = LTIF.INDEXID
+                and LTIF.FIELDID = LTF.FIELDID
+              where 
+                LTI.TABLEID = LT.TABLEID 
+                and LTI.INDEXTYPE = 'P') then 'PK'
+        else null
+      end as NOTES, 
+      case
+        when exists (select 
+                1 
+              from 
+                LIMSTABLEINDEXES LTI 
+              inner join LIMSTABLEINDEXFIELDS LTIF on
+                LTIF.TABLEID = LTI.TABLEID
+                and LTI.INDEXID = LTIF.INDEXID
+                and LTIF.FIELDID = LTF.FIELDID
+              where 
+                LTI.TABLEID = LT.TABLEID 
+                and LTI.INDEXTYPE = 'P') then 10
+        when exists (select 
+                1 
+              from 
+                LIMSTABLEINDEXES LTI 
+              inner join LIMSTABLEINDEXFIELDS LTIF on
+                LTIF.TABLEID = LTI.TABLEID
+                and LTI.INDEXID = LTIF.INDEXID
+                and LTIF.FIELDID = LTF.FIELDID
+              where 
+                LTI.TABLEID = LT.TABLEID 
+                and LTI.INDEXTYPE = 'U') then 20
+        when exists (select 
+                1 
+              from 
+                LIMSTABLEINDEXES LTI 
+              inner join LIMSTABLEINDEXFIELDS LTIF on
+                LTIF.TABLEID = LTI.TABLEID
+                and LTI.INDEXID = LTIF.INDEXID
+                and LTIF.FIELDID = LTF.FIELDID
+              where 
+                LTI.TABLEID = LT.TABLEID 
+                and LTI.INDEXTYPE = 'R') then 30
+        when LTF.NAME = 'ORIGREC' then 1
+        when LTF.NAME = 'ORIGSTS' then 2
+        else 999
+      end as FIELD_ORDER
+    from
+      LIMSTABLES LT
+    inner join LIMSTABLEFIELDS LTF on
+      LTF.TABLEID = LT.TABLEID
+    left join LIMSTABLERESOURCES LTR on
+      LTR.TABLEID = LT.TABLEID
+      and LTR.FIELDID = LTF.FIELDID
+      and LTR.LANGID = 'ENG'
+      and LTR.CAPTION is not null
+    where 
+      LT.TABLENAME = ?sTableName?
+    order by
+      FIELD_ORDER, LTF.NAME
+  ";
+
+  sSQL := DoProc("PrepareSqlStatementEnhanced", {sSQL});
+
+  aTableDefinition := SqlExecute(sSQL, "DICTIONARY");
+
+  /* unique indexes;
+  aIndexes := SqlExecute("
+    select 
+      LTI.INDEXNAME, 
+      LTF.NAME
+    from 
+      LIMSTABLEINDEXES LTI 
+    inner join LIMSTABLEINDEXFIELDS LTIF on LTIF.TABLEID = LTI.TABLEID and LTI.INDEXID = LTIF.INDEXID
+    inner join LIMSTABLES LT on LT.TABLEID = LTI.TABLEID
+    inner join LIMSTABLEFIELDS LTF on LTF.TABLEID = LTI.TABLEID and LTIF.FIELDID = LTF.FIELDID
+    where 
+      LT.TABLENAME = ?sTableName? and LTI.INDEXTYPE = 'U'
+    order by
+      LTI.INDEXNAME, 
+      LTF.NAME", "DICTIONARY");
+
+  sLastIndex := "";
+  nLastIndexCounter := 0;
+  :FOR nCounter := 1 :TO Len(aIndexes);
+    :IF (aIndexes[nCounter][1] != sLastIndex);
+      sLastIndex := aIndexes[nCounter][1];
+      nLastIndexCounter++;
+    :ENDIF;
+    :FOR nCounter2 := 1 :TO Len(aTableDefinition);
+      :IF (aTableDefinition[nCounter2][1] == aIndexes[nCounter][2]);
+        :IF (!Empty(aTableDefinition[nCounter2][7]));
+          aTableDefinition[nCounter2][7] += ", ";
+        :ENDIF;
+        aTableDefinition[nCounter2][7] += "UK" + LimsString(nLastIndexCounter);
+      :ENDIF;
+    :NEXT;
+  :NEXT;
+    
+    /* regular indexes;
+  aIndexes := SqlExecute("
+    select 
+      LTI.INDEXNAME, 
+      LTF.NAME
+    from 
+      LIMSTABLEINDEXES LTI 
+    inner join LIMSTABLEINDEXFIELDS LTIF on
+      LTIF.TABLEID = LTI.TABLEID
+      and LTI.INDEXID = LTIF.INDEXID
+    inner join LIMSTABLES LT on
+      LT.TABLEID = LTI.TABLEID
+    inner join LIMSTABLEFIELDS LTF on
+      LTF.TABLEID = LTI.TABLEID
+      and LTIF.FIELDID = LTF.FIELDID
+    where 
+      LT.TABLENAME = ?sTableName?
+      and LTI.INDEXTYPE = 'R'
+    order by
+      LTI.INDEXNAME, 
+      LTF.NAME", 
+    "DICTIONARY");
+
+	sLastIndex := "";
+	nLastIndexCounter := 0;
+	:FOR nCounter := 1 :TO Len(aIndexes);
+		:IF (aIndexes[nCounter][1] != sLastIndex);
+			sLastIndex := aIndexes[nCounter][1];
+			nLastIndexCounter++;
+		:ENDIF;
+		:FOR nCounter2 := 1 :TO Len(aTableDefinition);
+			:IF (aTableDefinition[nCounter2][1] == aIndexes[nCounter][2]);
+				:IF (!Empty(aTableDefinition[nCounter2][7]));
+					aTableDefinition[nCounter2][7] += ", ";
+				:ENDIF;
+				aTableDefinition[nCounter2][7] += "RK" + LimsString(nLastIndexCounter);
+			:ENDIF;
+		:NEXT;
+	:NEXT;
+	
+	:RETURN aTableDefinition;
+:ENDPROC;
+
+:PROCEDURE PrepareSqlStatementEnhanced;
+	:PARAMETERS sSQL;
+	
+	:DECLARE sSqlFinal;
+	sSqlFinal := DoProc("PrepareSqlStatement", {sSQL});
+	
+	/*$to_string;
+	:DECLARE nStartPos, nEndPos, sVariable, sSqlFinalPre, sSqlFinalPost;
+	nStartPos := At("$to_string(", sSqlFinal);
+
+	:WHILE nStartPos > 0;
+		nEndPos := LimsAt(")$", sSqlFinal, nStartPos);
+		sVariable := SubStr(sSqlFinal, nStartPos, nEndPos - nStartPos + 2);
+		sVariable := StrTran(sVariable, "$to_string(", "");
+		sVariable := StrTran(sVariable, ")$", "");
+		sSqlFinalPre := SubStr(sSqlFinal, 1, nStartPos - 1);
+		sSqlFinalPost := SubStr(sSqlFinal, nEndPos + 2, len(sSqlFinal));
+		:IF PLATFORMA = "ORACLE";
+			sSqlFinal := sSqlFinalPre + " to_char ( " + sVariable + ") " + sSqlFinalPost;
+		:ELSE;
+			sSqlFinal := sSqlFinalPre + " convert(nvarchar, " + sVariable + ") " + sSqlFinalPost;
+		:ENDIF;
+		nStartPos := At("$to_string(", sSqlFinal);
+	:ENDWHILE;
+	
+	:RETURN sSqlFinal;
+:ENDPROC;
+
+:PROCEDURE PrepareSqlStatement;
+:PARAMETERS sql;
+:DECLARE sqlFinal, sqlFinal1, sqlFinal2, pValue;
+
+	sqlFinal := sql;
+	
+	/** $+;
+	pValue := "+";
+	:IF PLATFORMA == "ORACLE";
+		pValue := "||";
+	:ENDIF;
+	sqlFinal := StrTran(sqlFinal, "$+", pValue);
+	
+	/** $isnull;
+	pValue := "isnull";
+	:IF PLATFORMA == "ORACLE";
+		pValue := "nvl";
+	:ENDIF;
+	sqlFinal := StrTran(sqlFinal, "$isnull", pValue);
+	
+	/** $dummyTable;
+	pValue := "";
+	:IF PLATFORMA == "ORACLE";
+		pValue := "From Dual";
+	:ENDIF;
+	sqlFinal := StrTran(sqlFinal, "$dummyTable", pValue);
+	
+	/** $substring;
+	pValue := "Substring";
+	:IF PLATFORMA == "ORACLE";
+		pValue := "substr";
+	:ENDIF;
+	sqlFinal := StrTran(sqlFinal, "$substring", pValue);
+
+	/** $getdate;
+	pValue := "{fn Now()}";
+	sqlFinal := StrTran(sqlFinal, "$getdate", pValue);
+	
+	/*$to_char;
+  :DECLARE startPos, endPos, variable;
+	startPos := At("$to_char", sqlFinal);
+	:WHILE startPos > 0;
+		endPos := LimsAt(")", sqlFinal, startPos);
+		variable := SubStr(sqlFinal, startPos, endPos - startPos + 1);
+		
+		variable := StrTran(variable, "$to_char", "");
+		variable := StrTran(variable, "(", "");
+		variable := StrTran(variable, ")", "");
+		
+		sqlFinal1 := SubStr(sqlFinal,1, startPos - 1);
+		sqlFinal2 := SubStr(sqlFinal,endPos + 1, len(sqlFinal));
+		variable := StrTran(variable, "{", "(");
+		variable := StrTran(variable, "}", ")");
+		:IF PLATFORMA = "ORACLE";
+			sqlFinal := sqlFinal1 + " to_char ( " + variable + ") " + sqlFinal2;
+		:ELSE;
+			sqlFinal := sqlFinal1 + " convert(nvarchar, " + variable + ") " + sqlFinal2;
+		:ENDIF;
+		startPos := At("$to_char", sqlFinal);
+	:ENDWHILE;
+	:RETURN sqlFinal;
+:ENDPROC;
