@@ -368,7 +368,6 @@ export async function activate(context: vscode.ExtensionContext) {
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri.toString());
         if (result) {
-
           // append current user log to output channel
           let logAfterRun = (await enterpriseService.getEnterpriseItemCode(logUri)).code;
           let logDiff = logAfterRun.replace(logBeforeRun, "");
