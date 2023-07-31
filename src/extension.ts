@@ -246,7 +246,7 @@ export async function activate(context: vscode.ExtensionContext) {
       DataViewPanel.render(context.extensionUri, {
         name: tableName,
         data: result,
-        title: `Table Definition: ${tableName}` 
+        title: `Table Definition: ${tableName}`
       });
     }
   }
@@ -349,22 +349,35 @@ export async function activate(context: vscode.ExtensionContext) {
         remoteUri = item.uri;
       }
       else {
-        // no item defined (shortcut key pressed)
-        if (item === undefined) {
-          let editor = vscode.window.activeTextEditor;
-          item = editor?.document.uri;
-        }
         remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
 
+      // document not saved, save it first
+      if (vscode.window.activeTextEditor?.document.isDirty) {
+        await vscode.commands.executeCommand("STARLIMS.Save", item);
+      }
+
       outputChannel.appendLine(
-        `${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}`
+        `\n${new Date().toLocaleString()} Executing remote script at URI: ${remoteUri}\n`
       );
+
+      // get user log
+      const logUri = "/ServerLogs/" + user + ".log";
+      var logBeforeRun = (await enterpriseService.getEnterpriseItemCode(logUri)).code;
 
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri.toString());
         if (result) {
+          // append current user log to output channel
+          let logAfterRun = (await enterpriseService.getEnterpriseItemCode(logUri)).code;
+          let logDiff = logAfterRun.replace(logBeforeRun, "");
+          outputChannel.appendLine("### Log output: ###");
+          outputChannel.appendLine(logDiff);
+
+          // append script output to output channel
+          outputChannel.appendLine("### Script output: ###");
           outputChannel.appendLine(result.data);
+
           outputChannel.show();
         }
       }, "Executing script...");
@@ -505,20 +518,20 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register the clear log command
   vscode.commands.registerCommand("STARLIMS.ClearLog",
-    async (uri : vscode.Uri) => {
+    async (uri: vscode.Uri) => {
 
       // ask for confirmation
       let name = path.parse(uri.path).name;
-      
+
       const confirm = await vscode.window.showWarningMessage(
         `Are you sure you want to clear the log for ${name}?`,
         { modal: true },
         "Yes"
       );
-      
+
       if (confirm === "Yes") {
         let remoteUri = enterpriseService.getUriFromLocalPath(uri.path);
-        await enterpriseService.clearLog(remoteUri);  
+        await enterpriseService.clearLog(remoteUri);
       }
     }
   );
@@ -1062,7 +1075,7 @@ export async function activate(context: vscode.ExtensionContext) {
       var editor = vscode.window.activeTextEditor;
       if (!editor) {
         return;
-      } 
+      }
 
       // get the script name from editor cursor position
       const position = editor.selection.active;
@@ -1072,7 +1085,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       if (aScriptNameComponents.length === 0) {
         found = false;
-      } 
+      }
       else if (aScriptNameComponents.length === 1) {
         // this is probably a procedure in the current script
         found = findProcedureInEditor(scriptName, editor);
@@ -1087,13 +1100,13 @@ export async function activate(context: vscode.ExtensionContext) {
       } else {
         // this is a server script or external script procedure, search on server to find the main script
         const procedureName = aScriptNameComponents.length > 2 ? aScriptNameComponents[2] : undefined;
-        found = await findScriptOnServer(scriptName, procedureName);  
+        found = await findScriptOnServer(scriptName, procedureName);
       }
 
       if (!found) {
         vscode.window.showErrorMessage("Couldn't find selected item.");
       }
-      
+
       async function findScriptOnServer(scriptName: string, procedureName: string | undefined) {
         let itemFound = await enterpriseProvider.search(scriptName, "SS", true);
         if (itemFound) {
@@ -1103,14 +1116,14 @@ export async function activate(context: vscode.ExtensionContext) {
           if (editor && procedureName) {
             // find procedure in the newly opened editor
             return findProcedureInEditor(procedureName, editor);
-          } 
+          }
           return true;
         } {
           return false;
         }
       }
 
-      function findProcedureInEditor(procedureName: string, editor: vscode.TextEditor) : boolean {
+      function findProcedureInEditor(procedureName: string, editor: vscode.TextEditor): boolean {
         const procName = `:PROCEDURE ${[procedureName]};`;
         // search the opened document for the procedure name and set cursor to the line of occurrence
         const procPosition = editor.document.getText().indexOf(procName);

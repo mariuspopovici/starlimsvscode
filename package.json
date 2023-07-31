@@ -178,7 +178,7 @@
       },
       {
         "command": "STARLIMS.GetCheckedOutItems",
-        "title": "Refresh checked out items",
+        "title": "Refresh my checked out items",
         "icon": {
           "dark": "resources/dark/refresh.svg",
           "light": "resources/light/refresh.svg"
@@ -194,7 +194,7 @@
       },
       {
         "command": "STARLIMS.CheckInAllItems",
-        "title": "Check in all items",
+        "title": "Check in all my items",
         "icon": {
           "dark": "resources/dark/checkinall.svg",
           "light": "resources/light/checkinall.svg"
@@ -230,12 +230,7 @@
         "command": "STARLIMS.OpenForm",
         "key": "ctrl+f5",
         "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
-      },
-      {
-        "command": "STARLIMS.Save",
-        "key": "ctrl+s",
-        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
-      }
+      }  
     ],
     "menus": {
       "view/title": [
@@ -393,10 +388,6 @@
           "command": "STARLIMS.RunDataSource",
           "when": "resourceDirname =~ /SLVSCODE/ && (editorLangId == 'SLSQL' || (editorLangId == 'SSL' && resourcePath =~ /DataSources/))",
           "group": "run"
-        },
-        {
-          "command": "STARLIMS.Save",
-          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'"
         },
         {
           "command": "STARLIMS.selectEnterpriseItem",
