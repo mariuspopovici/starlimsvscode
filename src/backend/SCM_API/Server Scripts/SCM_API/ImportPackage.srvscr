@@ -1,0 +1,54 @@
+/********************************************************************************
+Description.. :	Imports an .sdp package file.
+Parameters... :	- 
+Returns...... :	- 
+Author....... :	MARIUS
+Date......... : 2023-07-31
+********************************************************************************;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse;
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+
+:DECLARE sServerFile, sFileName;
+sServerFile := Request:SaveInputStream();
+sFileName := FileSupport(sServerFile, "NAME");
+
+:DECLARE sPackageId, sImportFolder, sSDPFileName;
+:DECLARE sImportLog;
+
+sSDPFileName := sFileName + ".sdp";
+sPackageId := CreateGuid();
+sImportFolder := IIf(Right(GlbImpExpPath, 1) == "\", GlbImpExpPath, GlbImpExpPath + "\") + sPackageId + "\";
+
+DosSupport("MD", sImportFolder);
+FileSupport(sServerFile, "COPY", IIf(Right(sImportFolder, 1) == "\", sImportFolder, sImportFolder + "\") + sSDPFileName);
+
+:IF DoProc("Enterprise_Data_Providers.ImportProvider.UnpackSDPBatch", {sPackageId, sFileName}) == 0;   
+    DoProc("Enterprise_Data_Providers.ImportProvider.StartImportUpdater", {sPackageId, .F., .T.});
+    sImportLog := DoProc("Enterprise_Data_Providers.ImportProvider.GetPackageFile", {sPackageId, sPackageId + ".impexp_log"});
+    oResponse:data := sImportLog;
+    :IF (At("Import ended with errors.", sImportLog) > 0);
+        Response:StatusCode := 400;
+        oResponse:success := .F.;
+    :ELSE;
+        Response:StatusCode := 200;
+        oResponse:success := .T.;
+    :ENDIF;
+    
+    DoProc("Enterprise_Data_Providers.PackageBuilderProvider.CleanUp", {sPackageId});
+    DoProc("Enterprise_Data_Providers.ImportProvider.ResetServerCache");
+:ELSE;
+    Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := "Unable to unpack the package .sdp file.";
+	:RETURN oResponse;
+:ENDIF;
+
+
+:RETURN oResponse;
