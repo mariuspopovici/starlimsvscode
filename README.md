@@ -66,12 +66,12 @@ This extension contributes the following settings:
 
 ## How to Use
 
-- Download extension files attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
-- (Install VSIX file, Import SCM_API.sdp package into STARLIMS)
+- Install the latest version of the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=MariusPopovici.vscode-starlims&ssr=false#qna)
+- Download the extension files attached to the [current release](https://github.com/mariuspopovici/starlimsvscode/releases) and import the SCM_API.sdp package into STARLIMS
 - Add a local folder to the current VS Code workspace. This will serve as your local STARLIMS code repository.
-- Activate extension clicking the STARLIMS logo in the VS Code sidebar.
-- Configure extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time. The root folder should be set as the path to the folder selected in the previous step.
-- Configure VS Code Color Theme and activate the **SSL Language Theme (Dark)** theme.
+- Activate the extension clicking the STARLIMS logo in the VS Code sidebar.
+- Configure the extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time. The root folder should be set as the path to the folder selected in the previous step.
+- Configure the VS Code Color Theme and activate the **SSL Language Theme (Dark)** theme.
 
 ## Known Issues
 

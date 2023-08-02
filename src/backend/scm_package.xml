@@ -151,6 +151,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>4BBC2372-CC11-44D8-B9C3-27EC84D71CE3</ItemID>
+          <ItemName>ImportPackage</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
           <ItemName>RunScript</ItemName>
           <LayerId>300</LayerId>
@@ -225,6 +237,18 @@
         <ServerScript>
           <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
           <ItemName>Utils</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>53E03591-B34C-4682-81AF-776952F01E96</ItemID>
+          <ItemName>Version</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
