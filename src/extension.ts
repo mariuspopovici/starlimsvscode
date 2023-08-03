@@ -503,7 +503,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
-        `Are you sure you want to undo checkout of '${item.label}' and loose all changes?`,
+        `Are you sure you want to undo checkout of '${item.label}' and lose all changes?`,
         { modal: true },
         "Yes"
       );

@@ -35,7 +35,7 @@
         {
           "id": "STARLIMSVSCode",
           "title": "STARLIMS",
-          "icon": "resources/starlims.png",
+          "icon": "resources/extension/star_gray.png",
           "alwaysShow": true
         }
       ]
@@ -432,6 +432,11 @@
         },
         {
           "command": "STARLIMS.Checkin",
+          "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'",
+          "group": "sourceControl"
+        },
+        {
+          "command": "STARLIMS.UndoCheckOut",
           "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'",
           "group": "sourceControl"
         },
