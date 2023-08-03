@@ -204,13 +204,21 @@
       {
         "command": "STARLIMS.UndoCheckOut",
         "title": "Undo Check Out"
+      },
+      {
+        "command": "STARLIMS.RefreshLogChannel",
+        "title": "Refresh"
+      },
+      {
+        "command": "STARLIMS.ClearLogChannel",
+        "title": "Clear"
       }
     ],
     "keybindings": [
       {
         "command": "STARLIMS.GoToItem",
         "key": "f11",
-        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'"
+        "when": "editorTextFocus && (resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL') || (inOutput && editorLangId == 'Log')"
       },
       {
         "command": "STARLIMS.RunScript",
@@ -231,6 +239,11 @@
         "command": "STARLIMS.OpenForm",
         "key": "ctrl+f5",
         "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+      },
+      {
+        "command": "STARLIMS.RefreshLogChannel",
+        "key": "f5",
+        "when": "inOutput && editorLangId == 'Log'"
       }
     ],
     "menus": {
@@ -426,6 +439,11 @@
           "submenu": "STARLIMS.GoTo",
           "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL'",
           "group": "navigation"
+        },
+        {
+          "submenu": "STARLIMS.ServerLog",
+          "when":"inOutput && editorLangId == 'Log'",
+          "group": "ServerLog"
         }
       ],
       "STARLIMS.GoTo": [
@@ -449,12 +467,26 @@
           "command": "STARLIMS.GoToForm",
           "group": "navigation"
         }
+      ],
+      "STARLIMS.ServerLog": [
+        {
+          "command": "STARLIMS.RefreshLogChannel",
+          "group": "ServerLog"
+        },
+        {
+          "command": "STARLIMS.ClearLogChannel",
+          "group": "ServerLog"
+        }
       ]
     },
     "submenus": [
       {
         "id": "STARLIMS.GoTo",
         "label": "Go to"
+      },
+      {
+        "id": "STARLIMS.ServerLog",
+        "label": "STARLIMS Log"
       }
     ],
     "configuration": [
