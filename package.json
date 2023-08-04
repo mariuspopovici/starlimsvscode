@@ -34,7 +34,7 @@
       "activitybar": [
         {
           "id": "STARLIMSVSCode",
-          "title": "STARLIMS",
+          "title": "STARLIMS VS Code",
           "icon": "resources/extension/star_gray.png",
           "alwaysShow": true
         }
