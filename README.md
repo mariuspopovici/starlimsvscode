@@ -6,7 +6,7 @@ Extension provides Visual Studio Code integration with STARLIMS Enterprise Desig
 
 This is an unofficial, unsupported, extension so use at your own risk.
 
-![STARLIMS VS Code Screenshot](resources/screenshot.png)
+![STARLIMS VS Code Screenshot](resources/preview.gif)
 
 # Authors
 

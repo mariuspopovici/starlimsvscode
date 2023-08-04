@@ -92,19 +92,56 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  // create the root path for the extension
+  // create root path for the extension
   rootPath = path.join(config.get("rootPath") as string, SLVSCODE_FOLDER);
 
-  // reload the configuration if it was updated
+  // reload configuration if it was updated
   if (reloadConfig) {
     config = vscode.workspace.getConfiguration("STARLIMS");
   }
 
-  // create the enterprise service
+  // create enterprise service
   const enterpriseService = new EnterpriseService(config);
 
-  // create the output channel for the extension
+  // create output channel for the extension
   const outputChannel = vscode.window.createOutputChannel("STARLIMS");
+
+  // create output channel for the log
+  const logChannel = vscode.window.createOutputChannel("STARLIMS Log");
+
+  // register the refreshLogChannel command
+  vscode.commands.registerCommand("STARLIMS.RefreshLogChannel",
+    async () => {
+      // get current user's log
+      const logUri = "/ServerLogs/" + user + ".log";
+      var log = await enterpriseService.getEnterpriseItemCode(logUri);
+      if (log) {
+        logChannel.clear();
+        logChannel.appendLine(log.code);
+        logChannel.show();
+      }
+    }
+  );
+
+  // register the clearLogChannel command
+  vscode.commands.registerCommand("STARLIMS.ClearLogChannel",
+    async () => {
+      // clear current user's log
+      let remoteUri = "/ServerLogs/" + user;
+      await enterpriseService.clearLog(remoteUri);
+
+      // refresh log
+      var log = await enterpriseService.getEnterpriseItemCode(remoteUri + ".log");
+      if (log) {
+        logChannel.clear();
+        logChannel.appendLine(log.code);
+        logChannel.show();
+      }
+    }
+  );
+
+  // load current user's log
+  vscode.commands.executeCommand("STARLIMS.RefreshLogChannel");
 
   // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
   const enterpriseTextContentProvider =
@@ -466,7 +503,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
-        `Are you sure you want to undo checkout of '${item.label}' and loose all changes?`,
+        `Are you sure you want to undo checkout of '${item.label}' and lose all changes?`,
         { modal: true },
         "Yes"
       );
@@ -1079,8 +1116,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // get the script name from editor cursor position
       const position = editor.selection.active;
-      const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
-      const aScriptNameComponents = scriptName.split(".");
+      let scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
+      let aScriptNameComponents = scriptName.split(".");
+
+      // remove first and main_ component (script type in log file)
+      if (aScriptNameComponents[0] === "ServerScript") {
+        aScriptNameComponents.shift();
+        if (aScriptNameComponents[2] === "main_") {
+          aScriptNameComponents.pop();
+          scriptName = aScriptNameComponents.join(".");
+        }
+      }
+
       let found = false;
 
       if (aScriptNameComponents.length === 0) {
@@ -1159,7 +1206,17 @@ export async function activate(context: vscode.ExtensionContext) {
       if (editor) {
         // get the script name from editor cursor position
         const position = editor.selection.active;
-        const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
+        let scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
+        let aScriptNameComponents = scriptName.split(".");
+
+        // remove first and main_ component (script type in log file)
+        if (aScriptNameComponents[0] === "DataSource") {
+          aScriptNameComponents.shift();
+          if (aScriptNameComponents[2] === "main_") {
+            aScriptNameComponents.pop();
+            scriptName = aScriptNameComponents.join(".");
+          }
+        }
 
         // use search to find the script
         const itemFound = await enterpriseProvider.search(scriptName, "DS", true);
@@ -1222,11 +1279,11 @@ export async function activate(context: vscode.ExtensionContext) {
       const autoDetectConfig = [
         {
           command: "STARLIMS.GoToServerScript",
-          keywords: ["lims.CallServer", "ExecFunction", "CreateUDObject", "SubmitToBatch", "DoProc"]
+          keywords: ["lims.CallServer", "ExecFunction", "CreateUDObject", "SubmitToBatch", "DoProc", "ServerScript"]
         },
         {
           command: "STARLIMS.GoToDataSource",
-          keywords: ["lims.GetData"]
+          keywords: ["lims.GetData", "DataSource"]
         },
         {
           command: "STARLIMS.GoToForm",
