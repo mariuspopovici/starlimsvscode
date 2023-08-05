@@ -11,6 +11,7 @@ import { DataViewPanel } from "./panels/DataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
 
+const {version} = require('../package.json');
 const SLVSCODE_FOLDER = "SLVSCODE";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -108,6 +109,26 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // create output channel for the log
   const logChannel = vscode.window.createOutputChannel("STARLIMS Log");
+
+  // verify API version
+  enterpriseService.getVersion()
+    .then(async (apiVersion) => {
+      if (!apiVersion) {
+        vscode.window.showWarningMessage('STARLIMS VS Code API is not reachable. Please check connection info or install API package. See extension README for installation instructions.');
+        return;
+      } 
+
+      if (version !== apiVersion) {
+        const selection = await vscode.window.showWarningMessage('A new version of the STARLIMS VS Code API is available. Select Upgrade to deploy the new version.', 
+          'Upgrade', 'Continue');	
+        if (selection === 'Upgrade') {
+          const sdpPackage = context.asAbsolutePath("dist/SCM_API.sdp");
+          executeWithProgress(async () => {
+            await enterpriseService.upgradeBackend(sdpPackage);
+          }, "Upgrading the extension backend API.");
+        }
+      }
+    });
 
   // register the refreshLogChannel command
   vscode.commands.registerCommand("STARLIMS.RefreshLogChannel",
