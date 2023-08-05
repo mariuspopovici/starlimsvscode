@@ -125,7 +125,7 @@ export async function activate(context: vscode.ExtensionContext) {
           const sdpPackage = context.asAbsolutePath("dist/SCM_API.sdp");
           executeWithProgress(async () => {
             await enterpriseService.upgradeBackend(sdpPackage);
-          }, "Upgrading the extension backend API."
+          }, "Upgrading the extension backend API.");
         }
       }
     });
