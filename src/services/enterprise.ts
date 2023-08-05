@@ -19,4 +19,6 @@ export interface Enterprise {
   getCheckedOutItems(): any;
   checkInAllItems(): any;
   getTableDefinition(uri: string): any;
+  getVersion(): any;
+  upgradeBackend(sdpPackage: string): any;
 }
