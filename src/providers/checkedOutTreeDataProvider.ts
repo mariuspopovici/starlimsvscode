@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { EnterpriseItemType, TreeEnterpriseItem } from "./enterpriseTreeDataProvider";
 import { DOMParser } from "@xmldom/xmldom";
 import { EnterpriseService } from "../services/enterpriseService";
+import path from "path";
 
 /**
  * Implements the VS Code TreeDataProvider to build the STARLIMS Checked out tree.
@@ -49,7 +50,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @param type Type of the tree view item.
    * @returns Icon path.
    */
-  private getIconForType(type: EnterpriseItemType): vscode.ThemeIcon {
+  private getIconForType(type: EnterpriseItemType): any {
     switch (type) {
       case EnterpriseItemType.ServerScript:
       case EnterpriseItemType.AppServerScript:
@@ -73,9 +74,17 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
       case EnterpriseItemType.Table:
         return new vscode.ThemeIcon("database");
 
-      case EnterpriseItemType.EnterpriseCategory:
       case EnterpriseItemType.AppCategory:
+      case EnterpriseItemType.EnterpriseCategory:
         return new vscode.ThemeIcon("folder-opened");
+
+      case EnterpriseItemType.Application:
+        // return app.svg as file type icon
+        return {
+          light: path.join(__filename, "..", "..", "resources", "light", "app.svg"),
+          dark: path.join(__filename, "..", "..", "resources", "dark", "app.svg")
+        };
+
       default:
         return new vscode.ThemeIcon("folder-opened");
     }

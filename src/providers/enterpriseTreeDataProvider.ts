@@ -203,38 +203,74 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     return resourceUri;
   }
 
+  private getCustomIcon(icon: string): any {
+    return {
+      light: path.join(__filename, "..", "..", "resources", "light", icon),
+      dark: path.join(__filename, "..", "..", "resources", "dark", icon)
+    };
+  }
+
   /**
    *  Returns an icon for the item.
    * @param item The item to check
    * @returns An icon for the item.
    */
-  private getItemIcon(item: any): vscode.ThemeIcon {
+  private getItemIcon(item: any): any {
     const config = this.service.getConfig();
     if (item.isFolder) {
-      return vscode.ThemeIcon.Folder;
+      switch (item.type) {
+        case EnterpriseItemType.EnterpriseCategory:
+          return new vscode.ThemeIcon("folder-opened");
+        case EnterpriseItemType.Application:
+          return this.getCustomIcon("app.svg");
+        case EnterpriseItemType.AppCategory:
+          return this.getCustomIcon("apps.svg");
+        case EnterpriseItemType.AppClientScriptCategory:
+          return this.getCustomIcon("javascript.svg");
+        case EnterpriseItemType.AppServerScriptCategory:
+          return this.getCustomIcon("ssl.svg");
+        case EnterpriseItemType.AppDataSourceCategory:
+          return this.getCustomIcon("sql.svg");
+        case EnterpriseItemType.XFDFormCategory:
+          return this.getCustomIcon("xfd.svg");
+        case EnterpriseItemType.HTMLFormCategory:
+          return this.getCustomIcon("html5.svg");
+        case EnterpriseItemType.TableCategory:
+          return vscode.ThemeIcon.Folder;
+        default:
+          return new vscode.ThemeIcon("folder-opened");
+      }
+
     } else if (item.checkedOutBy) {
       return item.checkedOutBy === config.get("user") ? new vscode.ThemeIcon("unlock") : new vscode.ThemeIcon("lock");
     } else {
       switch (item.type) {
         case EnterpriseItemType.DataSource:
         case EnterpriseItemType.AppDataSource:
+          return this.getCustomIcon("sql.svg");
         case EnterpriseItemType.Table:
-          return new vscode.ThemeIcon("database");
+          return this.getCustomIcon("db.svg");
+
         case EnterpriseItemType.ServerScript:
         case EnterpriseItemType.AppServerScript:
+          return this.getCustomIcon("ssl.svg");
+
         case EnterpriseItemType.AppClientScript:
         case EnterpriseItemType.HTMLFormCode:
         case EnterpriseItemType.XFDFormCode:
-          return new vscode.ThemeIcon("file-code");
+          return this.getCustomIcon("javascript.svg");
+
         case EnterpriseItemType.XFDFormXML:
         case EnterpriseItemType.HTMLFormXML:
-          return new vscode.ThemeIcon("preview");
+          return this.getCustomIcon("xml.svg");
+
         case EnterpriseItemType.HTMLFormGuide:
-          return new vscode.ThemeIcon("list-flat");
+          return this.getCustomIcon("document.svg");
+
         case EnterpriseItemType.ServerLog:
           return new vscode.ThemeIcon("output");
         default:
-          return new vscode.ThemeIcon("file-code");
+          return new vscode.ThemeIcon("folder-opened");
       }
     }
   }
@@ -255,7 +291,7 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   tooltip?: string | vscode.MarkdownString | undefined;
   isSystem?: boolean | undefined;
   iconPath?: string | vscode.Uri | { light: string | vscode.Uri; dark: string | vscode.Uri; } | vscode.ThemeIcon | undefined;
-  
+
   constructor(
     type: EnterpriseItemType,
     label: string,
@@ -284,22 +320,39 @@ export enum EnterpriseItemType {
   EnterpriseCategory = "CATEGORY",
   AppCategory = "APPCATEGORY",
   Application = "APP",
+
+  AppServerScriptCategory = "ENT_APP_SS",
   AppServerScript = "APPSS",
+
+  AppClientScriptCategory = "ENT_APP_CS",
   AppClientScript = "APPCS",
+
+  AppDataSourceCategory = "ENT_APP_DS",
   AppDataSource = "APPDS",
+
   ClientScriptCategory = "CSCAT",
-  DataSource = "DS",
+  ClientScript = "CS",
+
   DataSourceCategory = "DSCAT",
+  DataSource = "DS",
+
   ServerScriptCategory = "SSCAT",
   ServerScript = "SS",
+
+  XFDFormCategory = "ENT_APP_XFD_FRM",
   XFDFormXML = "XFDFORMXML",
   XFDFormCode = "XFDFORMCODE",
+
+  HTMLFormCategory = "ENT_APP_HTML_FRM",
   HTMLFormXML = "HTMLFORMXML",
   HTMLFormCode = "HTMLFORMCODE",
   HTMLFormGuide = "HTMLFORMGUIDE",
+
   PhoneForm = "PHONEFORM",
   TabletForm = "TABLETFORM",
+
   ServerLog = "SERVERLOG",
+
   TableCategory = "TBLCATEGORY",
   Table = "TABLE"
 }
