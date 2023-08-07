@@ -47,48 +47,73 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
   /**
    * Get the icon path for the tree view item.
-   * @param type Type of the tree view item.
-   * @returns Icon path.
+   * @param icon Icon name
+   * @returns Icon path
    */
+  private getCustomIcon(icon: string): any {
+    return {
+      light: path.join(__filename, "..", "..", "resources", "light", icon),
+      dark: path.join(__filename, "..", "..", "resources", "dark", icon)
+    };
+  }
+
+  /**
+    * Get the icon path for the tree view item.
+    * @param type Type of the tree view item.
+    * @returns Icon path.
+    */
   private getIconForType(type: EnterpriseItemType): any {
     switch (type) {
-      case EnterpriseItemType.ServerScript:
-      case EnterpriseItemType.AppServerScript:
-      case EnterpriseItemType.AppClientScript:
-      case EnterpriseItemType.HTMLFormCode:
+      case EnterpriseItemType.Application:
+        return this.getCustomIcon("app.svg");
+
+      case EnterpriseItemType.AppCategory:
+        return this.getCustomIcon("apps.svg");
+
+      case EnterpriseItemType.ClientScriptCategory:
+      case EnterpriseItemType.AppClientScriptCategory:
+        return this.getCustomIcon("js_docs.svg");
+
+      case EnterpriseItemType.ServerScriptCategory:
+      case EnterpriseItemType.AppServerScriptCategory:
+        return this.getCustomIcon("ssl_docs.svg");
+
+      case EnterpriseItemType.DataSourceCategory:
+      case EnterpriseItemType.AppDataSourceCategory:
+        return this.getCustomIcon("sql_docs.svg");
+
+      case EnterpriseItemType.XFDFormCategory:
+        return this.getCustomIcon("xfd_form.svg");
+
+      case EnterpriseItemType.HTMLFormCategory:
+        return this.getCustomIcon("html5.svg");
+
       case EnterpriseItemType.XFDFormCode:
-        return new vscode.ThemeIcon("file-code");
+      case EnterpriseItemType.HTMLFormCode:
+      case EnterpriseItemType.ClientScript:
+      case EnterpriseItemType.AppClientScript:
+        return this.getCustomIcon("js.svg");
+
+      case EnterpriseItemType.HTMLFormGuide:
+        return this.getCustomIcon("json.svg");
 
       case EnterpriseItemType.XFDFormXML:
       case EnterpriseItemType.HTMLFormXML:
-        return new vscode.ThemeIcon("preview");
+        return this.getCustomIcon("xml.svg");
 
-      case EnterpriseItemType.HTMLFormGuide:
-        return new vscode.ThemeIcon("list-flat");
+      case EnterpriseItemType.ServerScript:
+      case EnterpriseItemType.AppServerScript:
+        return this.getCustomIcon("ssl.svg");
 
-      case EnterpriseItemType.ServerLog:
-        return new vscode.ThemeIcon("output");
-
-      case EnterpriseItemType.AppDataSource:
       case EnterpriseItemType.DataSource:
-      case EnterpriseItemType.Table:
-        return new vscode.ThemeIcon("database");
-
-      case EnterpriseItemType.AppCategory:
-      case EnterpriseItemType.EnterpriseCategory:
-        return new vscode.ThemeIcon("folder-opened");
-
-      case EnterpriseItemType.Application:
-        // return app.svg as file type icon
-        return {
-          light: path.join(__filename, "..", "..", "resources", "light", "app.svg"),
-          dark: path.join(__filename, "..", "..", "resources", "dark", "app.svg")
-        };
+      case EnterpriseItemType.AppDataSource:
+        return this.getCustomIcon("sql.svg");
 
       default:
         return new vscode.ThemeIcon("folder-opened");
     }
   }
+
   /**
    *  Returns a URI for the item if it is checked out by the current user.
    * @param item The item to check
@@ -162,7 +187,8 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           rootNode.children = [];
-          rootNode.iconPath = this.getIconForType(EnterpriseItemType.EnterpriseCategory);
+          rootNode.iconPath =
+            this.getIconForType(EnterpriseItemType.AppCategory);
           rootNode.language = "";
           rootNode.guid = "";
           rootNode.checkedOutBy = "";
@@ -238,7 +264,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             htmlFormsCatNode.children = [];
-            htmlFormsCatNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+            htmlFormsCatNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormCategory);
             htmlFormsCatNode.language = "";
             htmlFormsCatNode.guid = "";
             htmlFormsCatNode.checkedOutBy = "";
@@ -265,7 +291,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormXmlNode.checkedOutBy = checkedOutBy ?? "";
             htmlFormXmlNode.isSystem = isSystem ? true : false;
             htmlFormXmlNode.children = [];
-            htmlFormXmlNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormCode);
+            htmlFormXmlNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormXML);
             htmlFormXmlNode.filePath = "";
             htmlFormXmlNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -313,7 +339,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormCodeNode.checkedOutBy = checkedOutBy ?? "";
             htmlFormCodeNode.isSystem = isSystem ? true : false;
             htmlFormCodeNode.children = [];
-            htmlFormCodeNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormCode);
+            htmlFormCodeNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormGuide);
             htmlFormCodeNode.filePath = "";
             htmlFormCodeNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -335,7 +361,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             xfdFormsCatNode.children = [];
-            xfdFormsCatNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+            xfdFormsCatNode.iconPath = this.getIconForType(EnterpriseItemType.XFDFormCategory);
             xfdFormsCatNode.language = "";
             xfdFormsCatNode.guid = "";
             xfdFormsCatNode.checkedOutBy = "";
@@ -363,7 +389,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             xfdFormXmlNode.checkedOutBy = checkedOutBy ?? "";
             xfdFormXmlNode.isSystem = isSystem ? true : false;
             xfdFormXmlNode.children = [];
-            xfdFormXmlNode.iconPath = this.getIconForType(EnterpriseItemType.XFDFormCode);
+            xfdFormXmlNode.iconPath = this.getIconForType(EnterpriseItemType.XFDFormXML);
             xfdFormXmlNode.filePath = "";
             xfdFormXmlNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -412,7 +438,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             appServerScriptsNode.children = [];
-            appServerScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+            appServerScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.AppServerScriptCategory);
             appServerScriptsNode.language = "";
             appServerScriptsNode.guid = "";
             appServerScriptsNode.checkedOutBy = "";
@@ -464,7 +490,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             appClientScriptsNode.children = [];
-            appClientScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+            appClientScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.AppClientScriptCategory);
             appClientScriptsNode.language = "";
             appClientScriptsNode.guid = "";
             appClientScriptsNode.checkedOutBy = "";
@@ -516,7 +542,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             appDataSourcesNode.children = [];
-            appDataSourcesNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+            appDataSourcesNode.iconPath = this.getIconForType(EnterpriseItemType.AppDataSourceCategory);
             appDataSourcesNode.language = "";
             appDataSourcesNode.guid = "";
             appDataSourcesNode.checkedOutBy = "";
@@ -569,7 +595,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           serverScriptsNode.children = [];
-          serverScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.EnterpriseCategory);
+          serverScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.ServerScriptCategory);
           serverScriptsNode.language = "";
           serverScriptsNode.guid = "";
           serverScriptsNode.checkedOutBy = "";
@@ -594,7 +620,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           serverScriptCatNode.children = [];
-          serverScriptCatNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+          serverScriptCatNode.iconPath = this.getIconForType(EnterpriseItemType.ServerScriptCategory);
           serverScriptCatNode.language = "";
           serverScriptCatNode.guid = "";
           serverScriptCatNode.checkedOutBy = "";
@@ -646,7 +672,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           clientScriptsNode.children = [];
-          clientScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.EnterpriseCategory);
+          clientScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.ClientScriptCategory);
           clientScriptsNode.language = "";
           clientScriptsNode.guid = "";
           clientScriptsNode.checkedOutBy = "";
@@ -671,7 +697,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           clientScriptCatNode.children = [];
-          clientScriptCatNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+          clientScriptCatNode.iconPath = this.getIconForType(EnterpriseItemType.ClientScriptCategory);
           clientScriptCatNode.language = "";
           clientScriptCatNode.guid = "";
           clientScriptCatNode.checkedOutBy = "";
@@ -699,7 +725,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           clientScriptNode.checkedOutBy = checkedOutBy ?? "";
           clientScriptNode.isSystem = isSystem ? true : false;
           clientScriptNode.children = [];
-          clientScriptNode.iconPath = this.getIconForType(EnterpriseItemType.ServerScript);
+          clientScriptNode.iconPath = this.getIconForType(EnterpriseItemType.ClientScript);
           clientScriptNode.filePath = "";
           clientScriptNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -718,7 +744,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             label: "Data Sources",
             type: EnterpriseItemType.EnterpriseCategory,
             children: [],
-            iconPath: this.getIconForType(EnterpriseItemType.EnterpriseCategory),
+            iconPath: this.getIconForType(EnterpriseItemType.DataSourceCategory),
             language: "",
             uri: "/DataSources/",
             guid: "",
@@ -743,7 +769,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           dataSourceCatNode.children = [];
-          dataSourceCatNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+          dataSourceCatNode.iconPath = this.getIconForType(EnterpriseItemType.DataSourceCategory);
           dataSourceCatNode.language = "";
           dataSourceCatNode.guid = "";
           dataSourceCatNode.checkedOutBy = "";

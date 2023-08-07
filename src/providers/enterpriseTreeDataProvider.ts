@@ -16,6 +16,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   private service: Enterprise;
   private dataMode: string = "LOAD";
   private treeItems: TreeEnterpriseItem[] = [];
+  static service: any;
 
   constructor(enterpriseService: Enterprise) {
     this.service = enterpriseService;
@@ -220,23 +221,42 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     if (item.isFolder) {
       switch (item.type) {
         case EnterpriseItemType.EnterpriseCategory:
-          return new vscode.ThemeIcon("folder-opened");
+          switch (item.name) {
+            case "Applications":
+              return this.getCustomIcon("apps.svg");
+            case "Tables":
+              return this.getCustomIcon("db.svg");
+            case "Server Scripts":
+              return this.getCustomIcon("ssl_docs.svg");
+            case "Client Scripts":
+              return this.getCustomIcon("js_docs.svg");
+            case "Data Sources":
+              return this.getCustomIcon("sql_docs.svg");
+            case "Server Logs":
+              return new vscode.ThemeIcon("output");
+          }
         case EnterpriseItemType.Application:
           return this.getCustomIcon("app.svg");
         case EnterpriseItemType.AppCategory:
           return this.getCustomIcon("apps.svg");
         case EnterpriseItemType.AppClientScriptCategory:
-          return this.getCustomIcon("javascript.svg");
+          return this.getCustomIcon("js_docs.svg");
         case EnterpriseItemType.AppServerScriptCategory:
-          return this.getCustomIcon("ssl.svg");
+          return this.getCustomIcon("ssl_docs.svg");
         case EnterpriseItemType.AppDataSourceCategory:
-          return this.getCustomIcon("sql.svg");
+          return this.getCustomIcon("sql_docs.svg");
         case EnterpriseItemType.XFDFormCategory:
-          return this.getCustomIcon("xfd.svg");
+          return this.getCustomIcon("xfd_form.svg");
         case EnterpriseItemType.HTMLFormCategory:
           return this.getCustomIcon("html5.svg");
         case EnterpriseItemType.TableCategory:
           return vscode.ThemeIcon.Folder;
+        case EnterpriseItemType.ClientScriptCategory:
+          return this.getCustomIcon("js_docs.svg");
+        case EnterpriseItemType.DataSourceCategory:
+          return this.getCustomIcon("sql_docs.svg");
+        case EnterpriseItemType.ServerScriptCategory:
+          return this.getCustomIcon("ssl_docs.svg");
         default:
           return new vscode.ThemeIcon("folder-opened");
       }
@@ -248,6 +268,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         case EnterpriseItemType.DataSource:
         case EnterpriseItemType.AppDataSource:
           return this.getCustomIcon("sql.svg");
+
         case EnterpriseItemType.Table:
           return this.getCustomIcon("db.svg");
 
@@ -258,14 +279,14 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         case EnterpriseItemType.AppClientScript:
         case EnterpriseItemType.HTMLFormCode:
         case EnterpriseItemType.XFDFormCode:
-          return this.getCustomIcon("javascript.svg");
+          return this.getCustomIcon("js.svg");
 
         case EnterpriseItemType.XFDFormXML:
         case EnterpriseItemType.HTMLFormXML:
           return this.getCustomIcon("xml.svg");
 
         case EnterpriseItemType.HTMLFormGuide:
-          return this.getCustomIcon("document.svg");
+          return this.getCustomIcon("json.svg");
 
         case EnterpriseItemType.ServerLog:
           return new vscode.ThemeIcon("output");
