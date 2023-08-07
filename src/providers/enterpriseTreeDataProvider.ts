@@ -16,6 +16,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   private service: Enterprise;
   private dataMode: string = "LOAD";
   private treeItems: TreeEnterpriseItem[] = [];
+  static service: any;
 
   constructor(enterpriseService: Enterprise) {
     this.service = enterpriseService;
