@@ -63,6 +63,7 @@ export class EnterpriseService implements Enterprise {
       } else {
         const outputChannel = vscode.window.createOutputChannel("STARLIMS");
         outputChannel.appendLine(data);
+        outputChannel.show();
         vscode.window.showErrorMessage("Backend API import ended with errors. See output for details.");
       }
       return data instanceof Object ? JSON.stringify(data) : data;

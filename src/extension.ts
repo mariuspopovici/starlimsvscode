@@ -119,7 +119,7 @@ export async function activate(context: vscode.ExtensionContext) {
       } 
 
       if (version !== apiVersion) {
-        const selection = await vscode.window.showWarningMessage('A new version of the STARLIMS VS Code API is available. Select Upgrade to deploy the new version.', 
+        const selection = await vscode.window.showInformationMessage(`A new version (${version}) of the STARLIMS VS Code API is available. Select Upgrade to deploy the new version.`, 
           'Upgrade', 'Continue');	
         if (selection === 'Upgrade') {
           const sdpPackage = context.asAbsolutePath("dist/SCM_API.sdp");
