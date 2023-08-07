@@ -2,7 +2,7 @@
 import fetch from "node-fetch";
 import { Headers } from "node-fetch";
 import * as vscode from "vscode";
-import { promises as fs } from "fs";
+import * as fs from "fs";
 import * as path from "path";
 import { Enterprise } from "./enterprise";
 import { connectBridge } from "../utilities/bridge";
@@ -25,6 +25,80 @@ export class EnterpriseService implements Enterprise {
   constructor(config: vscode.WorkspaceConfiguration) {
     this.config = config;
     this.baseUrl = cleanUrl(config.url);
+  }
+
+  /**
+   * Deploys the current version of the SCM_API.sdp on the STARLIMS server.
+   */
+  async upgradeBackend(sdpPackage: string) {
+    const url = `${this.baseUrl}/SCM_API.ImportPackage.lims`;
+    let stats: fs.Stats;
+    try {
+      stats = fs.statSync(sdpPackage);
+    } catch (e) {
+      vscode.window.showErrorMessage("Cannot access SCM_API.sdp");
+      return;
+    }
+    const readStream = fs.createReadStream(sdpPackage);
+
+    const headers = new Headers([
+      ["STARLIMSUser", this.config.user],
+      ["STARLIMSPass", this.config.password],
+      ["Accept", "*/*"],
+      ["Accept-Encoding", "gzip, deflate, br"],
+      ["Content-length", stats.size.toString()]
+    ]);
+
+    const options: any = {
+      method: "POST",
+      headers,
+      body: readStream
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("STARLIMS VS Code backend API upgraded successfully.");
+      } else {
+        const outputChannel = vscode.window.createOutputChannel("STARLIMS");
+        outputChannel.appendLine(data);
+        vscode.window.showErrorMessage("Backend API import ended with errors. See output for details.");
+      }
+      return data instanceof Object ? JSON.stringify(data) : data;
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Failed to execute HTTP call to remote service.");
+      console.error(e);
+      return;
+    }
+  }
+
+  /**
+   * Gets the extension backend API version.
+   */
+  async getVersion(): Promise<any> {
+    const url = `${this.baseUrl}/SCM_API.Version.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
+        return null;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not retrieve API version.");
+      console.error(e);
+      return null;
+    }
   }
 
   /**
@@ -326,12 +400,12 @@ export class EnterpriseService implements Enterprise {
       try {
         // create local folder if it does not exist
         const localFolder = path.dirname(localFilePath);
-        await fs.mkdir(localFolder, { recursive: true });
+        fs.mkdirSync(localFolder, { recursive: true });
 
         // comment out all occurences of '#include' for eslint to work
         item.code = item.code.replace(/^#include/gm, "//#include");
 
-        await fs.writeFile(localFilePath, item.code, {
+        fs.writeFileSync(localFilePath, item.code, {
           encoding: "utf8"
         });
 
@@ -614,7 +688,7 @@ export class EnterpriseService implements Enterprise {
         return null;
       }
     } catch (e: any) {
-      vscode.window.showErrorMessage("Could not delete item.");
+      vscode.window.showErrorMessage("Could not retrieve STARLIMS session info.");
       console.error(e);
       return null;
     }

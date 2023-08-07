@@ -114,3 +114,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.44] - 2023-07-29
 
 - fixed bug that prevented check in / check out from document of server scripts
+
+## [1.2.50] - 2023-08-05
+
+- added support for automatic upgrade of backend API
+- updated icons
+- added a new output channel for the STARLIMS server log
+- run script includes server log content in the output channel along with script result

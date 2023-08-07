@@ -30,7 +30,9 @@ DosSupport("MD", sImportFolder);
 FileSupport(sServerFile, "COPY", IIf(Right(sImportFolder, 1) == "\", sImportFolder, sImportFolder + "\") + sSDPFileName);
 
 :IF DoProc("Enterprise_Data_Providers.ImportProvider.UnpackSDPBatch", {sPackageId, sFileName}) == 0;   
-    DoProc("Enterprise_Data_Providers.ImportProvider.StartImportUpdater", {sPackageId, .F., .T.});
+    :DECLARE bImportInProductLayer;
+    bImportInProductLayer := GetSystemLayerId() == 200;
+    DoProc("Enterprise_Data_Providers.ImportProvider.StartImportUpdater", {sPackageId, .F., bImportInProductLayer});
     sImportLog := DoProc("Enterprise_Data_Providers.ImportProvider.GetPackageFile", {sPackageId, sPackageId + ".impexp_log"});
     oResponse:data := sImportLog;
     :IF (At("Import ended with errors.", sImportLog) > 0);
@@ -47,8 +49,8 @@ FileSupport(sServerFile, "COPY", IIf(Right(sImportFolder, 1) == "\", sImportFold
     Response:StatusCode := 400;
 	oResponse:success := .F.;
 	oResponse:data := "Unable to unpack the package .sdp file.";
-	:RETURN oResponse;
+	:RETURN ToJson(oResponse);
 :ENDIF;
 
 
-:RETURN oResponse;
+:RETURN ToJson(oResponse);
