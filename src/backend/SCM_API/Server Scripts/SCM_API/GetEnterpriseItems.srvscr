@@ -26,7 +26,7 @@ aEnterpriseCategories := {
 	{"Client Scripts", "CATEGORY", "N/A", sURI + "/ClientScripts", NIL, NIL},
 	{"Data Sources", "CATEGORY", "N/A", sURI + "/DataSources", NIL, NIL},
 	{"Tables", "CATEGORY", "N/A", sURI + "/Tables", NIL, NIL},
-	{"Server Log", "CATEGORY", "N/A", sURI + "/ServerLogs", NIL, NIL}
+	{"Server Logs", "CATEGORY", "N/A", sURI + "/ServerLogs", NIL, NIL}
 };
 
 aTablesSubCategories := {
