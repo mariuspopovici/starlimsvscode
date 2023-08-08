@@ -33,7 +33,7 @@ oResponse := CreateUDObject({
 :ENDIF;
 
 nLayerID := GetSystemLayerId();
-sSQL := "";
+sSQL := "select * from (";
 
 :IF sItemType == "FORMCODEBEHIND" .OR. Empty(sItemType);
 sSQL += "select
@@ -221,7 +221,9 @@ sSQL += "select
 	s.SCRIPTID as guid
 	from LIMSSERVERSCRIPTCATEGORIES c
 	join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	left join LIMSAPPSERVERSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'
+	and aps.SCRIPTID is null";
 	
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -245,7 +247,9 @@ sSQL += "select
 	s.DATASOURCEID as guid
 	from LIMSDATASOURCECATEGORIES c
 	join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
-	where s.DSNAME like '%" + limsstring(sItemName) + "%'";
+	left join LIMSAPPDATASOURCES aps on aps.DATASOURCEID = s.DATASOURCEID
+	where s.DSNAME like '%" + limsstring(sItemName) + "%'
+	and aps.DATASOURCEID is null";
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -269,7 +273,9 @@ sSQL += "select
 	s.SCRIPTID as guid
 	from LIMSCLIENTSCRIPTCATEGORIES c
 	join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	left join LIMSAPPCLIENTSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'
+	and aps.SCRIPTID is null";
 	
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -278,7 +284,44 @@ sSQL += "select
 	sSQL += " and s.LAYERID = ?nLayerID?";
 :ENDIF;
 
-sSQL += " order by 3";
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
+
+:IF sItemType == "TABLE" .OR. Empty(sItemType);
+	sSQL += "select
+	TABLENAME as name,
+	'TABLE' as type,
+	'/Tables/Dictionary/' + TABLENAME as uri,
+	CHECKEDOUTBY as checkedOutBy,
+	'' as language,
+	'N' as isFolder,
+	TABLEID as guid
+	from LIMSTABLES
+	where TABLENAME like '%" + limsstring(sItemName) + "%'
+	and upper(ISSYSTEM) = 'Y' 
+	and TABLENAME not like 'LIMS%'
+	and LAYERID = ?nLayerID?
+	
+	union
+	
+	select
+	TABLENAME as name,
+	'TABLE' as type,
+	'/Tables/Database/' + TABLENAME as uri,
+	CHECKEDOUTBY as checkedOutBy,
+	'' as language,
+	'N' as isFolder,
+	TABLEID as guid
+	from LIMSTABLES
+	where TABLENAME like '%" + limsstring(sItemName) + "%'
+	and upper(ISSYSTEM) = 'N'
+	and TABLENAME not like 'LIMS%'
+	and LAYERID = ?nLayerID?";
+:ENDIF;
+
+/* remove the types from uri before ordering;
+sSQL += ") t order by REPLACE(REPLACE(REPLACE(REPLACE(t.uri, '/HTMLForms', ''), '/XML', ''), '/Guide', ''), '/CodeBehind', ''), t.name";
 
 aItems := SQLexecute(sSQL, "Dictionary");
 
