@@ -281,6 +281,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         case EnterpriseItemType.AppServerScript:
           return this.getCustomIcon("ssl.svg");
 
+        case EnterpriseItemType.ClientScript:
         case EnterpriseItemType.AppClientScript:
         case EnterpriseItemType.HTMLFormCode:
         case EnterpriseItemType.XFDFormCode:
