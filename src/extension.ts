@@ -607,7 +607,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
       executeWithProgress(async () => {
         await enterpriseProvider.search(itemName, "", false);
-      }, "Searching STARLIMS enterprise...");
+      }, "Searching STARLIMS Enterprise...");
     }  
   );
 
