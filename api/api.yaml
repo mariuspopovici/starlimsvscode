@@ -285,6 +285,82 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalError"
+  /SCM_API.GetItemGUID.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: |
+        The `SCM_API.GetItemGUID.lims` endpoint returns the GUID of the item refererenced in the specified URI path.
+      operationId: GetItemGUID
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the code item to retrieve.
+          example: /Applications/TestApplications/MyApp/HTML Forms/Form1
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: The GUID of the requested item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GUIDResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.Version.lims:
+    get:
+      tags:
+        - "Extension Management"
+      description: |
+        The `SCM_API.Version.lims` endpoint returns the STARLIMS VS Code API version number.
+      responses:
+        "200":
+          description: The current version number installed on the server.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.ImportPackage.lims:
+    post:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.ImportPackage.lims` endpoint imports / deploys a STARLIMS .sdp package.
+      operationId: ImportPackage
+      requestBody:
+        description: The package binary content.
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        "200":
+          description: The import success status and import log contents.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportPackageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /SCM_API.GetEnterpriseItems.lims:
     get:
       tags:
@@ -317,6 +393,114 @@ paths:
                 $ref: "#/components/schemas/EnterpriseItemList"
         "500":
           $ref: "#/components/responses/InternalError"
+  /SCM_API.GetCheckedOutItems.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.GetCheckedOutItems.lims` endpoint returns and XML dataset with a list of checked out code items.
+      operationId: GetCheckedOutItems
+      parameters:
+        - in: query
+          name: allUsers
+          schema:
+            type: string
+          description: Set to ```true``` when requesting checked out items from all users
+          example: true
+          required: false
+      responses:
+        "200":
+          description: The operation response (success status and error or results).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckedOutItemsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /SCM_API.TableDefinition.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: |
+        The `SCM_API.TableDefinition.lims` endpoint returns table schema information for the table in the specified URI path.
+      operationId: TableDefinition
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the table item to retrieve.
+          example: /Tables/Database/FOLDERS
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: |
+            The schema definition of the requested item.
+            An array of arrays with the following column structure:
+              ["Field Name", "Caption", "Data Type", "Field Size", "Allow Nulls", "Default", "Notes", "Sorter"]
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableDefinitionResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /SCM_API.TableCommand.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: |
+        The `SCM_API.TableCommand.lims` endpoint returns SQL statements for SELECT, DELETE, UPDATE, INSERT operations on the specified table.
+      operationId: TableCommand
+      parameters:
+        - in: query
+          name: URI
+          schema:
+            type: string
+          description: The URI indicating the table item.
+          example: /Tables/Database/FOLDERS
+          required: true
+        - in: query
+          name: CommandType
+          schema:
+            type: string
+            enum:
+              - SELECT, DELETE, UPDATE, INSERT
+          description: The SQL command type.
+          example: SELECT
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: A SQL command for the specified operation type.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableCommandResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
 components:
   schemas:
     Response:
@@ -329,6 +513,23 @@ components:
           type: boolean
         Result:
           type: string
+    TableCommandResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: string
+          example: select ORIGREC, FOLDERNO from FOLDERS where FOLDERNO=?
+    CheckedOutItemsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: string
     SearchResponse:
       type: object
       properties:
@@ -340,7 +541,7 @@ components:
           properties:
             items:
               type: array
-              items: 
+              items:
                 $ref: "#/components/schemas/SearchItem"
     SearchItem:
       type: object
@@ -357,7 +558,7 @@ components:
         language:
           type: string
           example: SQL
-        isFolder: 
+        isFolder:
           type: boolean
           example: false
         guid:
@@ -370,8 +571,8 @@ components:
           type: boolean
         data:
           type: string
-          example: 
-          description: empty string if successful or an error message otherwise.          
+          example:
+          description: empty string if successful or an error message otherwise.
     SaveCodeRequest:
       required:
         - URI
@@ -459,7 +660,7 @@ components:
           type: string
           description: Code item category name
           example: ClinicalApplications
-        AppName: 
+        AppName:
           type: string
           description: Application name
           example: ClinicalLogin
@@ -493,6 +694,32 @@ components:
         data:
           type: string
           description: The return value of the remote script execution.
+    GUIDResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          description: The code item GUID.
+          example: 517ff7dd-e2e9-4896-a7c4-a6b38feb2c03
+    VersionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          description: The API version number.
+          example: 1.2.49
+    ImportPackageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: string
+          description: The import package log output.
     CodeResponse:
       type: object
       properties:
@@ -516,6 +743,17 @@ components:
                 - JS
                 - XML
                 - SLSQL
+    TableDefinitionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
     EnterpriseItemList:
       properties:
         success:
