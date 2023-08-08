@@ -49,7 +49,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     else {
       if (bSilent === false) {
         this.dataMode = "SEARCH";
-        this.treeItems = resultItems;
+        this.treeItems = await this.buildTreeFromSearchResults(resultItems);
         this._onDidChangeTreeData.fire(null);
 
         // wait for the tree to be refreshed
@@ -70,15 +70,15 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
   /**
    *  Returns the children of the given element.
-   * @param element The element to return the children for.
+   * @param item The element to return the children for.
    * @returns The children of the given element.
    */
-  public async getChildren(element?: TreeEnterpriseItem): Promise<TreeEnterpriseItem[]> {
+  public async getChildren(item?: TreeEnterpriseItem): Promise<TreeEnterpriseItem[]> {
     var returnItems: TreeEnterpriseItem[] = [];
     let treeItems: TreeEnterpriseItem[] | undefined;
 
     // if no element is passed, start from root
-    var uri: string = element ? element.uri : "";
+    var uri: string = item ? item.uri : "";
 
     // add mode - get all enterprise items
     if (this.dataMode === "LOAD") {
@@ -94,7 +94,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
       if (this.treeItems.length === 0) {
         throw new Error("No items found!");
       }
-      treeItems = this.treeItems;
+      return (item && Promise.resolve(item.children ?? [])) || Promise.resolve(this.treeItems);
     }
     if (treeItems === undefined) {
       throw new Error("No items found!");
@@ -204,6 +204,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     return resourceUri;
   }
 
+  /**
+   *  Returns a custom icon for the item.
+   * @param icon The name of the icon in the resources folder.
+   * @returns  A custom icon for the item.
+   */
   private getCustomIcon(icon: string): any {
     return {
       light: path.join(__filename, "..", "..", "resources", "light", icon),
@@ -294,6 +299,648 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           return new vscode.ThemeIcon("folder-opened");
       }
     }
+  }
+
+  /**
+   * Get icon for type
+   * @param type The type of the item to get the icon for
+   * @returns The icon for the type
+   */
+  private getIconForType(type: EnterpriseItemType, isFolder: boolean): any {
+    // create dummy item to call getItemIcon
+    const item = {
+      type: type,
+      isFolder: isFolder,
+      name: ""
+    };
+    return this.getItemIcon(item);
+  }
+
+  /**
+   * Build a tree from a list of uris.
+   * @param uris The uris to build the tree from.
+   * @returns The tree.
+   */
+  private async buildTreeFromSearchResults(searchResult: TreeEnterpriseItem[]): Promise<TreeEnterpriseItem[]> {
+    // loop through the items and create new tree items
+    const _this = this;
+    let returnItems: TreeEnterpriseItem[] = [];
+
+    // loop over search results
+    for (let item of searchResult) {
+      let uriParts = item.uri.substring(1, item.uri.length).split("/");
+
+      // node is part from application
+      if (uriParts[0] === "Applications") {
+        var rootAppNode: TreeEnterpriseItem | undefined =
+          returnItems.find((item) => item.label === "Applications") as TreeEnterpriseItem;
+
+        // create "Applications" node
+        if (!rootAppNode) {
+          rootAppNode = new TreeEnterpriseItem(
+            EnterpriseItemType.EnterpriseCategory,
+            "Applications",
+            "",
+            "/Applications/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          rootAppNode.children = [];
+          rootAppNode.iconPath = _this.getIconForType(rootAppNode.type, true);
+          rootAppNode.language = "";
+          rootAppNode.guid = "";
+          rootAppNode.checkedOutBy = "";
+          rootAppNode.filePath = "";
+          rootAppNode.isSystem = false;
+
+          returnItems.push(rootAppNode);
+        }
+
+        // application category name
+        var appCatName = uriParts[1];
+
+        // create Application Category node if it doesn't exist
+        var appCatNode: TreeEnterpriseItem | undefined = rootAppNode?.children?.find(
+          (item: TreeEnterpriseItem) => item.label === appCatName
+        );
+
+        if (!appCatNode) {
+          appCatNode = new TreeEnterpriseItem(
+            EnterpriseItemType.AppCategory,
+            appCatName ?? "",
+            "",
+            "/Applications/" + uriParts[1] + "/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          appCatNode.children = [];
+          appCatNode.iconPath = _this.getIconForType(appCatNode.type, true);
+
+          rootAppNode?.children?.push(appCatNode as TreeEnterpriseItem);
+        }
+
+        // get application name
+        var appName = uriParts[2];
+
+        // create Application node
+        var appNode: TreeEnterpriseItem | undefined = appCatNode?.children?.find(
+          (item: TreeEnterpriseItem) => item.label === appName
+        );
+
+        if (!appNode) {
+          appNode = new TreeEnterpriseItem(
+            EnterpriseItemType.Application,
+            appName ?? "",
+            "",
+            "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          appNode.children = [];
+          appNode.iconPath = _this.getIconForType(appNode.type, true);
+
+          appCatNode?.children?.push(appNode as TreeEnterpriseItem);
+        }
+
+        // create "HTML Forms" node and sub nodes
+        if (uriParts[3] === "HTMLForms") {
+          var htmlFormsNode: TreeEnterpriseItem | undefined = appNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "HTML Forms"
+          );
+
+          // node not found, create it
+          if (!htmlFormsNode) {
+            htmlFormsNode = new TreeEnterpriseItem(
+              EnterpriseItemType.HTMLFormCategory,
+              "HTML Forms",
+              "",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/HTMLForms/",
+              vscode.TreeItemCollapsibleState.Expanded
+            );
+
+            htmlFormsNode.children = [];
+            htmlFormsNode.iconPath = _this.getIconForType(htmlFormsNode.type, true);
+
+            appNode?.children?.push(htmlFormsNode);
+          }
+
+          // create actual code behind node (not category)
+          var codeBehindNode: TreeEnterpriseItem | undefined = htmlFormsNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "Code Behind"
+          );
+
+          // node not found, create it
+          if (!codeBehindNode && uriParts[4] === "CodeBehind") {
+            codeBehindNode = new TreeEnterpriseItem(
+              EnterpriseItemType.HTMLFormCode,
+              uriParts[5] + " [Code Behind]" ?? "",
+              "JS",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/HTMLForms/CodeBehind/" + uriParts[5],
+              vscode.TreeItemCollapsibleState.None
+            );
+
+            codeBehindNode.children = [];
+            codeBehindNode.iconPath = _this.getIconForType(codeBehindNode.type, false);
+            codeBehindNode.guid = item.guid;
+            codeBehindNode.checkedOutBy = item.checkedOutBy;
+            codeBehindNode.filePath = item.filePath;
+            codeBehindNode.isSystem = item.isSystem;
+            codeBehindNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [codeBehindNode]
+            };
+
+            htmlFormsNode?.children?.push(codeBehindNode);
+          }
+
+          // create HTML Form XML node
+          var htmlFormXMLNode: TreeEnterpriseItem | undefined = htmlFormsNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "XML"
+          );
+
+          // node not found, create it
+          if (!htmlFormXMLNode && uriParts[4] === "XML") {
+            htmlFormXMLNode = new TreeEnterpriseItem(
+              EnterpriseItemType.HTMLFormXML,
+              uriParts[5] + " [XML]" ?? "",
+              "XML",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/HTMLForms/XML/" + uriParts[5],
+              vscode.TreeItemCollapsibleState.None
+            );
+
+            htmlFormXMLNode.children = [];
+            htmlFormXMLNode.iconPath = _this.getIconForType(htmlFormXMLNode.type, false);
+            htmlFormXMLNode.guid = item.guid;
+            htmlFormXMLNode.checkedOutBy = item.checkedOutBy;
+            htmlFormXMLNode.filePath = item.filePath;
+            htmlFormXMLNode.isSystem = item.isSystem;
+            htmlFormXMLNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [htmlFormXMLNode]
+            };
+
+            htmlFormsNode?.children?.push(htmlFormXMLNode);
+          }
+
+          // create HTML Form Guide node
+          var htmlFormGuideNode: TreeEnterpriseItem | undefined = htmlFormsNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "Guide"
+          );
+
+          // node not found, create it
+          if (!htmlFormGuideNode && uriParts[4] === "Guide") {
+            htmlFormGuideNode = new TreeEnterpriseItem(
+              EnterpriseItemType.HTMLFormGuide,
+              uriParts[5] + " [Guide]" ?? "",
+              "JSON",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/HTMLForms/Guide/" + uriParts[5],
+              vscode.TreeItemCollapsibleState.None
+            );
+
+            htmlFormGuideNode.children = [];
+            htmlFormGuideNode.iconPath = _this.getIconForType(htmlFormGuideNode.type, false);
+            htmlFormGuideNode.guid = item.guid;
+            htmlFormGuideNode.checkedOutBy = item.checkedOutBy;
+            htmlFormGuideNode.filePath = item.filePath;
+            htmlFormGuideNode.isSystem = item.isSystem;
+            htmlFormGuideNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [htmlFormGuideNode]
+            };
+
+            htmlFormsNode?.children?.push(htmlFormGuideNode);
+          }
+        }
+
+        // create "XFD Forms" node and sub nodes
+        if (uriParts[3] === "XFDForms") {
+          var xfdFormsNode: TreeEnterpriseItem | undefined = appNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "XFD Forms"
+          );
+
+          // create "XFD Forms" node if "XFDForms" in uri
+          if (!xfdFormsNode) {
+            xfdFormsNode = new TreeEnterpriseItem(
+              EnterpriseItemType.EnterpriseCategory,
+              "XFD Forms",
+              "",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/XFDForms/",
+              vscode.TreeItemCollapsibleState.Expanded
+            );
+
+            xfdFormsNode.children = [];
+            xfdFormsNode.iconPath = _this.getIconForType(EnterpriseItemType.XFDFormCategory, true);
+
+            appNode?.children?.push(xfdFormsNode);
+
+            // create actual code behind node
+            let xfdCodeBehindNode: TreeEnterpriseItem | undefined = xfdFormsNode?.children?.find(
+              (item: TreeEnterpriseItem) => item.label === "Code Behind"
+            );
+
+            // node not found, create it
+            if (!xfdCodeBehindNode && uriParts[4] === "CodeBehind") {
+              xfdCodeBehindNode = new TreeEnterpriseItem(
+                EnterpriseItemType.XFDFormCode,
+                uriParts[5] + " [Code Behind]" ?? "",
+                "JS",
+                "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/XFDForms/CodeBehind/" + uriParts[5],
+                vscode.TreeItemCollapsibleState.None
+              );
+
+              xfdCodeBehindNode.children = [];
+              xfdCodeBehindNode.iconPath = _this.getIconForType(xfdCodeBehindNode.type, false);
+              xfdCodeBehindNode.guid = item.guid;
+              xfdCodeBehindNode.checkedOutBy = item.checkedOutBy;
+              xfdCodeBehindNode.filePath = item.filePath;
+              xfdCodeBehindNode.isSystem = item.isSystem;
+              xfdCodeBehindNode.command = {
+                command: "STARLIMS.selectEnterpriseItem",
+                title: "Open Item",
+                arguments: [xfdCodeBehindNode]
+              };
+
+              xfdFormsNode?.children?.push(xfdCodeBehindNode);
+            }
+
+            // create XFD Form XML node
+            let xfdFormXMLNode: TreeEnterpriseItem | undefined = xfdFormsNode?.children?.find(
+              (item: TreeEnterpriseItem) => item.label === "XML"
+            );
+
+            // node not found, create it
+            if (!xfdFormXMLNode && uriParts[4] === "XML") {
+              xfdFormXMLNode = new TreeEnterpriseItem(
+                EnterpriseItemType.XFDFormXML,
+                uriParts[5] + " [XML]" ?? "",
+                "XML",
+                "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/XFDForms/XML/" + uriParts[5],
+                vscode.TreeItemCollapsibleState.None
+              );
+
+              xfdFormXMLNode.children = [];
+              xfdFormXMLNode.iconPath = _this.getIconForType(xfdFormXMLNode.type, false);
+              xfdFormXMLNode.guid = item.guid;
+              xfdFormXMLNode.checkedOutBy = item.checkedOutBy;
+              xfdFormXMLNode.filePath = item.filePath;
+              xfdFormXMLNode.isSystem = item.isSystem;
+              xfdFormXMLNode.command = {
+                command: "STARLIMS.selectEnterpriseItem",
+                title: "Open Item",
+                arguments: [xfdFormXMLNode]
+              };
+
+              xfdFormsNode?.children?.push(xfdFormXMLNode);
+            }
+          }
+        }
+
+        // create "Server Scripts" node and sub nodes
+        if (uriParts[3] === "ServerScripts") {
+          var appServerScriptsNode: TreeEnterpriseItem | undefined = appNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "Server Scripts"
+          );
+
+          // not found, create it
+          if (!appServerScriptsNode) {
+            appServerScriptsNode = new TreeEnterpriseItem(
+              EnterpriseItemType.AppServerScriptCategory,
+              "Server Scripts",
+              "",
+              `/Applications/${appCatName}/${appName}/ServerScripts/`,
+              vscode.TreeItemCollapsibleState.Expanded
+            );
+
+            appServerScriptsNode.children = [];
+            appServerScriptsNode.iconPath = _this.getIconForType(appServerScriptsNode.type, true);
+
+            appNode?.children?.push(appServerScriptsNode);
+          }
+
+          // create actual app server script node for XFD form
+          let appServerScriptNode = new TreeEnterpriseItem(
+            EnterpriseItemType.AppServerScript,
+            uriParts[4],
+            "SSL",
+            `/Applications/${appCatName}/${appName}/ServerScripts/${uriParts[4]}`,
+            vscode.TreeItemCollapsibleState.None
+          );
+
+          appServerScriptNode.children = [];
+          appServerScriptNode.iconPath = _this.getIconForType(appServerScriptNode.type, false);
+          appServerScriptNode.guid = item.guid;
+          appServerScriptNode.checkedOutBy = item.checkedOutBy;
+          appServerScriptNode.filePath = item.filePath;
+          appServerScriptNode.isSystem = item.isSystem;
+          appServerScriptNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [appServerScriptNode]
+          };
+
+          appServerScriptsNode?.children?.push(appServerScriptNode);
+        }
+
+        // create "Client Scripts" node and sub nodes
+        if (uriParts[3] === "ClientScripts") {
+          let appClientScriptsNode: TreeEnterpriseItem | undefined = appNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "Client Scripts"
+          );
+
+          // not found, create it
+          if (!appClientScriptsNode) {
+            appClientScriptsNode = new TreeEnterpriseItem(
+              EnterpriseItemType.AppClientScriptCategory,
+              "Client Scripts",
+              "",
+              `/Applications/${appCatName}/${appName}/ClientScripts/`,
+              vscode.TreeItemCollapsibleState.Expanded
+            );
+
+            appClientScriptsNode.children = [];
+            appClientScriptsNode.iconPath = _this.getIconForType(appClientScriptsNode.type, true);
+
+            appNode?.children?.push(appClientScriptsNode);
+          }
+
+          // create actual app client script node for XFD form
+          let appClientScriptNode = new TreeEnterpriseItem(
+            EnterpriseItemType.AppClientScript,
+            uriParts[4],
+            "JS",
+            `/Applications/${appCatName}/${appName}/ClientScripts/${uriParts[4]}`,
+            vscode.TreeItemCollapsibleState.None
+          );
+
+          appClientScriptNode.children = [];
+          appClientScriptNode.iconPath = _this.getIconForType(appClientScriptNode.type, false);
+          appClientScriptNode.guid = item.guid;
+          appClientScriptNode.checkedOutBy = item.checkedOutBy;
+          appClientScriptNode.filePath = item.filePath;
+          appClientScriptNode.isSystem = item.isSystem;
+          appClientScriptNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [appClientScriptNode]
+          };
+
+          appClientScriptsNode?.children?.push(appClientScriptNode);
+        }
+
+        // create "Data Sources" node and sub nodes
+        if (uriParts[3] === "DataSources") {
+          let appDataSourcesNode: TreeEnterpriseItem | undefined = appNode?.children?.find(
+            (item: TreeEnterpriseItem) => item.label === "Data Sources"
+          );
+
+          // not found, create it
+          if (!appDataSourcesNode) {
+            appDataSourcesNode = new TreeEnterpriseItem(
+              EnterpriseItemType.AppDataSourceCategory,
+              "Data Sources",
+              "",
+              `/Applications/${appCatName}/${appName}/DataSources/`,
+              vscode.TreeItemCollapsibleState.Expanded
+            );
+
+            appDataSourcesNode.children = [];
+            appDataSourcesNode.iconPath = _this.getIconForType(appDataSourcesNode.type, true);
+
+            appNode?.children?.push(appDataSourcesNode);
+          }
+
+          // create actual app data source node for XFD form
+          let appDataSourceNode = new TreeEnterpriseItem(
+            EnterpriseItemType.AppDataSource,
+            uriParts[4],
+            "SQL",
+            `/Applications/${appCatName}/${appName}/DataSources/${uriParts[4]}`,
+            vscode.TreeItemCollapsibleState.None
+          );
+
+          appDataSourceNode.children = [];
+          appDataSourceNode.iconPath = _this.getIconForType(appDataSourceNode.type, false);
+          appDataSourceNode.guid = item.guid;
+          appDataSourceNode.checkedOutBy = item.checkedOutBy;
+          appDataSourceNode.filePath = item.filePath;
+          appDataSourceNode.isSystem = item.isSystem;
+          appDataSourceNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [appDataSourceNode]
+          };
+
+          appDataSourcesNode?.children?.push(appDataSourceNode);
+        }
+      }
+
+      // create global "Server Scripts" node
+      if (uriParts[0] === "ServerScripts") {
+
+        let glbServerScriptsNode: TreeEnterpriseItem | undefined = returnItems.find(
+          (item) => item.label === "Server Scripts"
+        );
+
+        // node not found, create it
+        if (!glbServerScriptsNode) {
+          glbServerScriptsNode = new TreeEnterpriseItem(
+            EnterpriseItemType.EnterpriseCategory,
+            "Server Scripts",
+            "",
+            "/ServerScripts/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          glbServerScriptsNode.children = [];
+          glbServerScriptsNode.iconPath = _this.getIconForType(glbServerScriptsNode.type, true);
+
+          returnItems.push(glbServerScriptsNode);
+        }
+
+        // create server scripts category node
+        let glbServerScriptCatNode: TreeEnterpriseItem | undefined = glbServerScriptsNode?.children?.find(
+          (item) => item.label === uriParts[1]
+        );
+
+        // node not found, create it
+        if (!glbServerScriptCatNode) {
+          glbServerScriptCatNode = new TreeEnterpriseItem(
+            EnterpriseItemType.ServerScriptCategory,
+            uriParts[1],
+            "",
+            "/ServerScripts/" + uriParts[1] + "/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          glbServerScriptCatNode.children = [];
+          glbServerScriptCatNode.iconPath = _this.getIconForType(glbServerScriptCatNode.type, true);
+
+          glbServerScriptsNode?.children?.push(glbServerScriptCatNode);
+        }
+
+        // create actual global server script node
+        let glbServerScriptNode = new TreeEnterpriseItem(
+          EnterpriseItemType.ServerScript,
+          uriParts[2],
+          "SSL",
+          "/ServerScripts/" + uriParts[1] + "/" + uriParts[2],
+          vscode.TreeItemCollapsibleState.None
+        );
+
+        glbServerScriptNode.children = [];
+        glbServerScriptNode.iconPath = _this.getIconForType(glbServerScriptNode.type, false);
+        glbServerScriptNode.guid = item.guid;
+        glbServerScriptNode.checkedOutBy = item.checkedOutBy;
+        glbServerScriptNode.filePath = item.filePath;
+        glbServerScriptNode.isSystem = item.isSystem;
+        glbServerScriptNode.command = {
+          command: "STARLIMS.selectEnterpriseItem",
+          title: "Open Item",
+          arguments: [glbServerScriptNode]
+        };
+
+        glbServerScriptCatNode?.children?.push(glbServerScriptNode);
+      }
+
+      // create global "Client Scripts" node
+      if (uriParts[0] === "ClientScripts") {
+        let glbClientScriptsNode: TreeEnterpriseItem | undefined = returnItems.find(
+          (item) => item.label === "Client Scripts"
+        );
+
+        // node not found, create it
+        if (!glbClientScriptsNode) {
+          glbClientScriptsNode = new TreeEnterpriseItem(
+            EnterpriseItemType.EnterpriseCategory,
+            "Client Scripts",
+            "",
+            "/ClientScripts/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          glbClientScriptsNode.children = [];
+          glbClientScriptsNode.iconPath = _this.getIconForType(glbClientScriptsNode.type, true);
+
+          returnItems.push(glbClientScriptsNode);
+        }
+
+        // create client scripts category node
+        let glbClientScriptCatNode: TreeEnterpriseItem | undefined = glbClientScriptsNode?.children?.find(
+          (item) => item.label === uriParts[1]
+        );
+
+        // node not found, create it
+        if (!glbClientScriptCatNode) {
+          glbClientScriptCatNode = new TreeEnterpriseItem(
+            EnterpriseItemType.ClientScriptCategory,
+            uriParts[1],
+            "",
+            "/ClientScripts/" + uriParts[1] + "/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          glbClientScriptCatNode.children = [];
+          glbClientScriptCatNode.iconPath = _this.getIconForType(glbClientScriptCatNode.type, true);
+
+          glbClientScriptsNode?.children?.push(glbClientScriptCatNode);
+        }
+
+        // create actual global client script node
+        let glbClientScriptNode = new TreeEnterpriseItem(
+          EnterpriseItemType.ClientScript,
+          uriParts[2],
+          "JS",
+          "/ClientScripts/" + uriParts[1] + "/" + uriParts[2],
+          vscode.TreeItemCollapsibleState.None
+        );
+
+        glbClientScriptNode.children = [];
+        glbClientScriptNode.iconPath = _this.getIconForType(glbClientScriptNode.type, false);
+        glbClientScriptNode.guid = item.guid;
+        glbClientScriptNode.checkedOutBy = item.checkedOutBy;
+        glbClientScriptNode.filePath = item.filePath;
+        glbClientScriptNode.isSystem = item.isSystem;
+        glbClientScriptNode.command = {
+          command: "STARLIMS.selectEnterpriseItem",
+          title: "Open Item",
+          arguments: [glbClientScriptNode]
+        };
+
+        glbClientScriptCatNode?.children?.push(glbClientScriptNode);
+      }
+
+      // create global "Data Sources" node
+      if (uriParts[0] === "DataSources") {
+        let glbDataSourcesNode: TreeEnterpriseItem | undefined = returnItems.find(
+          (item) => item.label === "Data Sources"
+        );
+
+        // node not found, create it
+        if (!glbDataSourcesNode) {
+          glbDataSourcesNode = new TreeEnterpriseItem(
+            EnterpriseItemType.EnterpriseCategory,
+            "Data Sources",
+            "",
+            "/DataSources/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          glbDataSourcesNode.children = [];
+          glbDataSourcesNode.iconPath = _this.getIconForType(glbDataSourcesNode.type, true);
+
+          returnItems.push(glbDataSourcesNode);
+        }
+
+        // create data sources category node
+        let glbDataSourceCatNode: TreeEnterpriseItem | undefined = glbDataSourcesNode?.children?.find(
+          (item) => item.label === uriParts[1]
+        );
+
+        // node not found, create it
+        if (!glbDataSourceCatNode) {
+          glbDataSourceCatNode = new TreeEnterpriseItem(
+            EnterpriseItemType.DataSourceCategory,
+            uriParts[1],
+            "",
+            "/DataSources/" + uriParts[1] + "/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          glbDataSourceCatNode.children = [];
+          glbDataSourceCatNode.iconPath = _this.getIconForType(glbDataSourceCatNode.type, true);
+
+          glbDataSourcesNode?.children?.push(glbDataSourceCatNode);
+        }
+
+        // create actual global data source node
+        let glbDataSourceNode = new TreeEnterpriseItem(
+          EnterpriseItemType.DataSource,
+          uriParts[2],
+          "SQL",
+          "/DataSources/" + uriParts[1] + "/" + uriParts[2],
+          vscode.TreeItemCollapsibleState.None
+        );
+
+        glbDataSourceNode.children = [];
+        glbDataSourceNode.iconPath = _this.getIconForType(glbDataSourceNode.type, false);
+        glbDataSourceNode.guid = item.guid;
+        glbDataSourceNode.checkedOutBy = item.checkedOutBy;
+        glbDataSourceNode.filePath = item.filePath;
+        glbDataSourceNode.isSystem = item.isSystem;
+        glbDataSourceNode.command = {
+          command: "STARLIMS.selectEnterpriseItem",
+          title: "Open Item",
+          arguments: [glbDataSourceNode]
+        };
+
+        glbDataSourceCatNode?.children?.push(glbDataSourceNode);
+      }
+    };
+
+    return returnItems;
   }
 }
 

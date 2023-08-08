@@ -284,7 +284,7 @@ sSQL += "select
 	sSQL += " and s.LAYERID = ?nLayerID?";
 :ENDIF;
 
-sSQL += " order by 3";
+sSQL += " order by 1,2";
 
 aItems := SQLexecute(sSQL, "Dictionary");
 
