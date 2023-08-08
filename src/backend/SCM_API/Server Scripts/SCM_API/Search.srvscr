@@ -221,7 +221,9 @@ sSQL += "select
 	s.SCRIPTID as guid
 	from LIMSSERVERSCRIPTCATEGORIES c
 	join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	left join LIMSAPPSERVERSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'
+	and aps.SCRIPTID is null";
 	
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -245,7 +247,9 @@ sSQL += "select
 	s.DATASOURCEID as guid
 	from LIMSDATASOURCECATEGORIES c
 	join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
-	where s.DSNAME like '%" + limsstring(sItemName) + "%'";
+	left join LIMSAPPDATASOURCES aps on aps.DATASOURCEID = s.DATASOURCEID
+	where s.DSNAME like '%" + limsstring(sItemName) + "%'
+	and aps.DATASOURCEID is null";
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -269,7 +273,9 @@ sSQL += "select
 	s.SCRIPTID as guid
 	from LIMSCLIENTSCRIPTCATEGORIES c
 	join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	left join LIMSAPPCLIENTSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
+	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'
+	and aps.SCRIPTID is null";
 	
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";

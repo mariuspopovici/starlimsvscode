@@ -1,7 +1,6 @@
 # Type: PowerShell Script
 # Description: Creates the SCM_API.sdp file for the backend
 
-
 # read the extension version from package.json
 $jsonData = Get-Content -Raw -Path "..\..\package.json" | ConvertFrom-Json
 $new_version = $jsonData.version
