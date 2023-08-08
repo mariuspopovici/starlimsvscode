@@ -142,6 +142,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @returns The parent of the given element or undefined if no element is passed.
    */
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
+    item.command = {
+      command: "STARLIMS.selectEnterpriseItem",
+      title: "Select Node",
+      arguments: [item]
+    };
     return item;
   }
 
@@ -398,7 +403,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.Application,
             appName ?? "",
             "",
-            "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/",
+            "/Applications/" + uriParts[1] + "/" + uriParts[2],
             vscode.TreeItemCollapsibleState.Expanded
           );
 
@@ -425,7 +430,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.HTMLFormCategory,
               "HTML Forms",
               "",
-              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/HTMLForms/",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/HTMLForms",
               vscode.TreeItemCollapsibleState.Expanded
             );
 
@@ -543,7 +548,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.EnterpriseCategory,
               "XFD Forms",
               "",
-              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/XFDForms/",
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/XFDForms",
               vscode.TreeItemCollapsibleState.Expanded
             );
 
@@ -631,7 +636,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.AppServerScriptCategory,
               "Server Scripts",
               "",
-              `/Applications/${appCatName}/${appName}/ServerScripts/`,
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/ServerScripts",
               vscode.TreeItemCollapsibleState.Expanded
             );
 
@@ -646,12 +651,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             appNode?.children?.push(appServerScriptsNode);
           }
 
-          // create actual app server script node for XFD form
+          // create actual app server script node
           let appServerScriptNode = new TreeEnterpriseItem(
             EnterpriseItemType.AppServerScript,
             uriParts[4],
             "SSL",
-            `/Applications/${appCatName}/${appName}/ServerScripts/${uriParts[4]}`,
+            "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/ServerScripts/" + uriParts[4],
             vscode.TreeItemCollapsibleState.None
           );
 
@@ -682,17 +687,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.AppClientScriptCategory,
               "Client Scripts",
               "",
-              `/Applications/${appCatName}/${appName}/ClientScripts/`,
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/ClientScripts",
               vscode.TreeItemCollapsibleState.Expanded
             );
 
             appClientScriptsNode.children = [];
             appClientScriptsNode.iconPath = _this.getIconForType(appClientScriptsNode.type, true);
-            appClientScriptsNode.command = {
-              command: "STARLIMS.selectEnterpriseItem",
-              title: "Open Item",
-              arguments: [appClientScriptsNode]
-            };
 
             appNode?.children?.push(appClientScriptsNode);
           }
@@ -702,21 +702,15 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.AppClientScript,
             uriParts[4],
             "JS",
-            `/Applications/${appCatName}/${appName}/ClientScripts/${uriParts[4]}`,
+            "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/ClientScripts/" + uriParts[4],
             vscode.TreeItemCollapsibleState.None
           );
 
-          appClientScriptNode.children = [];
           appClientScriptNode.iconPath = _this.getIconForType(appClientScriptNode.type, false);
           appClientScriptNode.guid = item.guid;
           appClientScriptNode.checkedOutBy = item.checkedOutBy;
           appClientScriptNode.filePath = item.filePath;
           appClientScriptNode.isSystem = item.isSystem;
-          appClientScriptNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [appClientScriptNode]
-          };
 
           appClientScriptsNode?.children?.push(appClientScriptNode);
         }
@@ -733,17 +727,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.AppDataSourceCategory,
               "Data Sources",
               "",
-              `/Applications/${appCatName}/${appName}/DataSources/`,
+              "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/DataSources",
               vscode.TreeItemCollapsibleState.Expanded
             );
 
             appDataSourcesNode.children = [];
             appDataSourcesNode.iconPath = _this.getIconForType(appDataSourcesNode.type, true);
-            appDataSourcesNode.command = {
-              command: "STARLIMS.selectEnterpriseItem",
-              title: "Open Item",
-              arguments: [appDataSourcesNode]
-            };
 
             appNode?.children?.push(appDataSourcesNode);
           }
@@ -753,7 +742,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.AppDataSource,
             uriParts[4],
             "SQL",
-            `/Applications/${appCatName}/${appName}/DataSources/${uriParts[4]}`,
+            "/Applications/" + uriParts[1] + "/" + uriParts[2] + "/DataSources/" + uriParts[4],
             vscode.TreeItemCollapsibleState.None
           );
 
@@ -763,11 +752,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           appDataSourceNode.checkedOutBy = item.checkedOutBy;
           appDataSourceNode.filePath = item.filePath;
           appDataSourceNode.isSystem = item.isSystem;
-          appDataSourceNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [appDataSourceNode]
-          };
 
           appDataSourcesNode?.children?.push(appDataSourceNode);
         }
@@ -786,17 +770,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.EnterpriseCategory,
             "Server Scripts",
             "",
-            "/ServerScripts/",
+            "/ServerScripts",
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           glbServerScriptsNode.children = [];
           glbServerScriptsNode.iconPath = _this.getIconForType(glbServerScriptsNode.type, true);
-          glbServerScriptsNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [glbServerScriptsNode]
-          };
 
           returnItems.push(glbServerScriptsNode);
         }
@@ -812,17 +791,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.ServerScriptCategory,
             uriParts[1],
             "",
-            "/ServerScripts/" + uriParts[1] + "/",
+            "/ServerScripts/" + uriParts[1],
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           glbServerScriptCatNode.children = [];
           glbServerScriptCatNode.iconPath = _this.getIconForType(glbServerScriptCatNode.type, true);
-          glbServerScriptCatNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [glbServerScriptCatNode]
-          };
 
           glbServerScriptsNode?.children?.push(glbServerScriptCatNode);
         }
@@ -842,11 +816,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         glbServerScriptNode.checkedOutBy = item.checkedOutBy;
         glbServerScriptNode.filePath = item.filePath;
         glbServerScriptNode.isSystem = item.isSystem;
-        glbServerScriptNode.command = {
-          command: "STARLIMS.selectEnterpriseItem",
-          title: "Open Item",
-          arguments: [glbServerScriptNode]
-        };
 
         glbServerScriptCatNode?.children?.push(glbServerScriptNode);
       }
@@ -863,17 +832,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.EnterpriseCategory,
             "Client Scripts",
             "",
-            "/ClientScripts/",
+            "/ClientScripts",
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           glbClientScriptsNode.children = [];
           glbClientScriptsNode.iconPath = _this.getIconForType(glbClientScriptsNode.type, true);
-          glbClientScriptsNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [glbClientScriptsNode]
-          };
 
           returnItems.push(glbClientScriptsNode);
         }
@@ -889,17 +853,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.ClientScriptCategory,
             uriParts[1],
             "",
-            "/ClientScripts/" + uriParts[1] + "/",
+            "/ClientScripts/" + uriParts[1],
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           glbClientScriptCatNode.children = [];
           glbClientScriptCatNode.iconPath = _this.getIconForType(glbClientScriptCatNode.type, true);
-          glbClientScriptCatNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [glbClientScriptCatNode]
-          };
 
           glbClientScriptsNode?.children?.push(glbClientScriptCatNode);
         }
@@ -919,11 +878,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         glbClientScriptNode.checkedOutBy = item.checkedOutBy;
         glbClientScriptNode.filePath = item.filePath;
         glbClientScriptNode.isSystem = item.isSystem;
-        glbClientScriptNode.command = {
-          command: "STARLIMS.selectEnterpriseItem",
-          title: "Open Item",
-          arguments: [glbClientScriptNode]
-        };
 
         glbClientScriptCatNode?.children?.push(glbClientScriptNode);
       }
@@ -940,17 +894,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.EnterpriseCategory,
             "Data Sources",
             "",
-            "/DataSources/",
+            "/DataSources",
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           glbDataSourcesNode.children = [];
           glbDataSourcesNode.iconPath = _this.getIconForType(glbDataSourcesNode.type, true);
-          glbDataSourcesNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [glbDataSourcesNode]
-          };
 
           returnItems.push(glbDataSourcesNode);
         }
@@ -966,17 +915,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.DataSourceCategory,
             uriParts[1],
             "",
-            "/DataSources/" + uriParts[1] + "/",
+            "/DataSources/" + uriParts[1],
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           glbDataSourceCatNode.children = [];
           glbDataSourceCatNode.iconPath = _this.getIconForType(glbDataSourceCatNode.type, true);
-          glbDataSourceCatNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [glbDataSourceCatNode]
-          };
 
           glbDataSourcesNode?.children?.push(glbDataSourceCatNode);
         }
@@ -996,11 +940,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         glbDataSourceNode.checkedOutBy = item.checkedOutBy;
         glbDataSourceNode.filePath = item.filePath;
         glbDataSourceNode.isSystem = item.isSystem;
-        glbDataSourceNode.command = {
-          command: "STARLIMS.selectEnterpriseItem",
-          title: "Open Item",
-          arguments: [glbDataSourceNode]
-        };
 
         glbDataSourceCatNode?.children?.push(glbDataSourceNode);
       }
@@ -1015,17 +954,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.EnterpriseCategory,
             "Tables",
             "",
-            "/Tables/",
+            "/Tables",
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           tablesNode.children = [];
           tablesNode.iconPath = _this.getIconForType(tablesNode.type, true);
-          tablesNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [tablesNode]
-          };
 
           returnItems.push(tablesNode);
         }
@@ -1041,17 +975,12 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.TableCategory,
             uriParts[1],
             "",
-            "/Tables/" + uriParts[1] + "/",
+            "/Tables/" + uriParts[1],
             vscode.TreeItemCollapsibleState.Expanded
           );
 
           tableDbNode.children = [];
           tableDbNode.iconPath = _this.getIconForType(tableDbNode.type, true);
-          tableDbNode.command = {
-            command: "STARLIMS.selectEnterpriseItem",
-            title: "Open Item",
-            arguments: [tableDbNode]
-          };
 
           tablesNode?.children?.push(tableDbNode);
         }
@@ -1071,11 +1000,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         tableNode.checkedOutBy = item.checkedOutBy;
         tableNode.filePath = item.filePath;
         tableNode.isSystem = item.isSystem;
-        tableNode.command = {
-          command: "STARLIMS.selectEnterpriseItem",
-          title: "Open Item",
-          arguments: [tableNode]
-        };
 
         tableDbNode?.children?.push(tableNode);
       }
