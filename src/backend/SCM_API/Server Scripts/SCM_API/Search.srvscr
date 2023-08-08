@@ -33,7 +33,7 @@ oResponse := CreateUDObject({
 :ENDIF;
 
 nLayerID := GetSystemLayerId();
-sSQL := "";
+sSQL := "select * from (";
 
 :IF sItemType == "FORMCODEBEHIND" .OR. Empty(sItemType);
 sSQL += "select
@@ -284,7 +284,44 @@ sSQL += "select
 	sSQL += " and s.LAYERID = ?nLayerID?";
 :ENDIF;
 
-sSQL += " order by 1,2";
+:IF Empty(sItemType);
+	sSQL += " union ";
+:ENDIF;
+
+:IF sItemType == "TABLE" .OR. Empty(sItemType);
+	sSQL += "select
+	TABLENAME as name,
+	'TABLE' as type,
+	'/Tables/Dictionary/' + TABLENAME as uri,
+	CHECKEDOUTBY as checkedOutBy,
+	'' as language,
+	'N' as isFolder,
+	TABLEID as guid
+	from LIMSTABLES
+	where TABLENAME like '%" + limsstring(sItemName) + "%'
+	and upper(ISSYSTEM) = 'Y' 
+	and TABLENAME not like 'LIMS%'
+	and LAYERID = ?nLayerID?
+	
+	union
+	
+	select
+	TABLENAME as name,
+	'TABLE' as type,
+	'/Tables/Database/' + TABLENAME as uri,
+	CHECKEDOUTBY as checkedOutBy,
+	'' as language,
+	'N' as isFolder,
+	TABLEID as guid
+	from LIMSTABLES
+	where TABLENAME like '%" + limsstring(sItemName) + "%'
+	and upper(ISSYSTEM) = 'N'
+	and TABLENAME not like 'LIMS%'
+	and LAYERID = ?nLayerID?";
+:ENDIF;
+
+/* remove the types from uri before ordering;
+sSQL += ") t order by REPLACE(REPLACE(REPLACE(REPLACE(t.uri, '/HTMLForms', ''), '/XML', ''), '/Guide', ''), '/CodeBehind', ''), t.name";
 
 aItems := SQLexecute(sSQL, "Dictionary");
 

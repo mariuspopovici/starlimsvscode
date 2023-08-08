@@ -939,6 +939,71 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         glbDataSourceCatNode?.children?.push(glbDataSourceNode);
       }
+
+      // create global "Tables" node
+      if (uriParts[0] === "Tables") {
+        let tablesNode: TreeEnterpriseItem | undefined = returnItems.find((item) => item.label === "Tables");
+
+        // node not found, create it
+        if (!tablesNode) {
+          tablesNode = new TreeEnterpriseItem(
+            EnterpriseItemType.EnterpriseCategory,
+            "Tables",
+            "",
+            "/Tables/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          tablesNode.children = [];
+          tablesNode.iconPath = _this.getIconForType(tablesNode.type, true);
+
+          returnItems.push(tablesNode);
+        }
+
+        // create database node
+        let tableDbNode: TreeEnterpriseItem | undefined = tablesNode?.children?.find(
+          (item) => item.label === uriParts[1]
+        );
+
+        // node not found, create it
+        if (!tableDbNode) {
+          tableDbNode = new TreeEnterpriseItem(
+            EnterpriseItemType.TableCategory,
+            uriParts[1],
+            "",
+            "/Tables/" + uriParts[1] + "/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          tableDbNode.children = [];
+          tableDbNode.iconPath = _this.getIconForType(tableDbNode.type, true);
+
+          tablesNode?.children?.push(tableDbNode);
+        }
+
+        // create actual global table node
+        let tableNode = new TreeEnterpriseItem(
+          EnterpriseItemType.Table,
+          uriParts[2],
+          "DB",
+          "/Tables/" + uriParts[1] + "/" + uriParts[2],
+          vscode.TreeItemCollapsibleState.None
+        );
+
+        tableNode.children = [];
+        tableNode.iconPath = _this.getIconForType(tableNode.type, false);
+        tableNode.guid = item.guid;
+        tableNode.checkedOutBy = item.checkedOutBy;
+        tableNode.filePath = item.filePath;
+        tableNode.isSystem = item.isSystem;
+        tableNode.command = {
+          command: "STARLIMS.selectEnterpriseItem",
+          title: "Open Item",
+          arguments: [tableNode]
+        };
+
+        tableDbNode?.children?.push(tableNode);
+      }
     };
 
     return returnItems;
