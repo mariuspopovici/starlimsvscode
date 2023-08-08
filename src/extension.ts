@@ -605,8 +605,10 @@ export async function activate(context: vscode.ExtensionContext) {
       if (!itemName) {
         return;
       }
-      await enterpriseProvider.search(itemName, "", false);
-    }
+      executeWithProgress(async () => {
+        await enterpriseProvider.search(itemName, "", false);
+      }, "Searching STARLIMS enterprise...");
+    }  
   );
 
   // register the open form command
