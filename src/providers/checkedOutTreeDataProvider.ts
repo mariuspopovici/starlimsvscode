@@ -15,14 +15,28 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
     new vscode.EventEmitter<TreeEnterpriseItem | null>();
   readonly onDidChangeTreeData: vscode.Event<TreeEnterpriseItem | null> = this._onDidChangeTreeData.event;
 
+  /**
+   * Constructor for CheckedOutTreeDataProvider.
+   * @param xmlDS XML dataset as string
+   * @param service EnterpriseService
+   * @returns CheckedOutTreeDataProvider
+  */
   constructor(xmlDS: string, private service: EnterpriseService) {
     this.data = this.getDataObject(xmlDS);
   }
 
+  /**
+   * Refresh the tree view.
+   */
   refresh(): void {
     this._onDidChangeTreeData.fire(null);
   }
 
+  /**
+   * Get the a view item.
+   * @param item Tree view item as TreeEnterpriseItem
+   * @returns Tree view item as vscode.TreeItem
+   */
   getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     const treeItem = new vscode.TreeItem(
       item.label ?? "",
@@ -41,6 +55,11 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
     return treeItem;
   }
 
+  /**
+   * Get the children of the tree view item.
+   * @param item Tree view item
+   * @returns Children of the tree view item.
+   */
   getChildren(item?: TreeEnterpriseItem): Thenable<TreeEnterpriseItem[] | undefined> {
     return (item && Promise.resolve(item.children ?? [])) || Promise.resolve(this.data);
   }
@@ -115,7 +134,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
   }
 
   /**
-   *  Returns a URI for the item if it is checked out by the current user.
+   * Returns a URI for the item if it is checked out by the current user.
    * @param item The item to check
    * @returns A URI for the item if it is checked out by the current user, otherwise undefined.
    */
@@ -133,6 +152,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
     }
     return resourceUri;
   }
+
   /**
    * Parse XML dataset string to create array of tree view data.
    * @param checkedOutItems XML dataset as string
@@ -152,12 +172,8 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
       const parentID = pendingCheckins[i].getElementsByTagName("PARENTID")[0]?.childNodes[0].nodeValue?.trim();
       const parentName = pendingCheckins[i].getElementsByTagName("ParentName")[0]?.childNodes[0].nodeValue?.trim();
       const parentType = pendingCheckins[i].getElementsByTagName("PARENTTYPE")[0]?.childNodes[0].nodeValue?.trim();
-      const checkedOutDate = pendingCheckins[i]
-        .getElementsByTagName("CHECKEDOUTDATE")[0]
-        ?.childNodes[0].nodeValue?.trim();
-      const scriptLanguage = pendingCheckins[i]
-        .getElementsByTagName("SCRIPTLANGUAGE")[0]
-        ?.childNodes[0].nodeValue?.trim();
+      const checkedOutDate = pendingCheckins[i].getElementsByTagName("CHECKEDOUTDATE")[0]?.childNodes[0].nodeValue?.trim();
+      const scriptLanguage = pendingCheckins[i].getElementsByTagName("SCRIPTLANGUAGE")[0]?.childNodes[0].nodeValue?.trim();
       const appCatName = pendingCheckins[i].getElementsByTagName("APPCATNAME")[0]?.childNodes[0].nodeValue?.trim();
       const isSystem = pendingCheckins[i].getElementsByTagName("ISSYSTEM")[0]?.childNodes[0].nodeValue?.trim();
 
@@ -179,7 +195,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!rootNode) {
           rootNode = new TreeEnterpriseItem(
-            EnterpriseItemType.EnterpriseCategory,
+            EnterpriseItemType.AppCategory,
             "Applications",
             "",
             "/Applications/",
@@ -187,8 +203,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           rootNode.children = [];
-          rootNode.iconPath =
-            this.getIconForType(EnterpriseItemType.AppCategory);
+          rootNode.iconPath = this.getIconForType(rootNode.type);
           rootNode.language = "";
           rootNode.guid = "";
           rootNode.checkedOutBy = "";
@@ -213,7 +228,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           appCatNode.children = [];
-          appCatNode.iconPath = this.getIconForType(EnterpriseItemType.AppCategory);
+          appCatNode.iconPath = this.getIconForType(appCatNode.type);
           appCatNode.language = "";
           appCatNode.guid = "";
           appCatNode.checkedOutBy = "";
@@ -238,7 +253,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           appNode.children = [];
-          appNode.iconPath = this.getIconForType(EnterpriseItemType.Application);
+          appNode.iconPath = this.getIconForType(appNode.type);
           appNode.language = "";
           appNode.guid = parentID ?? "";
           appNode.checkedOutBy = "";
@@ -256,7 +271,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           if (!htmlFormsCatNode) {
             htmlFormsCatNode = new TreeEnterpriseItem(
-              EnterpriseItemType.AppCategory,
+              EnterpriseItemType.HTMLFormCategory,
               "HTML Forms",
               "",
               `/Applications/${appCatName}/${parentName}/HTMLForms`,
@@ -264,7 +279,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             htmlFormsCatNode.children = [];
-            htmlFormsCatNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormCategory);
+            htmlFormsCatNode.iconPath = this.getIconForType(htmlFormsCatNode.type);
             htmlFormsCatNode.language = "";
             htmlFormsCatNode.guid = "";
             htmlFormsCatNode.checkedOutBy = "";
@@ -280,7 +295,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
           {
             htmlFormXmlNode = new TreeEnterpriseItem(
-              EnterpriseItemType.HTMLFormCode,
+              EnterpriseItemType.HTMLFormXML,
               childName + " [XML]" ?? "",
               "XML",
               `/Applications/${appCatName}/${parentName}/HTMLForms/XML/${childName}`,
@@ -291,7 +306,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormXmlNode.checkedOutBy = checkedOutBy ?? "";
             htmlFormXmlNode.isSystem = isSystem ? true : false;
             htmlFormXmlNode.children = [];
-            htmlFormXmlNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormXML);
+            htmlFormXmlNode.iconPath = this.getIconForType(htmlFormXmlNode.type);
             htmlFormXmlNode.filePath = "";
             htmlFormXmlNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -315,7 +330,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormCodeNode.checkedOutBy = checkedOutBy ?? "";
             htmlFormCodeNode.isSystem = isSystem ? true : false;
             htmlFormCodeNode.children = [];
-            htmlFormCodeNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormCode);
+            htmlFormCodeNode.iconPath = this.getIconForType(htmlFormCodeNode.type);
             htmlFormCodeNode.filePath = "";
             htmlFormCodeNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -323,27 +338,27 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           }
 
           // create HTML form guide node
-          var htmlFormCodeNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
+          var htmlFormGuideNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
             (item: TreeEnterpriseItem) => item.label === childName
           );
           {
-            htmlFormCodeNode = new TreeEnterpriseItem(
-              EnterpriseItemType.HTMLFormCode,
+            htmlFormGuideNode = new TreeEnterpriseItem(
+              EnterpriseItemType.HTMLFormGuide,
               childName + " [Guide]" ?? "",
               "GUIDE",
               `/Applications/${appCatName}/${parentName}/HTMLForms/Guide/${childName}`,
               vscode.TreeItemCollapsibleState.None
             );
 
-            htmlFormCodeNode.guid = childId ?? "";
-            htmlFormCodeNode.checkedOutBy = checkedOutBy ?? "";
-            htmlFormCodeNode.isSystem = isSystem ? true : false;
-            htmlFormCodeNode.children = [];
-            htmlFormCodeNode.iconPath = this.getIconForType(EnterpriseItemType.HTMLFormGuide);
-            htmlFormCodeNode.filePath = "";
-            htmlFormCodeNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
+            htmlFormGuideNode.guid = childId ?? "";
+            htmlFormGuideNode.checkedOutBy = checkedOutBy ?? "";
+            htmlFormGuideNode.isSystem = isSystem ? true : false;
+            htmlFormGuideNode.children = [];
+            htmlFormGuideNode.iconPath = this.getIconForType(htmlFormGuideNode.type);
+            htmlFormGuideNode.filePath = "";
+            htmlFormGuideNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
-            htmlFormsCatNode.children?.push(htmlFormCodeNode);
+            htmlFormsCatNode.children?.push(htmlFormGuideNode);
           }
         } else if (scriptLanguage === "JSCRIPT") {
           // create "XFD Forms" node
@@ -353,7 +368,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           if (!xfdFormsCatNode) {
             xfdFormsCatNode = new TreeEnterpriseItem(
-              EnterpriseItemType.AppCategory,
+              EnterpriseItemType.XFDFormCategory,
               "XFD Forms",
               "",
               `/Applications/${appCatName}/${parentName}/XFDForms`,
@@ -361,7 +376,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             xfdFormsCatNode.children = [];
-            xfdFormsCatNode.iconPath = this.getIconForType(EnterpriseItemType.XFDFormCategory);
+            xfdFormsCatNode.iconPath = this.getIconForType(xfdFormsCatNode.type);
             xfdFormsCatNode.language = "";
             xfdFormsCatNode.guid = "";
             xfdFormsCatNode.checkedOutBy = "";
@@ -378,7 +393,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           if (!xfdFormXmlNode) {
             xfdFormXmlNode = new TreeEnterpriseItem(
-              EnterpriseItemType.XFDFormCode,
+              EnterpriseItemType.XFDFormXML,
               childName ?? "",
               "XML",
               `/Applications/${appCatName}/${parentName}/XFDForms/XML/${childName}`,
@@ -414,7 +429,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             xfdFormCodeNode.checkedOutBy = checkedOutBy ?? "";
             xfdFormCodeNode.isSystem = isSystem ? true : false;
             xfdFormCodeNode.children = [];
-            xfdFormCodeNode.iconPath = this.getIconForType(EnterpriseItemType.XFDFormCode);
+            xfdFormCodeNode.iconPath = this.getIconForType(xfdFormCodeNode.type);
             xfdFormCodeNode.filePath = "";
             xfdFormCodeNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -430,7 +445,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           if (!appServerScriptsNode) {
             appServerScriptsNode = new TreeEnterpriseItem(
-              EnterpriseItemType.AppCategory,
+              EnterpriseItemType.AppServerScriptCategory,
               "Server Scripts",
               "",
               `/Applications/${appCatName}/${parentName}/ServerScripts`,
@@ -438,7 +453,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             appServerScriptsNode.children = [];
-            appServerScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.AppServerScriptCategory);
+            appServerScriptsNode.iconPath = this.getIconForType(appServerScriptsNode.type);
             appServerScriptsNode.language = "";
             appServerScriptsNode.guid = "";
             appServerScriptsNode.checkedOutBy = "";
@@ -466,7 +481,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             appServerScriptNode.checkedOutBy = checkedOutBy ?? "";
             appServerScriptNode.isSystem = isSystem ? true : false;
             appServerScriptNode.children = [];
-            appServerScriptNode.iconPath = this.getIconForType(EnterpriseItemType.AppServerScript);
+            appServerScriptNode.iconPath = this.getIconForType(appServerScriptNode.type);
             appServerScriptNode.filePath = "";
             appServerScriptNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -482,7 +497,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           if (!appClientScriptsNode) {
             appClientScriptsNode = new TreeEnterpriseItem(
-              EnterpriseItemType.AppCategory,
+              EnterpriseItemType.AppClientScriptCategory,
               "Client Scripts",
               "",
               `/Applications/${appCatName}/${parentName}/ClientScripts`,
@@ -490,7 +505,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             appClientScriptsNode.children = [];
-            appClientScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.AppClientScriptCategory);
+            appClientScriptsNode.iconPath = this.getIconForType(appClientScriptsNode.type);
             appClientScriptsNode.language = "";
             appClientScriptsNode.guid = "";
             appClientScriptsNode.checkedOutBy = "";
@@ -518,7 +533,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             appClientScriptNode.checkedOutBy = checkedOutBy ?? "";
             appClientScriptNode.isSystem = isSystem ? true : false;
             appClientScriptNode.children = [];
-            appClientScriptNode.iconPath = this.getIconForType(EnterpriseItemType.AppClientScript);
+            appClientScriptNode.iconPath = this.getIconForType(appClientScriptNode.type);
             appClientScriptNode.filePath = "";
             appClientScriptNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -534,7 +549,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           if (!appDataSourcesNode) {
             appDataSourcesNode = new TreeEnterpriseItem(
-              EnterpriseItemType.AppCategory,
+              EnterpriseItemType.AppDataSourceCategory,
               "Data Sources",
               "",
               `/Applications/${appCatName}/${parentName}/DataSources`,
@@ -542,7 +557,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             );
 
             appDataSourcesNode.children = [];
-            appDataSourcesNode.iconPath = this.getIconForType(EnterpriseItemType.AppDataSourceCategory);
+            appDataSourcesNode.iconPath = this.getIconForType(appDataSourcesNode.type);
             appDataSourcesNode.language = "";
             appDataSourcesNode.guid = "";
             appDataSourcesNode.checkedOutBy = "";
@@ -570,7 +585,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             appDataSourceNode.checkedOutBy = checkedOutBy ?? "";
             appDataSourceNode.isSystem = isSystem ? true : false;
             appDataSourceNode.children = [];
-            appDataSourceNode.iconPath = this.getIconForType(EnterpriseItemType.AppDataSource);
+            appDataSourceNode.iconPath = this.getIconForType(appDataSourceNode.type);
             appDataSourceNode.filePath = "";
             appDataSourceNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -587,7 +602,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!serverScriptsNode) {
           serverScriptsNode = new TreeEnterpriseItem(
-            EnterpriseItemType.EnterpriseCategory,
+            EnterpriseItemType.ServerScriptCategory,
             "Server Scripts",
             "",
             "/ServerScripts/",
@@ -595,7 +610,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           serverScriptsNode.children = [];
-          serverScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.ServerScriptCategory);
+          serverScriptsNode.iconPath = this.getIconForType(serverScriptsNode.type);
           serverScriptsNode.language = "";
           serverScriptsNode.guid = "";
           serverScriptsNode.checkedOutBy = "";
@@ -612,7 +627,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!serverScriptCatNode) {
           serverScriptCatNode = new TreeEnterpriseItem(
-            EnterpriseItemType.AppCategory,
+            EnterpriseItemType.ServerScriptCategory,
             parentName ?? "",
             "",
             `/ServerScripts/${parentName}/`,
@@ -620,7 +635,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           serverScriptCatNode.children = [];
-          serverScriptCatNode.iconPath = this.getIconForType(EnterpriseItemType.ServerScriptCategory);
+          serverScriptCatNode.iconPath = this.getIconForType(serverScriptCatNode.type);
           serverScriptCatNode.language = "";
           serverScriptCatNode.guid = "";
           serverScriptCatNode.checkedOutBy = "";
@@ -648,7 +663,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           serverScriptNode.checkedOutBy = checkedOutBy ?? "";
           serverScriptNode.isSystem = isSystem ? true : false;
           serverScriptNode.children = [];
-          serverScriptNode.iconPath = this.getIconForType(EnterpriseItemType.ServerScript);
+          serverScriptNode.iconPath = this.getIconForType(serverScriptNode.type);
           serverScriptNode.filePath = "";
           serverScriptNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -664,7 +679,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!clientScriptsNode) {
           clientScriptsNode = new TreeEnterpriseItem(
-            EnterpriseItemType.EnterpriseCategory,
+            EnterpriseItemType.ClientScriptCategory,
             "Client Scripts",
             "",
             "/ClientScripts/",
@@ -672,7 +687,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           clientScriptsNode.children = [];
-          clientScriptsNode.iconPath = this.getIconForType(EnterpriseItemType.ClientScriptCategory);
+          clientScriptsNode.iconPath = this.getIconForType(clientScriptsNode.type);
           clientScriptsNode.language = "";
           clientScriptsNode.guid = "";
           clientScriptsNode.checkedOutBy = "";
@@ -689,7 +704,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!clientScriptCatNode) {
           clientScriptCatNode = new TreeEnterpriseItem(
-            EnterpriseItemType.AppCategory,
+            EnterpriseItemType.ClientScriptCategory,
             parentName ?? "",
             "",
             `/ClientScripts/${parentName}/`,
@@ -697,7 +712,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           clientScriptCatNode.children = [];
-          clientScriptCatNode.iconPath = this.getIconForType(EnterpriseItemType.ClientScriptCategory);
+          clientScriptCatNode.iconPath = this.getIconForType(clientScriptCatNode.type);
           clientScriptCatNode.language = "";
           clientScriptCatNode.guid = "";
           clientScriptCatNode.checkedOutBy = "";
@@ -714,7 +729,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!clientScriptNode) {
           clientScriptNode = new TreeEnterpriseItem(
-            EnterpriseItemType.ServerScript,
+            EnterpriseItemType.ClientScript,
             childName ?? "",
             "JS",
             `/ClientScripts/${parentName}/${childName}`,
@@ -725,7 +740,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           clientScriptNode.checkedOutBy = checkedOutBy ?? "";
           clientScriptNode.isSystem = isSystem ? true : false;
           clientScriptNode.children = [];
-          clientScriptNode.iconPath = this.getIconForType(EnterpriseItemType.ClientScript);
+          clientScriptNode.iconPath = this.getIconForType(clientScriptNode.type);
           clientScriptNode.filePath = "";
           clientScriptNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
@@ -740,17 +755,22 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         );
 
         if (!dataSourcesNode) {
-          dataSourcesNode = {
-            label: "Data Sources",
-            type: EnterpriseItemType.EnterpriseCategory,
-            children: [],
-            iconPath: this.getIconForType(EnterpriseItemType.DataSourceCategory),
-            language: "",
-            uri: "/DataSources/",
-            guid: "",
-            checkedOutBy: "",
-            filePath: ""
-          };
+          dataSourcesNode = new TreeEnterpriseItem(
+            EnterpriseItemType.DataSourceCategory,
+            "Data Sources",
+            "",
+            "/DataSources/",
+            vscode.TreeItemCollapsibleState.Expanded
+          );
+
+          dataSourcesNode.children = [];
+          dataSourcesNode.iconPath = this.getIconForType(dataSourcesNode.type);
+          dataSourcesNode.language = "";
+          dataSourcesNode.guid = "";
+          dataSourcesNode.checkedOutBy = "";
+          dataSourcesNode.filePath = "";
+          dataSourcesNode.isSystem = isSystem ? true : false;;
+
           data.push(dataSourcesNode as TreeEnterpriseItem);
         }
 
@@ -761,7 +781,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         if (!dataSourceCatNode) {
           dataSourceCatNode = new TreeEnterpriseItem(
-            EnterpriseItemType.AppCategory,
+            EnterpriseItemType.DataSourceCategory,
             parentName ?? "",
             "",
             `/DataSources/${parentName}/`,
@@ -769,7 +789,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           );
 
           dataSourceCatNode.children = [];
-          dataSourceCatNode.iconPath = this.getIconForType(EnterpriseItemType.DataSourceCategory);
+          dataSourceCatNode.iconPath = this.getIconForType(dataSourceCatNode.type);
           dataSourceCatNode.language = "";
           dataSourceCatNode.guid = "";
           dataSourceCatNode.checkedOutBy = "";
@@ -797,7 +817,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           dataSourceNode.checkedOutBy = checkedOutBy ?? "";
           dataSourceNode.isSystem = isSystem ? true : false;
           dataSourceNode.children = [];
-          dataSourceNode.iconPath = this.getIconForType(EnterpriseItemType.DataSource);
+          dataSourceNode.iconPath = this.getIconForType(dataSourceNode.type);
           dataSourceNode.filePath = "";
           dataSourceNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
