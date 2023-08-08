@@ -376,6 +376,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           appCatNode.children = [];
           appCatNode.iconPath = _this.getIconForType(appCatNode.type, true);
+          appCatNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [appCatNode]
+          };
 
           rootAppNode?.children?.push(appCatNode as TreeEnterpriseItem);
         }
@@ -399,6 +404,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           appNode.children = [];
           appNode.iconPath = _this.getIconForType(appNode.type, true);
+          appNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [appNode]
+          };
 
           appCatNode?.children?.push(appNode as TreeEnterpriseItem);
         }
@@ -421,6 +431,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             htmlFormsNode.children = [];
             htmlFormsNode.iconPath = _this.getIconForType(htmlFormsNode.type, true);
+            htmlFormsNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [htmlFormsNode]
+            };
 
             appNode?.children?.push(htmlFormsNode);
           }
@@ -534,6 +549,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             xfdFormsNode.children = [];
             xfdFormsNode.iconPath = _this.getIconForType(EnterpriseItemType.XFDFormCategory, true);
+            xfdFormsNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [xfdFormsNode]
+            };
 
             appNode?.children?.push(xfdFormsNode);
 
@@ -617,6 +637,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             appServerScriptsNode.children = [];
             appServerScriptsNode.iconPath = _this.getIconForType(appServerScriptsNode.type, true);
+            appServerScriptsNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [appServerScriptsNode]
+            };
 
             appNode?.children?.push(appServerScriptsNode);
           }
@@ -663,6 +688,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             appClientScriptsNode.children = [];
             appClientScriptsNode.iconPath = _this.getIconForType(appClientScriptsNode.type, true);
+            appClientScriptsNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [appClientScriptsNode]
+            };
 
             appNode?.children?.push(appClientScriptsNode);
           }
@@ -709,6 +739,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             appDataSourcesNode.children = [];
             appDataSourcesNode.iconPath = _this.getIconForType(appDataSourcesNode.type, true);
+            appDataSourcesNode.command = {
+              command: "STARLIMS.selectEnterpriseItem",
+              title: "Open Item",
+              arguments: [appDataSourcesNode]
+            };
 
             appNode?.children?.push(appDataSourcesNode);
           }
@@ -757,6 +792,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           glbServerScriptsNode.children = [];
           glbServerScriptsNode.iconPath = _this.getIconForType(glbServerScriptsNode.type, true);
+          glbServerScriptsNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [glbServerScriptsNode]
+          };
 
           returnItems.push(glbServerScriptsNode);
         }
@@ -778,6 +818,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           glbServerScriptCatNode.children = [];
           glbServerScriptCatNode.iconPath = _this.getIconForType(glbServerScriptCatNode.type, true);
+          glbServerScriptCatNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [glbServerScriptCatNode]
+          };
 
           glbServerScriptsNode?.children?.push(glbServerScriptCatNode);
         }
@@ -824,6 +869,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           glbClientScriptsNode.children = [];
           glbClientScriptsNode.iconPath = _this.getIconForType(glbClientScriptsNode.type, true);
+          glbClientScriptsNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [glbClientScriptsNode]
+          };
 
           returnItems.push(glbClientScriptsNode);
         }
@@ -845,6 +895,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           glbClientScriptCatNode.children = [];
           glbClientScriptCatNode.iconPath = _this.getIconForType(glbClientScriptCatNode.type, true);
+          glbClientScriptCatNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [glbClientScriptCatNode]
+          };
 
           glbClientScriptsNode?.children?.push(glbClientScriptCatNode);
         }
@@ -891,6 +946,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           glbDataSourcesNode.children = [];
           glbDataSourcesNode.iconPath = _this.getIconForType(glbDataSourcesNode.type, true);
+          glbDataSourcesNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [glbDataSourcesNode]
+          };
 
           returnItems.push(glbDataSourcesNode);
         }
@@ -912,6 +972,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           glbDataSourceCatNode.children = [];
           glbDataSourceCatNode.iconPath = _this.getIconForType(glbDataSourceCatNode.type, true);
+          glbDataSourceCatNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [glbDataSourceCatNode]
+          };
 
           glbDataSourcesNode?.children?.push(glbDataSourceCatNode);
         }
@@ -956,6 +1021,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           tablesNode.children = [];
           tablesNode.iconPath = _this.getIconForType(tablesNode.type, true);
+          tablesNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [tablesNode]
+          };
 
           returnItems.push(tablesNode);
         }
@@ -977,6 +1047,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           tableDbNode.children = [];
           tableDbNode.iconPath = _this.getIconForType(tableDbNode.type, true);
+          tableDbNode.command = {
+            command: "STARLIMS.selectEnterpriseItem",
+            title: "Open Item",
+            arguments: [tableDbNode]
+          };
 
           tablesNode?.children?.push(tableDbNode);
         }
@@ -1005,7 +1080,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         tableDbNode?.children?.push(tableNode);
       }
     };
-
     return returnItems;
   }
 }
