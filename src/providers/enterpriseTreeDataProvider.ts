@@ -393,7 +393,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             EnterpriseItemType.Application,
             appName ?? "",
             "",
-            `Applications/${appCatName}/${appName}`,
+            `/Applications/${appCatName}/${appName}`,
             vscode.TreeItemCollapsibleState.Expanded
           );
 
@@ -414,7 +414,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.HTMLFormCategory,
               "HTML Forms",
               "",
-              `Applications/${appCatName}/${appName}/HTMLForms`,
+              `/Applications/${appCatName}/${appName}/HTMLForms`,
               vscode.TreeItemCollapsibleState.Expanded
             );
 
@@ -436,7 +436,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.HTMLFormCode,
               `${formName} [Code Behind]` ?? "",
               "JS",
-              `Applications/${appCatName}/${appName}/HTMLForms/CodeBehind/${formName}`,
+              `/Applications/${appCatName}/${appName}/HTMLForms/CodeBehind/${formName}`,
               vscode.TreeItemCollapsibleState.None
             );
 
@@ -460,7 +460,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.HTMLFormXML,
               `${formName} [XML]` ?? "",
               "XML",
-              `Applications/${appCatName}/${appName}/HTMLForms/XML/${formName}`,
+              `/Applications/${appCatName}/${appName}/HTMLForms/XML/${formName}`,
               vscode.TreeItemCollapsibleState.None
             );
 
@@ -484,7 +484,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.HTMLFormGuide,
               `${formName} [Guide]` ?? "",
               "JSON",
-              `Applications/${appCatName}/${appName}/HTMLForms/Guide/${formName}`,
+              `/Applications/${appCatName}/${appName}/HTMLForms/Guide/${formName}`,
               vscode.TreeItemCollapsibleState.None
             );
 
@@ -510,7 +510,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               EnterpriseItemType.EnterpriseCategory,
               "XFD Forms",
               "",
-              `Applications/${appCatName}/${appName}/XFDForms`,
+              `/Applications/${appCatName}/${appName}/XFDForms`,
               vscode.TreeItemCollapsibleState.Expanded
             );
 
@@ -531,7 +531,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
                 EnterpriseItemType.XFDFormCode,
                 `${formName} [Code Behind]` ?? "",
                 "JS",
-                `Applications/${appCatName}/${appName}/XFDForms/CodeBehind/${formName}`,
+                `/Applications/${appCatName}/${appName}/XFDForms/CodeBehind/${formName}`,
                 vscode.TreeItemCollapsibleState.None
               );
 
@@ -555,7 +555,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
                 EnterpriseItemType.XFDFormXML,
                 `${formName} [XML]` ?? "",
                 "XML",
-                `Applications/${appCatName}/${appName}/XFDForms/XML/${formName}`,
+                `/Applications/${appCatName}/${appName}/XFDForms/XML/${formName}`,
                 vscode.TreeItemCollapsibleState.None
               );
 

@@ -259,7 +259,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // open the item
       const handler: Function | undefined = getSelectItemHandler(item);
       if (handler !== undefined) {
-        await handler(item);
+        executeWithProgress(async () => {
+          await handler(item);
+        }, "Retrieving selected item...");
       }
     }
   );
