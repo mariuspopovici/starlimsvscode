@@ -239,9 +239,8 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.selectEnterpriseItem",
     async (item: TreeEnterpriseItem) => {
-      // check if item is TreeEnterpriseItem
+      // if no item is defined, get the item from the active editor
       if (!(item instanceof TreeEnterpriseItem)) {
-        // if not, get the item from the tree data provider
         const document = vscode.window.activeTextEditor?.document;
         item = await enterpriseProvider.getTreeItemForDocument(
           document
@@ -251,8 +250,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // set the selected item
       selectedItem = item;
 
-      // open leaf nodes only
-      if (item.collapsibleState !== vscode.TreeItemCollapsibleState.None) {
+      // open leaf nodes only and exclude dummy items ('no items found')
+      if (item.collapsibleState !== vscode.TreeItemCollapsibleState.None ||
+          item.type === EnterpriseItemType.EnterpriseCategory) {
         return;
       }
 
