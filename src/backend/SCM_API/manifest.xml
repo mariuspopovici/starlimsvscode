@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>A2A11947-43BC-4D56-9B53-51E063491A0B</ItemID>
+  <ItemID>AFC04171-A55B-46FC-804F-C334AD01D00D</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-07-31T17:40:39.0389878-04:00</PackageDate>
+  <PackageDate>2023-08-10T10:28:10.6039697-04:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -168,6 +168,7 @@
           <LayerId>300</LayerId>
           <ItemDescription />
           <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\GlobalSearch.srvscr</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
           <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
