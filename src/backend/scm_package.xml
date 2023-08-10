@@ -151,6 +151,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>E3AF9503-008A-4D3B-AB38-D56B91ADA572</ItemID>
+          <ItemName>GlobalSearch</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>4BBC2372-CC11-44D8-B9C3-27EC84D71CE3</ItemID>
           <ItemName>ImportPackage</ItemName>
           <LayerId>300</LayerId>
