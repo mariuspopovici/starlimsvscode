@@ -113,4 +113,5 @@ New features:
 - Support for exploring database and dictionary tables, view table definition and tree commands for generating INSERT, DELETE, SELECT and UPDATE statements for the selected table.
 - Go to script/form under the cursor
 - View checked out items, check in pending, undo check out, view checked out items from all uses, refresh checked out items tree
+- Global search / full text search in code items
 - Misc. bug fixes

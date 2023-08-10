@@ -121,3 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - updated icons
 - added a new output channel for the STARLIMS server log
 - run script includes server log content in the output channel along with script result
+
+## [1.2.59] - 2023-08-10
+
+- added initial support for full text search in code items, similar to the STARLIMS designer global search
