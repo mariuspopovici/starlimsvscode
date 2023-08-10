@@ -37,19 +37,21 @@ Features:
 - Explore Enterprise Designer (Applications, Data Sources, Server Scripts and Client Scripts)
 - Check out STARLIMS code items to a local folder
 - Edit local copies and compare changes with remote version
-- Check in changes to a server
+- Check in changes to the server
 - Open forms in browser (Chrome or Edge) and debug them in VS Code
 - Execute remote scripts and view execution return values
 - Execute data sources and render data source execution results in a grid view
 - View and clear user logs
 - Launch XFD forms via the STARLIMS bridge
 - Syntax color theme and highlighting for SSL and SSL SQL data sources
+- Global, full text search in scripts / code with code item type selection
+- Search code items by name
+- Explore tables and view table schema
 
 To Do:
 
 - Move forms and scripts
 - Edit form resources
-- Global find function
 - Create a HTML form designer
 - Implement table support including a schema and ERD generator / viewer
 - Rename items
