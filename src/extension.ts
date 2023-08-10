@@ -1354,6 +1354,31 @@ export async function activate(context: vscode.ExtensionContext) {
         placeHolder: "Search term...",
         ignoreFocusOut: true
       });
+      // let the user select the item types to search
+      const itemTypes = await vscode.window.showQuickPick(
+        [
+          { label: "All", description: "All Items", itemType: "" },
+          { label: "Forms", description: "HTML and XFD Forms (Code Behind)", itemType: "FORMCODEBEHIND" },
+          { label: "Application Client Scripts", description: "Application Client Scripts", itemType: "APPCS" },
+          { label: "Application Server Scripts", description: "Application Server Scripts", itemType: "APPSS" },
+          { label: "Application Data Sources", description: "Application Data Sources", itemType: "APPDS" },
+          { label: "Server Scripts", description: "Global Server Scripts", itemType: "GLBSS" },
+          { label: "Client Scripts", description: "Global Client Scripts", itemType: "GLBCS" },
+          { label: "Data Sources", description: "Global Data Sources", itemType: "GLBDS" }
+        ],
+        {
+          title: "Global Code Search",
+          placeHolder: "Select the item types to include in the search...",
+          canPickMany: true,
+          ignoreFocusOut: true
+        }
+      );
+      if(itemTypes === undefined) {
+        return;
+      }
+
+      // convert item types to string
+      const itemTypesString = itemTypes.map(itemType => itemType.itemType).join(",");
 
       if (searchTerm) {
         // display a progress message
@@ -1365,7 +1390,7 @@ export async function activate(context: vscode.ExtensionContext) {
           },
           async (progress, token) => {
             // find all items matching the search term
-            await enterpriseProvider.search(searchTerm, "", false, true);
+            await enterpriseProvider.search(searchTerm, itemTypesString, false, true);
           }
         );
       }

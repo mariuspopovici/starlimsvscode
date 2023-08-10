@@ -3,7 +3,7 @@ Description.. :	Full text search for items in the LIMS
 Author....... :	DC
 Date......... : 2023-08-10
 *******************************************************************************/;
-:DECLARE sSQL, ssearchString, sItemType, aItems, oResult, oUtils, nLayerID, String, sAppCatName, asearchString;
+:DECLARE sSQL, ssearchString, sItemTypes, aItems, oResult, oUtils, nLayerID, String;
 String := "";
 oUtils := CreateUDObject("SCM_API.Utils", {});
 oResponse := CreateUDObject({
@@ -21,14 +21,20 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDIF;
 
-:IF Request:QueryString:IsProperty("itemType");
-	sItemType := Request:QueryString:itemType;
+:IF Request:QueryString:IsProperty("itemTypes");
+	sItemTypes := Request:QueryString:itemTypes;
+:ELSE;
+    Response:StatusCode := 400;
+    oResponse:success := .F.;
+    oResponse:data := String:Format("Missing required parameter: {0}", "itemType");
+    usrmes(oResponse:data);
+    :RETURN oResponse;
 :ENDIF;
 
 :DECLARE sResult, aResultItems, oDataSet, aDataSet, i, oItem;
 aResultItems := {};
 
-:IF sItemType == "FORMCODEBEHIND" .OR. Empty(sItemType);
+:IF At("FORMCODEBEHIND", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
     sResult := DoProc("Enterprise_Data_Providers.FormProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -48,7 +54,7 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-:IF sItemType == "APPSS" .OR. Empty(sItemType);
+:IF At("APPSS", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
 	sResult := DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -68,7 +74,7 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-:IF sItemType == "APPCS" .OR. Empty(sItemType);
+:IF At("APPCS", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
     sResult := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -87,7 +93,7 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-:IF sItemType == "APPDS" .OR. Empty(sItemType);
+:IF At("APPDS", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
     sResult := DoProc("Enterprise_Data_Providers.AppDataSourceProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -106,7 +112,7 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-:IF sItemType == "SS" .OR. Empty(sItemType);
+:IF At("GLBSS", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
     sResult := DoProc("Enterprise_Data_Providers.ServerScriptProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -114,7 +120,7 @@ aResultItems := {};
     :FOR i:=1 :TO Len(aDataSet);
         oItem := oUtils:RemoveDBNull(CreateUDObject({
             {"name", aDataSet[i][4]},
-            {"type", "APPSS"},
+            {"type", "SS"},
             {"uri", "/ServerScripts/" + aDataSet[i][2] + "/" + aDataSet[i][4]},
             {"checkedOutBy", aDataSet[i][7]},
             {"language", "SSL"},
@@ -125,7 +131,7 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-:IF sItemType == "DS" .OR. Empty(sItemType);
+:IF At("GLBDS", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
     sResult := DoProc("Enterprise_Data_Providers.DataSourceProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -133,7 +139,7 @@ aResultItems := {};
     :FOR i:=1 :TO Len(aDataSet);
         oItem := oUtils:RemoveDBNull(CreateUDObject({
             {"name", aDataSet[i][4]},
-            {"type", "APPDS"},
+            {"type", "DS"},
             {"uri", "/DataSources/" + aDataSet[i][2] + "/" + aDataSet[i][4]},
             {"checkedOutBy", aDataSet[i][7]},
             {"language", iif((aDataSet[i][6] == "STARLIMS"), "SSL", "SQL")},
@@ -144,7 +150,7 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-:IF sItemType == "CS" .OR. Empty(sItemType);
+:IF At("GLBCS", sItemTypes) > 0 .OR. At("ALL", sItemTypes) > 0;
     sResult := DoProc("Enterprise_Data_Providers.ClientScriptProvider.Search", {sSearchString, .F., .F.});
     oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResult});
     aDataSet := DoProc("Enterprise_Server.DataSetSupport.DsToArray", {oDataSet});
@@ -152,7 +158,7 @@ aResultItems := {};
     :FOR i:=1 :TO Len(aDataSet);
         oItem := oUtils:RemoveDBNull(CreateUDObject({
             {"name", aDataSet[i][4]},
-            {"type", "APPCS"},
+            {"type", "CS"},
             {"uri", "/ClientScripts/" + aDataSet[i][2] + "/" + aDataSet[i][4]},
             {"checkedOutBy", aDataSet[i][7]},
             {"language", "JS"},
