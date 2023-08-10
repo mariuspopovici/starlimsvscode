@@ -169,8 +169,6 @@ aResultItems := {};
     :NEXT;
 :ENDIF;
 
-usrmes(aResultItems);
-
 oResult := CreateUDObject({
 	{"success", .T.},
 	{"data", CreateUDObject({{"items", aResultItems}})}

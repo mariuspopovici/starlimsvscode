@@ -1357,7 +1357,7 @@ export async function activate(context: vscode.ExtensionContext) {
       // let the user select the item types to search
       const itemTypes = await vscode.window.showQuickPick(
         [
-          { label: "All", description: "All Items", itemType: "" },
+          { label: "All", description: "All Items", itemType: "ALL" },
           { label: "Forms", description: "HTML and XFD Forms (Code Behind)", itemType: "FORMCODEBEHIND" },
           { label: "Application Client Scripts", description: "Application Client Scripts", itemType: "APPCS" },
           { label: "Application Server Scripts", description: "Application Server Scripts", itemType: "APPSS" },

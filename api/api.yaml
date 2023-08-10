@@ -500,7 +500,47 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalError"
-
+  /SCM_API.GlobalSearch.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: |
+        The `SCM_API.GlobalSearch.lims` endpoint executes a full text search using the provided search term.
+      operationId: GlobalSearch
+      parameters:
+        - in: query
+          name: SearchString
+          schema:
+            type: string
+          description: The search criteria or term.
+          example: SqlExecute("update FOLDERS
+          required: true
+        - in: query
+          name: ItemTypes
+          schema:
+            type: string
+          description: A comma separated string of item types (ALL, FORMCODEBEHIND, APPCS, APPSS, APPDS, GLBSS, GLBDS, GLBCS)
+          example: APPSS,GLBSS
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: An array of EnterpriseItem objects where the code contains the specified search term.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnterpriseItemList"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
 components:
   schemas:
     Response:
