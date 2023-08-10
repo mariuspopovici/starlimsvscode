@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 24 24"
+   fill="none"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="codesearch.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs18" />
+  <sodipodi:namedview
+     id="namedview16"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="26.08"
+     inkscape:cx="12.595859"
+     inkscape:cy="12.327454"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <g
+     id="SVGRepo_bgCarrier"
+     stroke-width="0" />
+  <g
+     id="SVGRepo_tracerCarrier"
+     stroke-linecap="round"
+     stroke-linejoin="round" />
+  <path
+     id="path11"
+     style="fill:#808080;stroke:none;stroke-width:0.853016;stroke-opacity:1"
+     d="m 6.0318492,-0.0703125 c -0.226237,0 -0.443541,0.09003384 -0.6035157,0.25 L 0.30919287,5.2988281 c -0.1599659,0.1599747 -0.25,0.3772786 -0.25,0.6035157 V 16.138672 c 0,1.413363 1.14722683,2.558594 2.56054693,2.558594 H 9.4830214 V 16.990234 H 2.6197398 c -0.4711038,0 -0.8535156,-0.380441 -0.8535156,-0.851562 V 6.7539062 h 4.265625 c 0.4711209,0 0.8515624,-0.3804585 0.8515624,-0.8515624 v -4.265625 h 5.9707024 c 0.47112,0 0.857529,0.3824288 0.853516,0.8535156 V 6.992188 h 1.707031 V 2.4902344 c 0,-1.4133202 -1.147185,-2.5605469 -2.560547,-2.5605469 z M 5.1783335,2.84375 V 5.0488281 H 2.9713023 Z M 4.3248179,9.3144531 c -0.4711039,0 -0.8535156,0.3804415 -0.8535156,0.8515629 0,0.471121 0.3824117,0.853515 0.8535156,0.853515 h 6.8242181 c 0.471121,0 0.853516,-0.382394 0.853516,-0.853515 0,-0.4711214 -0.382395,-0.8515629 -0.853516,-0.8515629 z m 0,3.4121089 c -0.4711039,0 -0.8535156,0.380442 -0.8535156,0.851563 0,0.471121 0.3824117,0.853516 0.8535156,0.853516 h 6.8242181 c 0.471121,0 0.853516,-0.382395 0.853516,-0.853516 0,-0.471121 -0.382395,-0.851563 -0.853516,-0.851563 z"
+     sodipodi:nodetypes="sccsssccsscsscssccsssccccssssssssssssss" />
+  <g
+     id="SVGRepo_bgCarrier-0"
+     stroke-width="0"
+     transform="matrix(0.81780513,0,0,0.81780513,6.8820008,6.8820008)" />
+  <g
+     id="SVGRepo_tracerCarrier-7"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     transform="matrix(0.81780513,0,0,0.81780513,6.8820008,6.8820008)" />
+  <g
+     id="SVGRepo_iconCarrier-9"
+     transform="matrix(0.96945934,0,0,0.96945934,3.4454117,3.3857727)"
+     style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.482745;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       fill-rule="evenodd"
+       clip-rule="evenodd"
+       d="m 10,5 c -2.76142,0 -5,2.23858 -5,5 0,2.7614 2.23858,5 5,5 1.381,0 2.6296,-0.5585 3.5355,-1.4645 C 14.4415,12.6296 15,11.381 15,10 15,7.23858 12.7614,5 10,5 Z m -7,5 c 0,-3.86599 3.13401,-7 7,-7 3.866,0 7,3.13401 7,7 0,1.5719 -0.519,3.0239 -1.3937,4.1921 l 5.1008,5.1008 c 0.3905,0.3905 0.3905,1.0237 0,1.4142 -0.3905,0.3905 -1.0237,0.3905 -1.4142,0 L 14.1921,15.6063 C 13.0239,16.481 11.5719,17 10,17 6.13401,17 3,13.866 3,10 Z"
+       fill="#000000"
+       id="path113"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.482745;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>

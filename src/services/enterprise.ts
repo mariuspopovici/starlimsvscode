@@ -11,7 +11,8 @@ export interface Enterprise {
   clearLog(uri: string): any;
   getEnterpriseItemUri(uri: string, rootPath: string): any;
   scrollToBottom(): any;
-  searchForItems(searchText: string, itemType: string): any;
+  searchForItems(itemName: string, itemType: string): any;
+  globalSearch(searchString: string, itemType: string): any;
   runXFDForm(uri: string): any;
   getGUID(uri: string): any;
   getTableCommand(uri: string, type: string): any;

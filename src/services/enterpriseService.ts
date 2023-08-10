@@ -582,6 +582,36 @@ export class EnterpriseService implements Enterprise {
   }
 
   /**
+   * Global search for items by occuring text
+   * @param searchString the text to search for
+   * @returns the enterprise items found
+   */
+  public async globalSearch(searchString: string): Promise<any> {
+    const url = `${this.baseUrl}/SCM_API.GlobalSearch.lims?&searchString=${searchString}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data.items;
+      } else {
+        vscode.window.showErrorMessage("No items found!");
+        console.error(data);
+        return [];
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("No items found!");
+      console.error(e);
+      return [];
+    }
+  }
+  
+  /**
    * Delete enterprise item
    * @param uri the URI of the enterprise item
    * @returns true if the item was deleted successfully, false otherwise
