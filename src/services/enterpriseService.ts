@@ -554,7 +554,7 @@ export class EnterpriseService implements Enterprise {
    * @returns the enterprise item found
    */
   public async searchForItems(itemName: string, itemType: string): Promise<any> {
-    let url = `${this.baseUrl}/SCM_API.Search.lims?&itemName=${itemName}`;
+    let url = `${this.baseUrl}/SCM_API.Search.lims?itemName=${itemName}`;
     if (itemType !== "") {
       url += `&itemType=${itemType}`;
     }
@@ -586,8 +586,8 @@ export class EnterpriseService implements Enterprise {
    * @param searchString the text to search for
    * @returns the enterprise items found
    */
-  public async globalSearch(searchString: string): Promise<any> {
-    const url = `${this.baseUrl}/SCM_API.GlobalSearch.lims?&searchString=${searchString}`;
+  public async globalSearch(searchString: string, itemTypes: string): Promise<any> {
+    const url = `${this.baseUrl}/SCM_API.GlobalSearch.lims?searchString=${searchString}&itemTypes=${itemTypes}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
