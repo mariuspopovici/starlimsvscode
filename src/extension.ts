@@ -11,7 +11,7 @@ import { DataViewPanel } from "./panels/DataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
 
-const {version} = require('../package.json');
+const { version } = require('../package.json');
 const SLVSCODE_FOLDER = "SLVSCODE";
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -27,15 +27,16 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!url) {
     url = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      prompt: "Enter STARLIMS URL",
-      ignoreFocusOut: true,
+      placeHolder: "STARLIMS URL (e. g. https://starlims.example.com/STARLIMS/)",
+      prompt: "Please enter your STARLIMS URL.",
+      ignoreFocusOut: true
     });
     if (url) {
       await config.update("url", url, false);
       reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
-        "Please configure STARLIMS URL in extension settings."
+        "Please configure the STARLIMS URL in the extension settings."
       );
       return;
     }
@@ -45,32 +46,35 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!user) {
     user = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      prompt: "Enter STARLIMS Username",
-      ignoreFocusOut: true,
+      placeHolder: "STARLIMS Username",
+      prompt: "Please enter your STARLIMS Username.",
+      ignoreFocusOut: true
     });
     if (user) {
       await config.update("user", user.toUpperCase(), false);
       reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
-        "Please configure STARLIMS user in extension settings."
+        "Please configure the STARLIMS User in the extension settings."
       );
     }
   }
 
+  // ensure password is defined and prompt for value if not
   if (!password) {
     password = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      prompt: `Enter Password for STARLIMS User '${user}'`,
+      placeHolder: "STARLIMS Password",
+      prompt: `Please enter the password for the STARLIMS User '${user}'.`,
       password: true,
-      ignoreFocusOut: true,
+      ignoreFocusOut: true
     });
     if (password) {
       await config.update("password", password, false);
       reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
-        "Please configure STARLIMS password in extension settings."
+        "Please configure the STARLIMS User Password in the extension settings."
       );
     }
   }
@@ -79,15 +83,16 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!rootPath) {
     let newRootPath = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      prompt: "Enter STARLIMS Root Path",
-      ignoreFocusOut: true,
+      placeHolder: "STARLIMS VS Code Root Path (e. g. C:\\STARLIMS\\VSCode)",
+      prompt: "Please enter a root path for the STARLIMS VS Code extension.",
+      ignoreFocusOut: true
     });
     if (newRootPath) {
       await config.update("rootPath", newRootPath, false);
       reloadConfig = true;
     } else {
       vscode.window.showErrorMessage(
-        "Please configure STARLIMS root path in extension settings."
+        "Please configure the STARLIMS VS Code Root Path in the extension settings."
       );
       return;
     }
@@ -116,11 +121,11 @@ export async function activate(context: vscode.ExtensionContext) {
       if (!apiVersion) {
         vscode.window.showWarningMessage('STARLIMS VS Code API is not reachable. Please check connection info or install API package. See extension README for installation instructions.');
         return;
-      } 
+      }
 
       if (version !== apiVersion) {
-        const selection = await vscode.window.showInformationMessage(`A new version (${version}) of the STARLIMS VS Code API is available. Select Upgrade to deploy the new version.`, 
-          'Upgrade', 'Continue');	
+        const selection = await vscode.window.showInformationMessage(`A new version (${version}) of the STARLIMS VS Code API is available. Select Upgrade to deploy the new version.`,
+          'Upgrade', 'Continue');
         if (selection === 'Upgrade') {
           const sdpPackage = context.asAbsolutePath("dist/SCM_API.sdp");
           executeWithProgress(async () => {
@@ -252,7 +257,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // open leaf nodes only and exclude dummy items ('no items found')
       if (item.collapsibleState !== vscode.TreeItemCollapsibleState.None ||
-          item.type === EnterpriseItemType.EnterpriseCategory) {
+        item.type === EnterpriseItemType.EnterpriseCategory) {
         return;
       }
 
@@ -500,6 +505,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       let checkinReason: string =
         (await vscode.window.showInputBox({
+          title: "Check in STARLIMS Enterprise Item",
           prompt: "Enter checkin reason",
           ignoreFocusOut: true,
         })) || "Checked in from VSCode";
@@ -601,16 +607,18 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       // ask for search text
       const itemName = await vscode.window.showInputBox({
-        prompt: "Enter search text",
+        title: "Search for STARLIMS Enterprise Items",
+        prompt: "Please enter the name or parts of the name of the item(s) to search for.",
+        placeHolder: "Item name...",
         ignoreFocusOut: true
       });
       if (!itemName) {
         return;
       }
       executeWithProgress(async () => {
-        await enterpriseProvider.search(itemName, "", false);
+        await enterpriseProvider.search(itemName, "", false, false);
       }, "Searching STARLIMS Enterprise...");
-    }  
+    }
   );
 
   // register the open form command
@@ -928,7 +936,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // ask for item name
       const itemName = await vscode.window.showInputBox({
-        prompt: `Enter name for new ${itemTypeName}`,
+        title: "Add STARLIMS Enterprise Item",
+        placeHolder: `Name for new ${itemTypeName}...`,
+        prompt: `Please enter a name for the new ${itemTypeName}.`,
         ignoreFocusOut: true
       });
 
@@ -1180,7 +1190,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       async function findScriptOnServer(scriptName: string, procedureName: string | undefined) {
-        let itemFound = await enterpriseProvider.search(scriptName, "SS", true);
+        let itemFound = await enterpriseProvider.search(scriptName, "SS", true, false);
         if (itemFound) {
           await vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
           // get new editor
@@ -1244,7 +1254,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // use search to find the script
-        const itemFound = await enterpriseProvider.search(scriptName, "DS", true);
+        const itemFound = await enterpriseProvider.search(scriptName, "DS", true, false);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1265,7 +1275,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
-        const itemFound = await enterpriseProvider.search(scriptName, "CS", true);
+        const itemFound = await enterpriseProvider.search(scriptName, "CS", true, false);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1286,7 +1296,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const formName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
-        const itemFound = await enterpriseProvider.search(formName, "FORMCODEBEHIND", true);
+        const itemFound = await enterpriseProvider.search(formName, "FORMCODEBEHIND", true, false);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1295,7 +1305,6 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }
   );
-
 
   // register the GoToItem command
   vscode.commands.registerCommand(
@@ -1330,6 +1339,35 @@ export async function activate(context: vscode.ExtensionContext) {
         } else {
           vscode.window.showErrorMessage("Could not find a STARLIMS item to navigate to.");
         }
+      }
+    }
+  );
+
+  // register the GlobalCodeSearch command
+  vscode.commands.registerCommand(
+    "STARLIMS.GlobalCodeSearch",
+    async () => {
+      // get the search term from the user
+      const searchTerm = await vscode.window.showInputBox({
+        title: "Global Code Search",
+        prompt: "Enter a search term to find in all code documents.",
+        placeHolder: "Search term...",
+        ignoreFocusOut: true
+      });
+
+      if (searchTerm) {
+        // display a progress message
+        vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: "Searching STARLIMS, please wait...",
+            cancellable: false
+          },
+          async (progress, token) => {
+            // find all items matching the search term
+            await enterpriseProvider.search(searchTerm, "", false, true);
+          }
+        );
       }
     }
   );

@@ -42,15 +42,21 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   }
 
   /** Search for tree items on the server.
-   * @param itemName The text to search for.
+   * @param searchString The text to search for.
    * @param itemType The type of items to search for.
    * @returns First item found.
    * */
-  async search(itemName: string, itemType: string, bSilent: boolean): Promise<TreeEnterpriseItem | undefined> {
-    if (itemName === "") {
+  async search(searchString: string, itemType: string, bSilent: boolean, bGlobal: boolean): Promise<TreeEnterpriseItem | undefined> {
+    if (searchString === "") {
       return;
     }
-    var resultItems = await this.service.searchForItems(itemName, itemType);
+    var resultItems;
+    if (bGlobal === true) {
+      resultItems = await this.service.globalSearch(searchString, itemType);
+    }
+    else {
+      resultItems = await this.service.searchForItems(searchString, itemType);
+    }
     if (resultItems === undefined || resultItems.length === 0) {
       vscode.window.showErrorMessage("No items found!");
       return;
@@ -75,11 +81,11 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
     // load mode - load the current node's children
     if (this.dataMode === "LOAD" || this.dataMode === "REFRESH") {
-      
+
       let uri: string = item ? item.uri : "";
-      
+
       // refresh always starts from root
-      if(this.dataMode === "REFRESH") {
+      if (this.dataMode === "REFRESH") {
         uri = "";
         this.dataMode = "LOAD";
       }
@@ -923,7 +929,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           tableDbNode.iconPath = _this.getIconForType(tableDbNode.type, true);
           tablesNode?.children?.push(tableDbNode);
         }
-        
+
         let tableName = uriParts[2];
 
         // create actual global table node

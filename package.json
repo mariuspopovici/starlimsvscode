@@ -3,7 +3,7 @@
   "displayName": "STARLIMS VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.56",
+  "version": "1.2.57",
   "icon": "resources/extension/starlimsvscode.png",
   "publisher": "MariusPopovici",
   "author": {
@@ -212,6 +212,14 @@
       {
         "command": "STARLIMS.ClearLogChannel",
         "title": "Clear"
+      },
+      {
+        "command": "STARLIMS.GlobalCodeSearch",
+        "title": "Search in Code...",
+        "icon": {
+          "dark": "resources/dark/codesearch.svg",
+          "light": "resources/light/codesearch.svg"
+        }
       }
     ],
     "keybindings": [
@@ -238,12 +246,17 @@
       {
         "command": "STARLIMS.OpenForm",
         "key": "ctrl+f5",
-        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /HTMLForms/"
+        "when": "editorTextFocus && resourceDirname =~ /SLVSCODE/ && resourcePath =~ /Forms/"
       },
       {
         "command": "STARLIMS.RefreshLogChannel",
         "key": "f5",
         "when": "inOutput && editorLangId == 'Log'"
+      },
+      {
+        "command": "STARLIMS.GlobalCodeSearch",
+        "key": "ctrl+alt+f",
+        "when": "view == STARLIMSMainTree || (editorTextFocus && resourceDirname =~ /SLVSCODE/)"
       }
     ],
     "menus": {
@@ -255,6 +268,11 @@
         },
         {
           "command": "STARLIMS.Search",
+          "when": "view == STARLIMSMainTree",
+          "group": "navigation"
+        },
+        {
+          "command": "STARLIMS.GlobalCodeSearch",
           "when": "view == STARLIMSMainTree",
           "group": "navigation"
         },
@@ -602,32 +620,32 @@
   "devDependencies": {
     "@types/glob": "^7.2.0",
     "@types/jsdom": "^21.1.1",
-    "@types/mocha": "^9.1.0",
-    "@types/node": "^14.18.12",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^14.18.54",
     "@types/node-fetch": "^2.6.4",
-    "@types/vscode": "^1.65.0",
-    "@types/vscode-webview": "^1.57.0",
+    "@types/vscode": "^1.81.0",
+    "@types/vscode-webview": "^1.57.1",
     "@types/xmldom": "^0.1.31",
-    "@typescript-eslint/eslint-plugin": "^5.16.0",
-    "@typescript-eslint/parser": "^5.16.0",
-    "@vscode/test-electron": "^2.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@vscode/test-electron": "^2.3.4",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
     "esbuild": "^0.17.19",
-    "eslint": "^8.11.0",
-    "glob": "^7.2.0",
+    "eslint": "^8.46.0",
+    "glob": "^7.2.3",
     "mocha": "^9.2.2",
     "run-script-os": "^1.1.6",
     "style-loader": "^3.3.3",
-    "ts-loader": "^9.2.8",
-    "typescript": "^4.5.5",
-    "webpack": "^5.84.1",
+    "ts-loader": "^9.4.4",
+    "typescript": "^4.9.5",
+    "webpack": "^5.88.2",
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "@xmldom/xmldom": "^0.7.13",
     "jsdom": "^22.1.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.12"
   }
 }
