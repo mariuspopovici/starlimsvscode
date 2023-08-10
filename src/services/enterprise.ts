@@ -12,7 +12,7 @@ export interface Enterprise {
   getEnterpriseItemUri(uri: string, rootPath: string): any;
   scrollToBottom(): any;
   searchForItems(itemName: string, itemType: string): any;
-  globalSearch(searchString: string, itemType: string): any;
+  globalSearch(searchString: string, itemTypes: string): any;
   runXFDForm(uri: string): any;
   getGUID(uri: string): any;
   getTableCommand(uri: string, type: string): any;
