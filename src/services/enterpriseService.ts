@@ -902,6 +902,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns true if the item is checked out, false otherwise
    */
   public async isCheckedOut(uri: string) {
+    uri = uri.replace(/\\/g, "/");
     // check if document is in checked out documents map
     if (this.checkedOutDocuments.has(uri)) {
       return true;
