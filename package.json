@@ -58,7 +58,7 @@
         "title": "Refresh Explorer"
       },
       {
-        "command": "STARLIMS.Checkout",
+        "command": "STARLIMS.CheckOut",
         "title": "Check Out"
       },
       {
@@ -319,7 +319,7 @@
           "group": "run"
         },
         {
-          "command": "STARLIMS.Checkout",
+          "command": "STARLIMS.CheckOut",
           "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
           "group": "sourceControl"
         },
@@ -395,7 +395,7 @@
           "group": "sourceControl"
         },
         {
-          "command": "STARLIMS.Checkout",
+          "command": "STARLIMS.CheckOut",
           "when": "view == STARLIMSMainTree",
           "group": "sourceControl"
         },
@@ -444,7 +444,7 @@
           "group": "run"
         },
         {
-          "command": "STARLIMS.Checkout",
+          "command": "STARLIMS.CheckOut",
           "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'",
           "group": "sourceControl"
         },

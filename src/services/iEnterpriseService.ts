@@ -22,4 +22,6 @@ export interface IEnterpriseService {
   getTableDefinition(uri: string): any;
   getVersion(): any;
   upgradeBackend(sdpPackage: string): any;
+  isCheckedOut(uri: string): any;
+  setCheckedOut(uri: string): any;
 }

@@ -31,8 +31,14 @@ export class EnterpriseTextDocumentContentProvider
 
   async onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
     const document = event.document;
-    // get the checked out status of the document
 
+    // Check if the document has already been checked out in this session
+    const uri = await this.service.getUriFromLocalPath(document.fileName);
+    if (await this.service.isCheckedOut(uri) === true) {
+      return;
+    }
+
+    // get the checked out status from the server
     let item = await this.enterpriseTreeProvider.getTreeItemFromPath(document.fileName, true);
     if (item === undefined) {
       return;
@@ -55,9 +61,12 @@ export class EnterpriseTextDocumentContentProvider
         this.promptOpen = false;
 
         if (result === 'Yes') {
-          vscode.commands.executeCommand('STARLIMS.Checkout', item);
+          vscode.commands.executeCommand('STARLIMS.CheckOut', item);
         }
       }
+    }
+    else {
+      this.service.setCheckedOut(uri);
     }
   }
 }

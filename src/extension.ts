@@ -446,7 +446,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // register the checkout command
   vscode.commands.registerCommand(
-    "STARLIMS.Checkout",
+    "STARLIMS.CheckOut",
     async (item: TreeEnterpriseItem | any) => {
       if (!(item instanceof TreeEnterpriseItem)) {
         item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
