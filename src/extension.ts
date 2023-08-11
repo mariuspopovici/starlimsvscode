@@ -169,19 +169,9 @@ export async function activate(context: vscode.ExtensionContext) {
   // load current user's log
   vscode.commands.executeCommand("STARLIMS.RefreshLogChannel");
 
-  // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
-  const enterpriseTextContentProvider =
-    new EnterpriseTextDocumentContentProvider(enterpriseService);
-  context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(
-      "starlims",
-      enterpriseTextContentProvider
-    )
-  );
-
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
-  const enterpriseProvider = new EnterpriseTreeDataProvider(enterpriseService);
-  vscode.window.registerTreeDataProvider("STARLIMSMainTree", enterpriseProvider);
+  const enterpriseTreeProvider = new EnterpriseTreeDataProvider(enterpriseService);
+  vscode.window.registerTreeDataProvider("STARLIMSMainTree", enterpriseTreeProvider);
 
   // register a custom tree data provider for the STARLIMS checked out items
   const checkedOutProvider = vscode.commands.registerCommand(
@@ -193,6 +183,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(checkedOutProvider);
+
+  // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
+  const enterpriseTextContentProvider =
+    new EnterpriseTextDocumentContentProvider(enterpriseService, enterpriseTreeProvider);
+  context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider(
+      "starlims",
+      enterpriseTextContentProvider
+    )
+  );
 
   // register the GetAllCheckedOutItems command
   vscode.commands.registerCommand(
@@ -243,13 +243,10 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the selectEnterpriseItem command
   vscode.commands.registerCommand(
     "STARLIMS.selectEnterpriseItem",
-    async (item: TreeEnterpriseItem) => {
+    async (item: TreeEnterpriseItem | any) => {
       // if no item is defined, get the item from the active editor
       if (!(item instanceof TreeEnterpriseItem)) {
-        const document = vscode.window.activeTextEditor?.document;
-        item = await enterpriseProvider.getTreeItemForDocument(
-          document
-        ) as TreeEnterpriseItem;
+        item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false) as TreeEnterpriseItem;
       }
 
       // set the selected item
@@ -286,7 +283,6 @@ export async function activate(context: vscode.ExtensionContext) {
       if (localFilePath) {
         let uri: vscode.Uri = vscode.Uri.file(localFilePath);
         await vscode.window.showTextDocument(uri);
-        await setReadWrite(item);
       }
     }
   );
@@ -342,8 +338,6 @@ export async function activate(context: vscode.ExtensionContext) {
         // show the document
         await vscode.window.showTextDocument(openDocument);
 
-        setReadWrite(item);
-
         // scroll to bottom of document
         enterpriseService.scrollToBottom();
       } else {
@@ -363,37 +357,10 @@ export async function activate(context: vscode.ExtensionContext) {
         let localUri: vscode.Uri = vscode.Uri.file(localFilePath);
         await vscode.window.showTextDocument(localUri, { preview: false });
 
-        setReadWrite(item);
-
         // scroll to bottom of log files
         if (localUri.toString().endsWith(".log")) {
           enterpriseService.scrollToBottom();
         }
-      }
-    }
-  }
-
-  // set document to read only if item is not checked out and vice versa (requires vscode insiders)
-  async function setReadWrite(item: TreeEnterpriseItem) {
-    // check if the commands are available (VSCode version >= 1.79 (May 2023))
-    // see https://code.visualstudio.com/updates/v1_79#_readonly-mode
-    if (!(await vscode.commands.getCommands()).includes("workbench.action.files.setActiveEditorReadonlyInSession")) {
-      return;
-    }
-
-    // check if the item is checked out by the current user
-    if (item.checkedOutBy === user) {
-      vscode.commands.executeCommand(
-        "workbench.action.files.resetActiveEditorReadonlyInSession"
-      );
-    }
-    else {
-      vscode.commands.executeCommand(
-        "workbench.action.files.setActiveEditorReadonlyInSession"
-      );
-
-      if (item.type !== EnterpriseItemType.ServerLog) {
-        vscode.window.showInformationMessage("Please check out the item to make changes.");
       }
     }
   }
@@ -417,9 +384,11 @@ export async function activate(context: vscode.ExtensionContext) {
         remoteUri = enterpriseService.getUriFromLocalPath(item.path);
       }
 
-      // document not saved, save it first
-      if (vscode.window.activeTextEditor?.document.isDirty) {
-        await vscode.commands.executeCommand("STARLIMS.Save", item);
+      if (item.checkedOutBy === user) {
+        // document not saved, save it first
+        if (vscode.window.activeTextEditor?.document.isDirty) {
+          await vscode.commands.executeCommand("STARLIMS.Save", item);
+        }
       }
 
       outputChannel.appendLine(
@@ -480,13 +449,13 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.Checkout",
     async (item: TreeEnterpriseItem | any) => {
       if (!(item instanceof TreeEnterpriseItem)) {
-        item = await enterpriseProvider.getTreeItemForDocument(vscode.window.activeTextEditor?.document);
+        item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
       }
 
-      let bSuccess = await enterpriseService.CheckOut(item.uri);
+      let bSuccess =   await enterpriseService.CheckOut(item.uri);
       if (bSuccess) {
         item.checkedOutBy = user;
-        enterpriseProvider.refresh();
+        enterpriseTreeProvider.refresh();
         vscode.commands.executeCommand("STARLIMS.GetLocal", item);
 
         // refresh checked out items
@@ -500,7 +469,7 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.Checkin",
     async (item: TreeEnterpriseItem | any) => {
       if (!(item instanceof TreeEnterpriseItem)) {
-        item = await enterpriseProvider.getTreeItemForDocument(vscode.window.activeTextEditor?.document);
+        item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
       }
 
       let checkinReason: string =
@@ -513,9 +482,8 @@ export async function activate(context: vscode.ExtensionContext) {
       let bSuccess = await enterpriseService.CheckIn(item.uri, checkinReason);
       if (bSuccess) {
         item.checkedOutBy = "";
-        enterpriseProvider.refresh();
-        setReadWrite(item);
-
+        enterpriseTreeProvider.refresh();
+        
         // refresh checked out items
         vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
       }
@@ -527,7 +495,7 @@ export async function activate(context: vscode.ExtensionContext) {
     "STARLIMS.UndoCheckOut",
     async (item: TreeEnterpriseItem | any) => {
       if (!(item instanceof TreeEnterpriseItem)) {
-        item = await enterpriseProvider.getTreeItemForDocument(vscode.window.activeTextEditor?.document);
+        item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
       }
 
       // ask for confirmation
@@ -544,8 +512,7 @@ export async function activate(context: vscode.ExtensionContext) {
       let bSuccess = await enterpriseService.undoCheckOut(item.uri);
       if (bSuccess) {
         item.checkedOutBy = "";
-        enterpriseProvider.refresh();
-        setReadWrite(item);
+        enterpriseTreeProvider.refresh();
 
         // refresh checked out items
         vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
@@ -557,7 +524,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.Refresh",
     async () => {
-      enterpriseProvider.refresh();
+      enterpriseTreeProvider.refresh();
     }
   );
 
@@ -565,7 +532,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.ShowTreeView",
     async () => {
-      enterpriseProvider.refresh();
+      enterpriseTreeProvider.refresh();
     }
   );
 
@@ -616,7 +583,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
       executeWithProgress(async () => {
-        await enterpriseProvider.search(itemName, "", false, false);
+        await enterpriseTreeProvider.search(itemName, "", false, false);
       }, "Searching STARLIMS Enterprise...");
     }
   );
@@ -951,14 +918,14 @@ export async function activate(context: vscode.ExtensionContext) {
       var sReturn = await enterpriseService.addItem(itemName, itemType, itemLanguage, categoryName, appName);
 
       if (sReturn.length > 0) {
-        enterpriseProvider.refresh();
+        enterpriseTreeProvider.refresh();
 
         // wait for the tree to refresh
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // open newly created item (works only if section is expanded)
         var sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
-        var newItem = await enterpriseProvider.getTreeItemByUri(sUri);
+        var newItem = await enterpriseTreeProvider.getTreeItemByUri(sUri);
         if (newItem !== undefined) {
           vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
         }
@@ -1005,7 +972,7 @@ export async function activate(context: vscode.ExtensionContext) {
           });
         }
         selectedItem = undefined;
-        enterpriseProvider.refresh();
+        enterpriseTreeProvider.refresh();
       }
     }
   );
@@ -1190,7 +1157,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       async function findScriptOnServer(scriptName: string, procedureName: string | undefined) {
-        let itemFound = await enterpriseProvider.search(scriptName, "SS", true, false);
+        let itemFound = await enterpriseTreeProvider.search(scriptName, "SS", true, false);
         if (itemFound) {
           await vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
           // get new editor
@@ -1254,7 +1221,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // use search to find the script
-        const itemFound = await enterpriseProvider.search(scriptName, "DS", true, false);
+        const itemFound = await enterpriseTreeProvider.search(scriptName, "DS", true, false);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1275,7 +1242,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
-        const itemFound = await enterpriseProvider.search(scriptName, "CS", true, false);
+        const itemFound = await enterpriseTreeProvider.search(scriptName, "CS", true, false);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1296,7 +1263,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const formName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
-        const itemFound = await enterpriseProvider.search(formName, "FORMCODEBEHIND", true, false);
+        const itemFound = await enterpriseTreeProvider.search(formName, "FORMCODEBEHIND", true, false);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1373,7 +1340,7 @@ export async function activate(context: vscode.ExtensionContext) {
           ignoreFocusOut: true
         }
       );
-      if(itemTypes === undefined) {
+      if (itemTypes === undefined) {
         return;
       }
 
@@ -1390,7 +1357,7 @@ export async function activate(context: vscode.ExtensionContext) {
           },
           async (progress, token) => {
             // find all items matching the search term
-            await enterpriseProvider.search(searchTerm, itemTypesString, false, true);
+            await enterpriseTreeProvider.search(searchTerm, itemTypesString, false, true);
           }
         );
       }

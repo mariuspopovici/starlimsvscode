@@ -1,7 +1,7 @@
 "use strict";
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
-import { Enterprise } from "../services/enterprise";
+import { IEnterpriseService } from "../services/iEnterpriseService";
 import path from "path";
 
 /**
@@ -12,7 +12,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     new vscode.EventEmitter<TreeEnterpriseItem | null>();
   readonly onDidChangeTreeData: vscode.Event<TreeEnterpriseItem | null> = this._onDidChangeTreeData.event;
 
-  private service: Enterprise;
+  private service: IEnterpriseService;
   private dataMode: string = "LOAD";
   private treeItems: TreeEnterpriseItem[] = [];
   static service: any;
@@ -21,7 +21,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * Class constructor
    * @param enterpriseService Enterprise service
   */
-  constructor(enterpriseService: Enterprise) {
+  constructor(enterpriseService: IEnterpriseService) {
     this.service = enterpriseService;
   }
 
@@ -90,7 +90,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         this.dataMode = "LOAD";
       }
 
-      let treeData = await this.service.getEnterpriseItems(uri);
+      let treeData = await this.service.getEnterpriseItems(uri, false);
       this.treeItems = [];
 
       // insert dummy item to show "No items found" message
@@ -159,19 +159,17 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   }
 
   /**
-   * Get corresponding tree item from open document
-   * @param document The document to get the tree item for
+   * Get corresponding tree item from local path
+   * @param localPath The local path of the document
+   * @param bSilent If true, no error message will be shown
    * @returns The tree item for the document
    */
-  async getTreeItemForDocument(document: any): Promise<TreeEnterpriseItem | undefined> {
-    const localUri = document.uri;
-    const config = this.service.getConfig();
-    const rootPath: string = path.join(config.get("rootPath") as string, "SLVSCODE");
-    let remotePath = localUri.path.slice(rootPath.length + 1);
-    remotePath = remotePath.slice(0, remotePath.lastIndexOf("."));
-    remotePath = remotePath.startsWith("/") ? remotePath : `/${remotePath}`;
+  async getTreeItemFromPath(localPath: string, bSilent: boolean): Promise<TreeEnterpriseItem | undefined> {
+    // get remote uri from local path
+    const uri = await this.service.getUriFromLocalPath(localPath);
 
-    const [item] = await this.service.getEnterpriseItems(remotePath);
+    // get tree item from the server
+    const [item] = await this.service.getEnterpriseItems(uri, bSilent);
 
     let newItem = new TreeEnterpriseItem(
       item.type,
@@ -183,6 +181,8 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
       item.filePath,
       item.guid
     );
+
+    newItem.checkedOutBy = item.checkedOutBy;
 
     return newItem;
   }

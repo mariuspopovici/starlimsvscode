@@ -214,6 +214,7 @@ Date......... : 2018-11-02
 :PROCEDURE GetURIComponents;
 :PARAMETERS sURI;
 :DECLARE aURIComponents;
+	sURI := Replace(sURI, "\", "/");
 	aURIComponents := BuildArray(sURI,,"/",,.T.);
 	:IF Len(aURIComponents) > 0;
 		:RETURN DelArray(aURIComponents, 1);
