@@ -1,8 +1,8 @@
 /**
  * Defines the interface for STARLIMS enterprise services.
  */
-export interface Enterprise {
-  getEnterpriseItems(uri: string): any;
+export interface IEnterpriseService {
+  getEnterpriseItems(uri: string, bSilent: boolean): any;
   getEnterpriseItemCode(uri: string): any;
   getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean): Promise<string | null>;
   getConfig(): any;
@@ -22,4 +22,6 @@ export interface Enterprise {
   getTableDefinition(uri: string): any;
   getVersion(): any;
   upgradeBackend(sdpPackage: string): any;
+  isCheckedOut(uri: string): any;
+  setCheckedOut(uri: string, username: string | null): any;
 }
