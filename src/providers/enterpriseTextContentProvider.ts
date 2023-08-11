@@ -45,7 +45,7 @@ export class EnterpriseTextDocumentContentProvider
     }
 
     // Check if the document is checked out (is null or empty string)
-    if (item.checkedOutBy === null || item.checkedOutBy === '') {
+    if (item.checkedOutBy === '') {
       // Revert the changes made by the user
       await vscode.commands.executeCommand('workbench.action.files.revert', document.uri);
 

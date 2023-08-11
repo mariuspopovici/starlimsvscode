@@ -569,7 +569,7 @@ Returns the table ID for the table identified by TableName
 						else t.LAYERID
 					end";
  
-	aReturn := SqlExecute(sSQL, "DICTIONARY");
+	aReturn := SqlExecute(sSQL, "DICTIONARY"); 
 	
 	:IF Len(aReturn) = 0;
 		:RETURN "";

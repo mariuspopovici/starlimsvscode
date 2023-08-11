@@ -166,8 +166,9 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    */
   async getTreeItemFromPath(localPath: string, bSilent: boolean): Promise<TreeEnterpriseItem | undefined> {
     // get remote uri from local path
-    const uri = await this.service.getUriFromLocalPath(localPath);
-
+    let uri = await this.service.getUriFromLocalPath(localPath);
+    uri = uri.replace(/\\/g, "/");
+    
     // get tree item from the server
     const [item] = await this.service.getEnterpriseItems(uri, bSilent);
 
