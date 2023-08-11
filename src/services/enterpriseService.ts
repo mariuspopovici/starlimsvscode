@@ -4,19 +4,21 @@ import { Headers } from "node-fetch";
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { Enterprise } from "./enterprise";
+import { IEnterpriseService } from "./iEnterpriseService";
 import { connectBridge } from "../utilities/bridge";
 import { cleanUrl } from "../utilities/miscUtils";
-
+import { EnterpriseTextDocumentContentProvider } from "../providers/enterpriseTextContentProvider";
+import { userInfo } from "os";
 /**
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
  * at time using the SCM_API REST services in STARLIMS backed.
  */
-export class EnterpriseService implements Enterprise {
+export class EnterpriseService implements IEnterpriseService {
   private config: any;
   private baseUrl: string;
   private refreshSessionInterval: NodeJS.Timeout | undefined;
   private SLVSCODE_FOLDER: string = "SLVSCODE";
+  private checkedOutDocuments: Map<string, string> = new Map<string, string>();
 
   /**
    * Constructor
@@ -252,7 +254,7 @@ export class EnterpriseService implements Enterprise {
    * @param uri the URI of the remote STARLIMS code item.
    * @returns A descriptor object with the following properties: name, type, uri, language, isFolder
    */
-  public async getEnterpriseItems(uri: string) {
+  public async getEnterpriseItems(uri: string, bSilent: boolean = false) {
     const params = new URLSearchParams([["URI", uri]]);
     const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
@@ -267,17 +269,24 @@ export class EnterpriseService implements Enterprise {
       if (success) {
         return data.items;
       } else {
-        vscode.window.showErrorMessage("Could not retrieve enterprise items.");
-        console.log(data);
+        if (!bSilent) {
+          vscode.window.showErrorMessage("Could not retrieve enterprise items.");
+          console.log(data);
+        }
         return [];
       }
     } catch (e: any) {
-      console.error(e);
-      vscode.window.showErrorMessage("Could not retrieve enterprise items.");
+      if (!bSilent) {
+        console.error(e);
+        vscode.window.showErrorMessage("Could not retrieve enterprise items.");
+      }
       return [];
     }
   }
 
+  /**
+   * 
+   */
   /**
    * Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
    * by the specified URI.
@@ -332,6 +341,7 @@ export class EnterpriseService implements Enterprise {
       const response = await fetch(url, options);
       const { success }: { success: boolean } = await response.json();
       if (success) {
+        this.setCheckedOut(uri, "");
         vscode.window.showInformationMessage("Enterprise item checked out successfully.");
         return true;
       } else {
@@ -372,6 +382,7 @@ export class EnterpriseService implements Enterprise {
       const response = await fetch(url, options);
       const { success }: { success: boolean } = await response.json();
       if (success) {
+        this.checkedOutDocuments.delete(uri);
         vscode.window.showInformationMessage("Enterprise item checked in successfully.");
         return true;
       } else {
@@ -610,7 +621,7 @@ export class EnterpriseService implements Enterprise {
       return [];
     }
   }
-  
+
   /**
    * Delete enterprise item
    * @param uri the URI of the enterprise item
@@ -838,6 +849,7 @@ export class EnterpriseService implements Enterprise {
       const response = await fetch(url, options);
       const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
+        this.checkedOutDocuments.clear();
         vscode.window.showInformationMessage("All items checked in successfully.");
         return true;
       } else {
@@ -869,6 +881,7 @@ export class EnterpriseService implements Enterprise {
       const response = await fetch(url, options);
       const { success, data }: { success: boolean; data: any } = await response.json();
       if (success) {
+        this.checkedOutDocuments.delete(uri);
         vscode.window.showInformationMessage("Check out of item undone successfully.");
         return true;
       } else {
@@ -881,5 +894,31 @@ export class EnterpriseService implements Enterprise {
       console.error(e);
       return false;
     }
+  }
+
+  /**
+   * Check if item is checked out
+   * @param uri the URI of the enterprise item
+   * @returns true if the item is checked out, false otherwise
+   */
+  public async isCheckedOut(uri: string) {
+    uri = uri.replace(/\\/g, "/");
+    // check if document is in checked out documents map
+    if (this.checkedOutDocuments.has(uri)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  /**
+   * Set item as checked out by current user
+   * @param uri the URI of the enterprise item
+   */
+  public async setCheckedOut(uri: string, username: string | null) {
+    var user = (username === null) ? this.config.username : username;
+    uri = uri.replace(/\\/g, "/");
+    this.checkedOutDocuments.set(uri, user);
   }
 }

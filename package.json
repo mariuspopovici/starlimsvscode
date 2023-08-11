@@ -3,7 +3,7 @@
   "displayName": "STARLIMS VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.60",
+  "version": "1.2.61",
   "icon": "resources/extension/starlimsvscode.png",
   "publisher": "MariusPopovici",
   "author": {
@@ -58,7 +58,7 @@
         "title": "Refresh Explorer"
       },
       {
-        "command": "STARLIMS.Checkout",
+        "command": "STARLIMS.CheckOut",
         "title": "Check Out"
       },
       {
@@ -319,7 +319,7 @@
           "group": "run"
         },
         {
-          "command": "STARLIMS.Checkout",
+          "command": "STARLIMS.CheckOut",
           "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
           "group": "sourceControl"
         },
@@ -395,7 +395,7 @@
           "group": "sourceControl"
         },
         {
-          "command": "STARLIMS.Checkout",
+          "command": "STARLIMS.CheckOut",
           "when": "view == STARLIMSMainTree",
           "group": "sourceControl"
         },
@@ -444,7 +444,7 @@
           "group": "run"
         },
         {
-          "command": "STARLIMS.Checkout",
+          "command": "STARLIMS.CheckOut",
           "when": "resourceDirname =~ /SLVSCODE/ && editorLangId != 'log'",
           "group": "sourceControl"
         },
@@ -615,6 +615,7 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "build": "(rm -rf out || true) && mkdir out && cp package.json out && cd ./src/backend && ./create-packages.sh && cd ../.. && vsce package",
+    "build-windows": "if exist out rmdir /s /q out & mkdir out & copy package.json out & cd .\\src\\backend & .\\create-packages.sh & cd ..\\.. & vsce package",
     "vsce": "vsce"
   },
   "devDependencies": {
