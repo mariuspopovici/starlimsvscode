@@ -341,7 +341,7 @@ export class EnterpriseService implements IEnterpriseService {
       const response = await fetch(url, options);
       const { success }: { success: boolean } = await response.json();
       if (success) {
-        this.setCheckedOut(uri);
+        this.setCheckedOut(uri, "");
         vscode.window.showInformationMessage("Enterprise item checked out successfully.");
         return true;
       } else {
@@ -916,8 +916,9 @@ export class EnterpriseService implements IEnterpriseService {
    * Set item as checked out by current user
    * @param uri the URI of the enterprise item
    */
-  public async setCheckedOut(uri: string) {
+  public async setCheckedOut(uri: string, username: string | null) {
+    var user = (username === null) ? this.config.username : username;
     uri = uri.replace(/\\/g, "/");
-    this.checkedOutDocuments.set(uri, this.config.username);
+    this.checkedOutDocuments.set(uri, user);
   }
 }

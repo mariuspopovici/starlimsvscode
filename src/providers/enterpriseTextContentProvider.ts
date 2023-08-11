@@ -66,7 +66,7 @@ export class EnterpriseTextDocumentContentProvider
       }
     }
     else {
-      this.service.setCheckedOut(uri);
+      this.service.setCheckedOut(uri, null);
     }
   }
 }

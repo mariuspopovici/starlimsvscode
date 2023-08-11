@@ -23,5 +23,5 @@ export interface IEnterpriseService {
   getVersion(): any;
   upgradeBackend(sdpPackage: string): any;
   isCheckedOut(uri: string): any;
-  setCheckedOut(uri: string): any;
+  setCheckedOut(uri: string, username: string | null): any;
 }
