@@ -209,6 +209,7 @@ bFolder := .T.;
 		sGUID := oUtils:GetItemGUID(sItemName, oEnterpriseItem:Type);
 		
 		/* get checked out by user;
+		:DECLARE sSQL, aReturn;
 		sSQL := "select CHECKEDOUTBY from LIMSSOURCECONTROL where ITEMID = ? and DONE = 0";
 		aReturn := LSelect(sSQL,, "DICTIONARY", {sGUID});
 		:IF Empty(aReturn);
@@ -254,8 +255,7 @@ aResultItems := {};
 			sLanguage := "SERVERLOG";
 		:EXITCASE;
 	:ENDCASE;
-	
-	/*usrmes(aItems[i]);
+
 	:DECLARE oItem;
 	oItem := oUtils:RemoveDBNull(CreateUDObject({
 		{"name", aItems[i][1]},
