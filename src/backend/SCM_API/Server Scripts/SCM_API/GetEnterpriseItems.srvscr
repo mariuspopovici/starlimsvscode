@@ -3,8 +3,9 @@ Description.. :	Get enterprise tree
 Author....... :	MARIUS, DC
 Date......... : 2018-11-06
 *******************************************************************************/;
-:DECLARE sOutType, aItems, aEnterpriseCategories, i, oResult, sDataSet, oDataSet, bFolder;
-:DECLARE aApplicationSubCategories, aTablesSubCategories, sURI, oRow;
+:DECLARE sOutType, aItems, aEnterpriseCategories, i, oResult, sDataSet, oDataSet, bFolder,
+		 aApplicationSubCategories, aTablesSubCategories, sURI, oRow, sGUID, sCheckedOutBy,
+		 sItemName;
 
 :IF Request:QueryString:IsProperty("URI");
 	sURI := Request:QueryString:URI;
@@ -117,7 +118,7 @@ bFolder := .T.;
 		bFolder := .F.;
 		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetList", {oEnterpriseItem:AppName, "HTML"});
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
-		:DECLARE sFormName, sGUID;
+		:DECLARE sFormName;
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			sFormName := oEnterpriseItem:AppName + "." + oRow["FORMNAME"];
@@ -194,11 +195,28 @@ bFolder := .T.;
 	:EXITCASE; 
 	
 	:CASE AScanExact({"APPSS", "APPCS", "APPDS", "HTMLFORMXML", "HTMLFORMGUIDE", 
-			"HTMLFORMCODE", "XFDFORMXML", "XFDFORMCODE", "CS", "DS", "SERVERLOG", "SS", "APPSS"}, 
+			"HTMLFORMCODE", "XFDFORMXML", "XFDFORMCODE", "CS", "DS", "SS", "SERVERLOG"}, 
 			oEnterpriseItem:Type) > 0;
 		sOutType := oEnterpriseItem:Type;
 		bFolder := .F.;
-		AAdd(aItems, {oEnterpriseItem:Type, sOutType, sOutType, sURI, "", oUtils:GetItemGUID(sURI)});
+
+		:IF !Empty(oEnterpriseItem:AppName);
+			sItemName := oEnterpriseItem:AppName + "." + oEnterpriseItem:Name;
+		:ELSE;
+			sItemName := oEnterpriseItem:CategoryName + "." + oEnterpriseItem:Name;
+		:ENDIF;
+		
+		sGUID := oUtils:GetItemGUID(sItemName, oEnterpriseItem:Type);
+		
+		/* get checked out by user;
+		sSQL := "select CHECKEDOUTBY from LIMSSOURCECONTROL where ITEMID = ? and DONE = 0";
+		aReturn := LSelect(sSQL,, "DICTIONARY", {sGUID});
+		:IF Empty(aReturn);
+			sCheckedOutBy := "";
+		:ELSE;
+			sCheckedOutBy := aReturn[1][1];
+		:ENDIF;
+		AAdd(aItems, {oEnterpriseItem:Type, sOutType, sOutType, sURI, sCheckedOutBy, sGUID});
 	:EXITCASE; 
 	
 	:CASE oEnterpriseItem:Type == "ENT_CAT_TABLES";
@@ -236,6 +254,7 @@ aResultItems := {};
 			sLanguage := "SERVERLOG";
 		:EXITCASE;
 	:ENDCASE;
+
 	:DECLARE oItem;
 	oItem := oUtils:RemoveDBNull(CreateUDObject({
 		{"name", aItems[i][1]},
