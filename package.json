@@ -615,6 +615,7 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "build": "(rm -rf out || true) && mkdir out && cp package.json out && cd ./src/backend && ./create-packages.sh && cd ../.. && vsce package",
+    "build-windows": "if exist out rmdir /s /q out & mkdir out & copy package.json out & cd .\\src\\backend & .\\create-packages.sh & cd ..\\.. & vsce package",
     "vsce": "vsce"
   },
   "devDependencies": {
