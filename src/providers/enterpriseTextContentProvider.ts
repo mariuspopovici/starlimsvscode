@@ -68,5 +68,6 @@ export class EnterpriseTextDocumentContentProvider
     else {
       this.service.setCheckedOut(uri, null);
     }
+    this.promptOpen = false;
   }
 }
