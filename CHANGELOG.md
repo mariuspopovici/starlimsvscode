@@ -125,3 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.59] - 2023-08-10
 
 - added initial support for full text search in code items, similar to the STARLIMS designer global search
+
+## [1.2.62] - 2023-09-06
+
+- Bug fix: check Out message not showing after closing it.
