@@ -7,8 +7,8 @@ import * as path from "path";
 import { IEnterpriseService } from "./iEnterpriseService";
 import { connectBridge } from "../utilities/bridge";
 import { cleanUrl } from "../utilities/miscUtils";
-import { EnterpriseTextDocumentContentProvider } from "../providers/enterpriseTextContentProvider";
-import { userInfo } from "os";
+// import { EnterpriseTextDocumentContentProvider } from "../providers/enterpriseTextContentProvider";
+// import { userInfo } from "os";
 /**
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
  * at time using the SCM_API REST services in STARLIMS backed.

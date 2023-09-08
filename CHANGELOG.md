@@ -126,6 +126,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added initial support for full text search in code items, similar to the STARLIMS designer global search
 
-## [1.2.62] - 2023-09-06
+## [1.2.63] - 2023-09-06
 
 - Bug fix: check Out message not showing after closing it.
+
+## [1.2.64] - 2023-09-08
+
+- Updated icons
+- Storing user password is secure storage vs settings.json
+- Show form resources for HTML and XFD forms
