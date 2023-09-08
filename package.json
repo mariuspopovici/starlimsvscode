@@ -220,6 +220,10 @@
           "dark": "resources/dark/codesearch.svg",
           "light": "resources/light/codesearch.svg"
         }
+      },
+      {
+        "command": "STARLIMS.setPassword",
+        "title": "Set user password"
       }
     ],
     "keybindings": [
@@ -251,6 +255,11 @@
       {
         "command": "STARLIMS.RefreshLogChannel",
         "key": "f5",
+        "when": "inOutput && editorLangId == 'Log'"
+      },
+      {
+        "command": "STARLIMS.ClearLogChannel",
+        "key": "ctrl+f5",
         "when": "inOutput && editorLangId == 'Log'"
       },
       {
@@ -520,22 +529,22 @@
           "STARLIMS.url": {
             "type": "string",
             "default": "",
-            "description": "STARLIMS Installation URL. For example: https://server/STARLIMS.Dev/"
+            "description": "STARLIMS Installation URL. For example: https://my.starlims.server.com/STARLIMS/"
           },
           "STARLIMS.user": {
             "type": "string",
             "default": "",
-            "description": "STARLIMS User ID"
+            "description": "STARLIMS User Name"
           },
-          "STARLIMS.password": {
-            "type": "string",
-            "default": "",
-            "description": "STARLIMS User Password"
+          "STARLIMS.userPassword": {
+            "type": "null",
+            "description": "STARLIMS User Password. This value is not stored in the settings file.",
+            "markdownDescription": "[Set Password](command:STARLIMS.setPassword)"
           },
           "STARLIMS.rootPath": {
             "type": "string",
             "default": "",
-            "description": "Root path for temporary STARLIMS files. For example: C:\\STARLIMS\\. SLVSCODE will be appended to this path."
+            "description": "Root path for downloaded STARLIMS files. For example: C:\\STARLIMS\\. SLVSCODE will be appended to this path."
           },
           "STARLIMS.browser": {
             "type": "string",
