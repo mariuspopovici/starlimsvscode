@@ -168,7 +168,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     // get remote uri from local path
     let uri = await this.service.getUriFromLocalPath(localPath);
     uri = uri.replace(/\\/g, "/");
-    
+
     // get tree item from the server
     const [item] = await this.service.getEnterpriseItems(uri, bSilent);
 
@@ -199,7 +199,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   }
 
   /**
-   *  Returns a URI for the item if it is checked out by the current user.
+   * Returns a URI for the item if it is checked out by the current user.
    * @param item The item to check
    * @returns A URI for the item if it is checked out by the current user, otherwise undefined.
    */
@@ -302,7 +302,9 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           return this.getCustomIcon("js.svg");
 
         case EnterpriseItemType.XFDFormXML:
+        case EnterpriseItemType.XFDFormResources:
         case EnterpriseItemType.HTMLFormXML:
+        case EnterpriseItemType.HTMLFormResources:
           return this.getCustomIcon("xml.svg");
 
         case EnterpriseItemType.HTMLFormGuide:
@@ -1021,11 +1023,13 @@ export enum EnterpriseItemType {
   XFDFormCategory = "ENT_APP_XFD_FRM",
   XFDFormXML = "XFDFORMXML",
   XFDFormCode = "XFDFORMCODE",
+  XFDFormResources = "XFDFORMRESOURCES",
 
   HTMLFormCategory = "ENT_APP_HTML_FRM",
   HTMLFormXML = "HTMLFORMXML",
   HTMLFormCode = "HTMLFORMCODE",
   HTMLFormGuide = "HTMLFORMGUIDE",
+  HTMLFormResources = "HTMLFORMRESOURCES",
 
   PhoneForm = "PHONEFORM",
   TabletForm = "TABLETFORM",

@@ -118,6 +118,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
       case EnterpriseItemType.XFDFormXML:
       case EnterpriseItemType.HTMLFormXML:
+      case EnterpriseItemType.HTMLFormResources:
         return this.getCustomIcon("xml.svg");
 
       case EnterpriseItemType.ServerScript:
