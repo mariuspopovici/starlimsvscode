@@ -3,7 +3,7 @@
   "displayName": "STARLIMS VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.62",
+  "version": "1.2.63",
   "icon": "resources/extension/starlimsvscode.png",
   "publisher": "MariusPopovici",
   "author": {

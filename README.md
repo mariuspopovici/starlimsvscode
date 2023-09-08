@@ -17,8 +17,8 @@ This is an unofficial, unsupported, extension so use at your own risk.
 ## Pre-requisites
 
 - Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
-  - If deploying on a product development environment (layer ID 200) then make sure you select the "Overwrite System Layer" option during import
-- Import .sdp package into STARLIMS Designer.
+- Import .sdp package into STARLIMS Designer. Subsequent versions will be updated automatically.
+  - If you are deploying on a product development environment (System Layer ID 200) please make sure to select the "Overwrite System Layer" option during the package import
 - Add the following setting to STARLIMS web.config file
 
 ```
@@ -117,4 +117,5 @@ New features:
 - Go to script/form under the cursor
 - View checked out items, check in pending, undo check out, view checked out items from all uses, refresh checked out items tree
 - Global search / full text search in code items
+- View form resources
 - Misc. bug fixes
