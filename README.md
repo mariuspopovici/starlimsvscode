@@ -17,6 +17,7 @@ This is an unofficial, unsupported, extension so use at your own risk.
 ## Pre-requisites
 
 - Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
+  - If deploying on a product development environment (layer ID 200) then make sure you select the "Overwrite System Layer" option during import
 - Import .sdp package into STARLIMS Designer.
 - Add the following setting to STARLIMS web.config file
 
