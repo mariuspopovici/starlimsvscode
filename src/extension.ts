@@ -10,14 +10,16 @@ import path = require("path");
 import { DataViewPanel } from "./panels/DataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
+import { DOMParser } from "@xmldom/xmldom";
 
 const { version } = require('../package.json');
 const SLVSCODE_FOLDER = "SLVSCODE";
 
 export async function activate(context: vscode.ExtensionContext) {
+  const secretStorage: vscode.SecretStorage = context.secrets;
   let config = vscode.workspace.getConfiguration("STARLIMS");
   let user: string | undefined = config.get("user");
-  let password: string | undefined = config.get("password");
+  let password: string | undefined;
   let url: string | undefined = config.get("url");
   let rootPath: string | undefined = config.get("rootPath");
   let reloadConfig = false;
@@ -27,7 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!url) {
     url = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
-      placeHolder: "STARLIMS URL (e. g. https://starlims.example.com/STARLIMS/)",
+      placeHolder: "STARLIMS URL (e. g. https://my.starlims.server.com/STARLIMS/)",
       prompt: "Please enter your STARLIMS URL.",
       ignoreFocusOut: true
     });
@@ -42,7 +44,20 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  // ensure user and password are defined and prompt for values if not
+  // register the setPassword command
+  vscode.commands.registerCommand('STARLIMS.setPassword', async () => {
+    const passwordInput: string = await vscode.window.showInputBox({
+      title: "Configure STARLIMS",
+      placeHolder: "STARLIMS Password",
+      prompt: `Please enter the password for the STARLIMS User '${user}'.`,
+      password: true,
+      ignoreFocusOut: true
+    }) ?? '';
+
+    secretStorage.store("userPassword", passwordInput);
+  });
+
+  // ensure Starlims user name is defined and prompt for it if not
   if (!user) {
     user = await vscode.window.showInputBox({
       title: "Configure STARLIMS",
@@ -60,23 +75,12 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  // ensure password is defined and prompt for value if not
+  // get password from secret storage
+  password = await secretStorage.get("userPassword");
+
+  // prompt for password if not found in secret storage
   if (!password) {
-    password = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
-      placeHolder: "STARLIMS Password",
-      prompt: `Please enter the password for the STARLIMS User '${user}'.`,
-      password: true,
-      ignoreFocusOut: true
-    });
-    if (password) {
-      await config.update("password", password, false);
-      reloadConfig = true;
-    } else {
-      vscode.window.showErrorMessage(
-        "Please configure the STARLIMS User Password in the extension settings."
-      );
-    }
+    password = await vscode.commands.executeCommand('STARLIMS.setPassword');
   }
 
   // ensure base path is defined and prompt for value if not
@@ -287,9 +291,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  /**
+   *  Returns the handler function for the selected enterprise item.
+   * @param item the enterprise tree item to handle
+   * @returns the handler function for the selected enterprise item
+   */
   function getSelectItemHandler(item: TreeEnterpriseItem): Function | undefined {
     const config = new Map([
       [EnterpriseItemType.Table, handleSelectTableItem],
+      [EnterpriseItemType.HTMLFormResources, handleSelectResourcesItem],
+      [EnterpriseItemType.XFDFormResources, handleSelectResourcesItem]
     ]);
 
     return config.has(item.type) ? config.get(item.type) : handleSelectCodeItem;
@@ -308,6 +319,52 @@ export async function activate(context: vscode.ExtensionContext) {
         name: tableName,
         data: result,
         title: `Table Definition: ${tableName}`
+      });
+    }
+  }
+
+  /**
+   * Handles selecting a resources item in the enterprise tree.
+   * 
+   * @param item the enterprise tree item to handle
+   */
+  async function handleSelectResourcesItem(item: TreeEnterpriseItem) {
+    // get the remote URI
+    const remoteUri = enterpriseService.getEnterpriseItemUri(
+      item.uri,
+      rootPath!
+    );
+
+    var dataSet = await enterpriseService.getEnterpriseItemCode(remoteUri);
+
+    if (dataSet) {
+      const formName = item.uri.split('/').pop();
+
+      // Create a new DOMParser
+      const parser = new DOMParser();
+
+      // Parse the XML string
+      const xmlDoc = parser.parseFromString(dataSet.code, 'text/xml');
+
+      // Extract values into a 2D array
+      const resourcesArray: any[][] = [];
+
+      const resourcesTableNodes =  Array.from(xmlDoc.getElementsByTagName('ResourcesTable'));
+      for (const resourcesTableNode of resourcesTableNodes) {
+        const guid = resourcesTableNode.getElementsByTagName('Guid')[0].textContent;
+        const resourceId = resourcesTableNode.getElementsByTagName('ResourceId')[0].textContent;
+        const resourceValue = resourcesTableNode.getElementsByTagName('ResourceValue')[0].textContent;
+
+        resourcesArray.push([guid, resourceId, resourceValue]);
+      }
+
+      const header = ['Guid', 'ResourceId', 'ResourceValue'];
+      const tableData = [header, ...resourcesArray];
+
+      DataViewPanel.render(context.extensionUri, {
+        name: `Form Resources of ${formName}`,
+        data: JSON.stringify(tableData, null, 2),
+        title: `Form Resources: ${formName}`
       });
     }
   }
@@ -452,7 +509,7 @@ export async function activate(context: vscode.ExtensionContext) {
         item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
       }
 
-      let bSuccess =   await enterpriseService.CheckOut(item.uri);
+      let bSuccess = await enterpriseService.CheckOut(item.uri);
       if (bSuccess) {
         item.checkedOutBy = user;
         enterpriseTreeProvider.refresh();
@@ -483,7 +540,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (bSuccess) {
         item.checkedOutBy = "";
         enterpriseTreeProvider.refresh();
-        
+
         // refresh checked out items
         vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
       }
@@ -1375,3 +1432,4 @@ export async function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
+

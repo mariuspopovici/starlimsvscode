@@ -135,7 +135,11 @@ Date......... : 2018-11-02
 						:IF sFormCodeType == "Guide";
 							oEnterpriseItem:Type := "HTMLFORMGUIDE";
 						:ELSE;
-							oEnterpriseItem:Type := "HTMLFORMCODE";
+							:IF sFormCodeType == "Resources";
+								oEnterpriseItem:Type := "HTMLFORMRESOURCES";
+							:ELSE;
+								oEnterpriseItem:Type := "HTMLFORMCODE";
+							:ENDIF;
 						:ENDIF;
 					:ENDIF;
 				:EXITCASE;
@@ -145,7 +149,11 @@ Date......... : 2018-11-02
 					:IF sFormCodeType == "XML";
 						oEnterpriseItem:Type := "XFDFORMXML";
 					:ELSE;
-						oEnterpriseItem:Type := "XFDFORMCODE";
+						:IF sFormCodeType == "Resources";
+							oEnterpriseItem:Type := "XFDFORMRESOURCES";
+						:ELSE;
+							oEnterpriseItem:Type := "XFDFORMCODE";
+						:ENDIF;
 					:ENDIF;
 				:EXITCASE;
 			:ENDCASE;	
@@ -263,10 +271,10 @@ Returns the GUID of an item
 		:CASE sItemType == "DS" .OR. sItemType == "APPDS";
 			sGUID := Me:GetDataSourceId(aItemName[1], aItemName[2]);
 		:EXITCASE;
-		:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE" .OR. sItemType == "HTMLFORMGUIDE";
+		:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE" .OR. sItemType == "HTMLFORMGUIDE" .OR. sItemType == "HTMLFORMRESOURCES";
 			sGUID := Me:GetFormId(aItemName[1], aItemName[2], "HTML");
 		:EXITCASE;
-		:CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE";
+		:CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE" .OR. sItemType == "XFDFORMRESOURCES";
 			sGUID := Me:GetFormId(aItemName[1], aItemName[2], "XFD");
 		:EXITCASE;
 		:CASE sItemType == "TABLE";

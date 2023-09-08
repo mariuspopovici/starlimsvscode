@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
 import { getUri } from "../utilities/getUri";
-import { platform } from "os";
+//import { platform } from "os";
 
 export class DataViewPanel {
   public static currentPanel: DataViewPanel | undefined;
@@ -28,6 +28,7 @@ export class DataViewPanel {
     this._setWebviewMessageListener(this._panel.webview);
   }
 
+  // render the webview panel
   public static render(extensionUri: vscode.Uri, payload: any) {
     const panel = vscode.window.createWebviewPanel("data-results", payload.title, vscode.ViewColumn.One, {
       enableScripts: true,
@@ -82,7 +83,6 @@ export class DataViewPanel {
           <section>
             <vscode-data-grid id="data-grid" generate-header="sticky" aria-label="Data Source Results"></vscode-data-grid>
           </section>
-          
           <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
         </body>
       </html>
@@ -93,7 +93,7 @@ export class DataViewPanel {
 
   /**
    * Sets up an event listener to listen for messages passed from the webview context and
-   * executes code based on the message that is recieved.
+   * executes code based on the message that is received.
    *
    * @param webview A reference to the extension webview
    */
