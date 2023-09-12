@@ -285,7 +285,7 @@ export class EnterpriseService implements IEnterpriseService {
   }
 
   /**
-   * 
+   *
    */
   /**
    * Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
@@ -564,8 +564,8 @@ export class EnterpriseService implements IEnterpriseService {
    * @param itemType the type of the enterprise item
    * @returns the enterprise item found
    */
-  public async searchForItems(itemName: string, itemType: string): Promise<any> {
-    let url = `${this.baseUrl}/SCM_API.Search.lims?itemName=${itemName}`;
+  public async searchForItems(itemName: string, itemType: string, isExactMatch: boolean = false): Promise<any> {
+    let url = `${this.baseUrl}/SCM_API.Search.lims?itemName=${itemName}&exactMatch=${isExactMatch}`;
     if (itemType !== "") {
       url += `&itemType=${itemType}`;
     }
@@ -906,8 +906,7 @@ export class EnterpriseService implements IEnterpriseService {
     // check if document is in checked out documents map
     if (this.checkedOutDocuments.has(uri)) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -917,7 +916,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @param uri the URI of the enterprise item
    */
   public async setCheckedOut(uri: string, username: string | null) {
-    var user = (username === null) ? this.config.username : username;
+    var user = username === null ? this.config.username : username;
     uri = uri.replace(/\\/g, "/");
     this.checkedOutDocuments.set(uri, user);
   }
