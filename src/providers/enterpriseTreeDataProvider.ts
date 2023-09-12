@@ -20,7 +20,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   /**
    * Class constructor
    * @param enterpriseService Enterprise service
-  */
+   */
   constructor(enterpriseService: IEnterpriseService) {
     this.service = enterpriseService;
   }
@@ -46,22 +46,26 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @param itemType The type of items to search for.
    * @returns First item found.
    * */
-  async search(searchString: string, itemType: string, bSilent: boolean, bGlobal: boolean): Promise<TreeEnterpriseItem | undefined> {
+  async search(
+    searchString: string,
+    itemType: string,
+    bSilent: boolean,
+    bGlobal: boolean,
+    bExactMatch: boolean = false
+  ): Promise<TreeEnterpriseItem | undefined> {
     if (searchString === "") {
       return;
     }
     var resultItems;
     if (bGlobal === true) {
       resultItems = await this.service.globalSearch(searchString, itemType);
-    }
-    else {
-      resultItems = await this.service.searchForItems(searchString, itemType);
+    } else {
+      resultItems = await this.service.searchForItems(searchString, itemType, bExactMatch);
     }
     if (resultItems === undefined || resultItems.length === 0) {
       vscode.window.showErrorMessage("No items found!");
       return;
-    }
-    else {
+    } else {
       if (bSilent === false) {
         this.dataMode = "SEARCH";
         this.treeItems = await this.buildTreeFromSearchResults(resultItems);
@@ -81,7 +85,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
     // load mode - load the current node's children
     if (this.dataMode === "LOAD" || this.dataMode === "REFRESH") {
-
       let uri: string = item ? item.uri : "";
 
       // refresh always starts from root
@@ -128,7 +131,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         // add the new item to the tree
         _this.treeItems.push(newItem);
       });
-
     }
     // clear mode - clear the tree
     else if (this.dataMode === "CLEAR") {
@@ -279,7 +281,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         default:
           return new vscode.ThemeIcon("folder-opened");
       }
-
     } else if (item.checkedOutBy) {
       return item.checkedOutBy === config.get("user") ? new vscode.ThemeIcon("unlock") : new vscode.ThemeIcon("lock");
     } else {
@@ -349,8 +350,9 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
       // node is part from application
       if (uriParts[0] === "Applications") {
-        let rootAppNode: TreeEnterpriseItem | undefined =
-          returnItems.find((item) => item.label === "Applications") as TreeEnterpriseItem;
+        let rootAppNode: TreeEnterpriseItem | undefined = returnItems.find(
+          (item) => item.label === "Applications"
+        ) as TreeEnterpriseItem;
 
         // create "Applications" node
         if (!rootAppNode) {
@@ -704,7 +706,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
       // create global "Server Scripts" node
       if (uriParts[0] === "ServerScripts") {
-
         let glbServerScriptsNode: TreeEnterpriseItem | undefined = returnItems.find(
           (item) => item.label === "Server Scripts"
         );
@@ -914,9 +915,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         let dbName = uriParts[1];
 
         // create database node
-        let tableDbNode: TreeEnterpriseItem | undefined = tablesNode?.children?.find(
-          (item) => item.label === dbName
-        );
+        let tableDbNode: TreeEnterpriseItem | undefined = tablesNode?.children?.find((item) => item.label === dbName);
 
         // node not found, create it
         if (!tableDbNode) {
@@ -952,7 +951,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         tableNode.isSystem = item.isSystem;
         tableDbNode?.children?.push(tableNode);
       }
-    };
+    }
     return returnItems;
   }
 }
@@ -971,7 +970,12 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   children?: TreeEnterpriseItem[];
   tooltip?: string | vscode.MarkdownString | undefined;
   isSystem?: boolean | undefined;
-  iconPath?: string | vscode.Uri | { light: string | vscode.Uri; dark: string | vscode.Uri; } | vscode.ThemeIcon | undefined;
+  iconPath?:
+    | string
+    | vscode.Uri
+    | { light: string | vscode.Uri; dark: string | vscode.Uri }
+    | vscode.ThemeIcon
+    | undefined;
 
   constructor(
     type: EnterpriseItemType,

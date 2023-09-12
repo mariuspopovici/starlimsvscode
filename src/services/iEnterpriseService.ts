@@ -11,7 +11,7 @@ export interface IEnterpriseService {
   clearLog(uri: string): any;
   getEnterpriseItemUri(uri: string, rootPath: string): any;
   scrollToBottom(): any;
-  searchForItems(itemName: string, itemType: string): any;
+  searchForItems(itemName: string, itemType: string, isExactMatch: boolean): any;
   globalSearch(searchString: string, itemTypes: string): any;
   runXFDForm(uri: string): any;
   getGUID(uri: string): any;

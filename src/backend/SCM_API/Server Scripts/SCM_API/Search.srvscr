@@ -3,7 +3,7 @@ Description.. :	Search for items and return all matches
 Author....... :	DC
 Date......... : 2023-06-29
 *******************************************************************************/;
-:DECLARE sSQL, sItemName, sItemType, aItems, oResult, oUtils, nLayerID, String, sAppCatName, aItemName;
+:DECLARE sSQL, sItemName, sItemType, aItems, oResult, oUtils, nLayerID, String, sAppCatName, aItemName, bExactMatch;
 String := "";
 oUtils := CreateUDObject("SCM_API.Utils", {});
 oResponse := CreateUDObject({
@@ -25,6 +25,12 @@ oResponse := CreateUDObject({
 	sItemType := Request:QueryString:itemType;
 :ENDIF;
 
+bExactMatch := .F.;
+:IF Request:QueryString:IsProperty("exactMatch");
+	bExactMatch := Request:QueryString:exactMatch == "true";
+:ENDIF;
+
+
 /* split the search string into appname/catname + sItemName */;
 :IF At(".", sItemName) > 0;
 	aItemName := BuildArray(sItemName,, ".");
@@ -35,8 +41,19 @@ oResponse := CreateUDObject({
 nLayerID := GetSystemLayerId();
 sSQL := "select * from (";
 
+:DECLARE sFormNameFilter, sScriptNameFilter, sDSNameFilter;
+:IF bExactMatch;
+	sFormNameFilter := "f.FORMNAME = '" + limsstring(sItemName) + "'";
+	sScriptNameFilter := "s.SCRIPTNAME = '" + limsstring(sItemName) + "'";
+	sDSNameFilter := "s.DSNAME = '" + limsstring(sItemName) + "'";
+:ELSE;
+	sFormNameFilter := "f.FORMNAME like '%" + limsstring(sItemName) + "%'";
+	sScriptNameFilter := "s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	sDSNameFilter := "s.DSNAME like '%" + limsstring(sItemName) + "%'";
+:ENDIF;
+
 :IF sItemType == "FORMCODEBEHIND" .OR. Empty(sItemType);
-sSQL += "select
+	sSQL += "select
 	f.DISPLAYTEXT as name,
 	case f.FORMTYPE
 		when 'XFD' then 'XFDFORMCODE'
@@ -57,7 +74,7 @@ sSQL += "select
 	from LIMSXFDFORMS f
 	join LIMSAPPLICATIONS a on a.APPID = f.APPID
 	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-	where f.FORMNAME like '%" + limsstring(sItemName) + "%'";
+	where " + sFormNameFilter;
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -92,7 +109,7 @@ sSQL += "select
 	from LIMSXFDFORMS f
 	join LIMSAPPLICATIONS a on a.APPID = f.APPID
 	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-	where f.FORMNAME like '%" + limsstring(sItemName) + "%'";
+	where " + sFormNameFilter;;
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -117,7 +134,7 @@ sSQL += "select
 	from LIMSXFDFORMS f
 	join LIMSAPPLICATIONS a on a.APPID = f.APPID
 	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-	where f.FORMNAME like '%" + limsstring(sItemName) + "%'";
+	where " + sFormNameFilter;
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%' ";
@@ -144,7 +161,7 @@ sSQL += "select
 	join LIMSAPPSERVERSCRIPTS aps on aps.APPID = a.APPID
 	join LIMSSERVERSCRIPTS s on s.SCRIPTID = aps.SCRIPTID
 	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	where " + sScriptNameFilter;
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -170,7 +187,7 @@ sSQL += "select
 	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 	join LIMSAPPCLIENTSCRIPTS apc on apc.APPID = a.APPID
 	join LIMSCLIENTSCRIPTS s on s.SCRIPTID = apc.SCRIPTID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'";
+	where " + sScriptNameFilter;
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -196,7 +213,7 @@ sSQL += "select
 	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 	join LIMSAPPDATASOURCES aps on aps.APPID = a.APPID
 	join LIMSDATASOURCES s on s.DATASOURCEID = aps.DATASOURCEID
-	where s.DSNAME like '%" + limsstring(sItemName) + "%'";
+	where " + sDSNameFilter;
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and a.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -222,8 +239,7 @@ sSQL += "select
 	from LIMSSERVERSCRIPTCATEGORIES c
 	join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
 	left join LIMSAPPSERVERSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'
-	and aps.SCRIPTID is null";
+	where " + sScriptNameFilter + "	and aps.SCRIPTID is null";
 	
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -248,8 +264,7 @@ sSQL += "select
 	from LIMSDATASOURCECATEGORIES c
 	join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
 	left join LIMSAPPDATASOURCES aps on aps.DATASOURCEID = s.DATASOURCEID
-	where s.DSNAME like '%" + limsstring(sItemName) + "%'
-	and aps.DATASOURCEID is null";
+	where " + sDSNameFilter +" and aps.DATASOURCEID is null";
 
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
@@ -274,8 +289,7 @@ sSQL += "select
 	from LIMSCLIENTSCRIPTCATEGORIES c
 	join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
 	left join LIMSAPPCLIENTSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
-	where s.SCRIPTNAME like '%" + limsstring(sItemName) + "%'
-	and aps.SCRIPTID is null";
+	where " + sScriptNameFilter + " and aps.SCRIPTID is null";
 	
 	:IF !Empty(sAppCatName);
 		sSQL += " and c.DISPLAYTEXT like '%" + limsstring(sAppCatName) + "%'";
