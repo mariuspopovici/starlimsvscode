@@ -3,7 +3,7 @@ import { getNonce } from "../utilities/getNonce";
 import { getUri } from "../utilities/getUri";
 
 export class GenericDataViewPanel {
-  public static currentPanel: DataViewPanel | undefined;
+  public static currentPanel: GenericDataViewPanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
   private _data: string;
