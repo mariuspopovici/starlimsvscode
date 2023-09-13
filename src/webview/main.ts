@@ -58,7 +58,7 @@ function main() {
     }
 
     // add a new row to the grid
-    const newRow = {};
+    const newRow : any = {};
 
     // generate new guid
     const guid = () => {
@@ -73,7 +73,7 @@ function main() {
     for(let i = 1; i < grid.columnDefinitions.length; i++) {
       newRow[`column${i}`] = "";
     }
-    
+
     grid.rowsData.push(newRow);
   });
 
