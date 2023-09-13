@@ -114,17 +114,19 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         let newItem = new TreeEnterpriseItem(
           item.type,
           item.name,
-          item.language,
+          item.scriptLanguage,
           item.uri,
           item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           item.command,
           item.filePath,
-          item.guid
+          item.guid,
+          item.language
         );
 
         newItem.contextValue = item.type;
         newItem.iconPath = _this.getItemIcon(item);
-        newItem.label = item.checkedOutBy ? `${newItem.label} (Checked out by ${item.checkedOutBy})` : newItem.label;
+        let language = item.language? ", Language: " + item.language : "";
+        newItem.label = item.checkedOutBy ? `${newItem.label} (Checked out by ${item.checkedOutBy}${language})` : newItem.label;
         newItem.checkedOutBy = item.checkedOutBy;
         newItem.resourceUri = _this.getItemResource(item);
 
@@ -177,12 +179,13 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     let newItem = new TreeEnterpriseItem(
       item.type,
       item.name,
-      item.language,
+      item.scriptLanguage,
       item.uri,
       item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
       item.command,
       item.filePath,
-      item.guid
+      item.guid,
+      item.language
     );
 
     newItem.checkedOutBy = item.checkedOutBy;
@@ -961,6 +964,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
  */
 export class TreeEnterpriseItem extends vscode.TreeItem {
   type: EnterpriseItemType;
+  scriptLanguage: string;
   language: string;
   uri: string;
   filePath: string | undefined;
@@ -980,21 +984,23 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
   constructor(
     type: EnterpriseItemType,
     label: string,
-    language: string,
+    scriptLanguage: string,
     uri: string,
     collapsibleState: vscode.TreeItemCollapsibleState,
     command?: vscode.Command,
     filePath?: string,
-    guid?: string
+    guid?: string,
+    language?: string
   ) {
     super(label, collapsibleState);
     this.label = label;
     this.type = type;
-    this.language = language;
+    this.scriptLanguage = scriptLanguage;
     this.command = command;
     this.uri = uri;
     this.filePath = filePath;
     this.guid = guid;
+    this.language = language ?? "";
   }
 }
 

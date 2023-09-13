@@ -12,16 +12,71 @@ body {
 section {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  width: 90%;
-  overflow-x: scroll;
+  align-items: baseline;
   justify-content: flex-start;
+  margin-bottom: 20px;
+  width: 100%;
+  overflow-x: scroll;
   margin: 1rem;
   padding: 1rem;
+}
+
+.dropdown-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dropdown-label {
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #bbb;
+  top: 0.2rem;
+  position: relative;
 }
 
 h1 {
   font-size: 1.5em;
 }
+
+vscode-data-grid-cell[contenteditable='plaintext-only'] {
+  resize: none;
+  background-color: #00e7ff3b;
+  line-height: 0.2rem;
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* vscode-button inside .dropdown-wrapper */
+.dropdown-wrapper vscode-button {
+  margin-left: auto;
+}
+
+/* vscode-button inside .footer */
+.footer vscode-button {
+  margin-left: 0;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Hide the "Guid" column */
+/* vscode-data-grid-header-cell[grid-column="1"],
+vscode-data-grid-cell[grid-column="1"] {
+  display: none;
+} */

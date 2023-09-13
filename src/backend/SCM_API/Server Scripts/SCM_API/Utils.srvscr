@@ -78,10 +78,10 @@ Date......... : 2018-11-02
 	/* initialize AppName and Category with default values;
 	oEnterpriseItem:AppName := "N/A";
 	oEnterpriseItem:Category := "N/A";
+	oEnterpriseItem:Type = "";
 	
 	aComponents := Me:GetURIComponents(sURI);
 	nCount := Len(aComponents);
-	
 	:IF Empty(aComponents);
 		oEnterpriseItem:Type := "ROOT";
 		:RETURN oEnterpriseItem;

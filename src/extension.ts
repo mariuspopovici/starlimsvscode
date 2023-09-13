@@ -10,7 +10,6 @@ import path = require("path");
 import { DataViewPanel } from "./panels/DataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
-import { DOMParser } from "@xmldom/xmldom";
 
 const { version } = require('../package.json');
 const SLVSCODE_FOLDER = "SLVSCODE";
@@ -24,6 +23,7 @@ export async function activate(context: vscode.ExtensionContext) {
   let rootPath: string | undefined = config.get("rootPath");
   let reloadConfig = false;
   let selectedItem: TreeEnterpriseItem | undefined;
+  let languages: any[] = [];
 
   // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
@@ -144,7 +144,7 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       // get current user's log
       const logUri = "/ServerLogs/" + user + ".log";
-      var log = await enterpriseService.getEnterpriseItemCode(logUri);
+      var log = await enterpriseService.getEnterpriseItemCode(logUri, undefined);
       if (log) {
         logChannel.clear();
         logChannel.appendLine(log.code);
@@ -161,7 +161,7 @@ export async function activate(context: vscode.ExtensionContext) {
       await enterpriseService.clearLog(remoteUri);
 
       // refresh log
-      var log = await enterpriseService.getEnterpriseItemCode(remoteUri + ".log");
+      var log = await enterpriseService.getEnterpriseItemCode(remoteUri + ".log", undefined);
       if (log) {
         logChannel.clear();
         logChannel.appendLine(log.code);
@@ -173,12 +173,18 @@ export async function activate(context: vscode.ExtensionContext) {
   // load current user's log
   vscode.commands.executeCommand("STARLIMS.RefreshLogChannel");
 
+  // load system languages from server into config
+  await enterpriseService.getLanguages();
+  for (let lang of enterpriseService.languages) {
+    languages.push({ label: lang[0], description: lang[1] });
+  }
+
   // register a custom tree data provider for the STARLIMS enterprise designer explorer
   const enterpriseTreeProvider = new EnterpriseTreeDataProvider(enterpriseService);
   vscode.window.registerTreeDataProvider("STARLIMSMainTree", enterpriseTreeProvider);
 
   // register a custom tree data provider for the STARLIMS checked out items
-  const checkedOutProvider = vscode.commands.registerCommand(
+  vscode.commands.registerCommand(
     "STARLIMS.GetCheckedOutItems",
     async () => {
       let checkedOutItems = await enterpriseService.getCheckedOutItems(false);
@@ -186,7 +192,6 @@ export async function activate(context: vscode.ExtensionContext) {
         new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService));
     }
   );
-  context.subscriptions.push(checkedOutProvider);
 
   // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
   const enterpriseTextContentProvider =
@@ -292,7 +297,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   /**
-   *  Returns the handler function for the selected enterprise item.
+   * Returns the handler function for the selected enterprise item.
    * @param item the enterprise tree item to handle
    * @returns the handler function for the selected enterprise item
    */
@@ -308,7 +313,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   /**
    * Handles selecting a table item in the enterprise tree.
-   * 
    * @param item the enterprise tree item to handle
    */
   async function handleSelectTableItem(item: TreeEnterpriseItem) {
@@ -319,60 +323,31 @@ export async function activate(context: vscode.ExtensionContext) {
         name: tableName,
         data: result,
         title: `Table Definition: ${tableName}`
-      });
+      },
+        enterpriseService,
+        enterpriseTreeProvider);
     }
   }
 
   /**
    * Handles selecting a resources item in the enterprise tree.
-   * 
    * @param item the enterprise tree item to handle
    */
   async function handleSelectResourcesItem(item: TreeEnterpriseItem) {
-    // get the remote URI
-    const remoteUri = enterpriseService.getEnterpriseItemUri(
-      item.uri,
-      rootPath!
-    );
+    // get remote URI
+    const remoteUri = enterpriseService.getEnterpriseItemUri(item.uri, rootPath!);
 
-    var dataSet = await enterpriseService.getEnterpriseItemCode(remoteUri);
+    // get form resources
+    let oParams = await enterpriseService.getFormResources(remoteUri, item.language);
 
-    if (dataSet) {
-      const formName = item.uri.split('/').pop();
-
-      // Create a new DOMParser
-      const parser = new DOMParser();
-
-      // Parse the XML string
-      const xmlDoc = parser.parseFromString(dataSet.code, 'text/xml');
-
-      // Extract values into a 2D array
-      const resourcesArray: any[][] = [];
-
-      const resourcesTableNodes =  Array.from(xmlDoc.getElementsByTagName('ResourcesTable'));
-      for (const resourcesTableNode of resourcesTableNodes) {
-        const guid = resourcesTableNode.getElementsByTagName('Guid')[0].textContent;
-        const resourceId = resourcesTableNode.getElementsByTagName('ResourceId')[0].textContent;
-        const resourceValue = resourcesTableNode.getElementsByTagName('ResourceValue')[0].textContent;
-
-        resourcesArray.push([guid, resourceId, resourceValue]);
-      }
-
-      const header = ['Guid', 'ResourceId', 'ResourceValue'];
-      const tableData = [header, ...resourcesArray];
-
-      DataViewPanel.render(context.extensionUri, {
-        name: `Form Resources of ${formName}`,
-        data: JSON.stringify(tableData, null, 2),
-        title: `Form Resources: ${formName}`
-      });
-    }
+    // render the data view panel
+    DataViewPanel.render(context.extensionUri, oParams, enterpriseService, 
+                         enterpriseTreeProvider);
   }
 
   /**
    * Handles selecting a code type enterprise item. Such items are: server scripts, data sources, client scripts, 
    * basically anything that needs to be opened in a code editor.
-   * 
    * @param item the enterprise tree item to handle
    */
   async function handleSelectCodeItem(item: TreeEnterpriseItem) {
@@ -454,13 +429,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // get user log
       const logUri = "/ServerLogs/" + user + ".log";
-      var logBeforeRun = (await enterpriseService.getEnterpriseItemCode(logUri)).code;
+      var logBeforeRun = (await enterpriseService.getEnterpriseItemCode(logUri, undefined)).code;
 
       executeWithProgress(async () => {
         const result = await enterpriseService.runScript(remoteUri.toString());
         if (result) {
           // append current user log to output channel
-          let logAfterRun = (await enterpriseService.getEnterpriseItemCode(logUri)).code;
+          let logAfterRun = (await enterpriseService.getEnterpriseItemCode(logUri, undefined)).code;
           let logDiff = logAfterRun.replace(logBeforeRun, "");
           outputChannel.appendLine("### Log output: ###");
           outputChannel.appendLine(logDiff);
@@ -509,9 +484,26 @@ export async function activate(context: vscode.ExtensionContext) {
         item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
       }
 
-      let bSuccess = await enterpriseService.CheckOut(item.uri);
+      // choose language for forms only
+      let language;
+      if (item.type === EnterpriseItemType.XFDFormXML ||
+        item.type === EnterpriseItemType.HTMLFormXML ||
+        item.type === EnterpriseItemType.XFDFormResources ||
+        item.type === EnterpriseItemType.HTMLFormResources) {
+        let oReturn = await vscode.window.showQuickPick(
+          languages,
+          {
+            placeHolder: "Select language",
+            ignoreFocusOut: true
+          }
+        );
+        language = oReturn.label;
+      }
+      // check out the item
+      let bSuccess = await enterpriseService.checkOutItem(item.uri, language);
       if (bSuccess) {
         item.checkedOutBy = user;
+        item.language = language;
         enterpriseTreeProvider.refresh();
         vscode.commands.executeCommand("STARLIMS.GetLocal", item);
 
@@ -536,9 +528,10 @@ export async function activate(context: vscode.ExtensionContext) {
           ignoreFocusOut: true,
         })) || "Checked in from VSCode";
 
-      let bSuccess = await enterpriseService.CheckIn(item.uri, checkinReason);
+      let bSuccess = await enterpriseService.checkInItem(item.uri, checkinReason, item.language);
       if (bSuccess) {
         item.checkedOutBy = "";
+        item.language = "";
         enterpriseTreeProvider.refresh();
 
         // refresh checked out items
@@ -601,7 +594,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       if (editor) {
         let remoteUri = enterpriseService.getUriFromLocalPath(editor.document.uri.path);
-        enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText());
+        enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText(), "");
       }
     }
   );
@@ -1064,7 +1057,9 @@ export async function activate(context: vscode.ExtensionContext) {
             name: dataSourceName,
             data: result.data,
             title: `Data Source Output: ${dataSourceName}`
-          });
+          },
+            enterpriseService,
+            enterpriseTreeProvider);
         }
         outputChannel.appendLine(result.data);
         outputChannel.show();

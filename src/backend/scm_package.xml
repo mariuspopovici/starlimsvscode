@@ -10,9 +10,9 @@
   <OverwriteLayer>false</OverwriteLayer>
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>069AD641-5BC8-4D98-84CD-8B1B1D3E6C95</ItemID>
+      <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>300</LayerId>
+      <LayerId>200</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
@@ -55,7 +55,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>55796A78-5B64-4CF4-A11D-662C95991EDC</ItemID>
+          <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
           <ItemName>CheckOut</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -103,7 +103,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>2125F634-42D7-4E95-B40D-B376A7F2F87F</ItemID>
+          <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -115,7 +115,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>C70E01EB-5FBA-46E6-912B-A04C6127A0C8</ItemID>
+          <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -139,6 +139,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>F3531C75-49CB-4CD2-9304-BE41BEC3DF73</ItemID>
+          <ItemName>GetLanguages</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>344AAB9F-470D-4312-841A-D193F9D758FF</ItemID>
           <ItemName>GetSessions</ItemName>
           <LayerId>300</LayerId>
@@ -151,7 +163,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>E3AF9503-008A-4D3B-AB38-D56B91ADA572</ItemID>
+          <ItemID>5A682FAB-C29C-4E87-9831-8A4F7361A817</ItemID>
           <ItemName>GlobalSearch</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -175,7 +187,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
+          <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
           <ItemName>RunScript</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -247,7 +259,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
+          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
           <ItemName>Utils</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
