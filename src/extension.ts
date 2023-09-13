@@ -1209,7 +1209,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       async function findScriptOnServer(scriptName: string, procedureName: string | undefined) {
-        let itemFound = await enterpriseTreeProvider.search(scriptName, "SS", true, false);
+        let itemFound = await enterpriseTreeProvider.search(scriptName, "SS", true, false, true);
         if (itemFound) {
           await vscode.commands.executeCommand("STARLIMS.GetLocal", itemFound);
           // get new editor
@@ -1273,7 +1273,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // use search to find the script
-        const itemFound = await enterpriseTreeProvider.search(scriptName, "DS", true, false);
+        const itemFound = await enterpriseTreeProvider.search(scriptName, "DS", true, false, true);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1294,7 +1294,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const scriptName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
-        const itemFound = await enterpriseTreeProvider.search(scriptName, "CS", true, false);
+        const itemFound = await enterpriseTreeProvider.search(scriptName, "CS", true, false, true);
 
         // open the first item found
         if (itemFound !== undefined) {
@@ -1315,7 +1315,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const formName = editor.document.getText(editor.document.getWordRangeAtPosition(position, /[\w\.]+/));
 
         // use search to find the script
-        const itemFound = await enterpriseTreeProvider.search(formName, "FORMCODEBEHIND", true, false);
+        const itemFound = await enterpriseTreeProvider.search(formName, "FORMCODEBEHIND", true, false, true);
 
         // open the first item found
         if (itemFound !== undefined) {
