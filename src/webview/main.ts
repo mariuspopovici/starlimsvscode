@@ -30,8 +30,14 @@ import {
 //
 // provideVSCodeDesignSystem().register(allComponents);
 
-provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeDataGrid(), vsCodeDataGridCell(), 
-                                     vsCodeDataGridRow(), vsCodeDropdown(), vsCodeOption());
+provideVSCodeDesignSystem().register(
+  vsCodeButton(),
+  vsCodeDataGrid(),
+  vsCodeDataGridCell(),
+  vsCodeDataGridRow(),
+  vsCodeDropdown(),
+  vsCodeOption()
+);
 
 // Get access to the VS Code API from within the webview context
 const vscode = acquireVsCodeApi();
@@ -53,24 +59,27 @@ function main() {
   const addButton = document.getElementById("add-button") as Button;
   addButton.addEventListener("click", () => {
     const grid = document.getElementById("data-grid") as DataGrid;
-    if(grid.columnDefinitions === null || grid.rowsData === null) {
+    if (grid.columnDefinitions === null || grid.rowsData === null) {
       return;
     }
 
     // add a new row to the grid
-    const newRow : any = {};
+    const newRow: any = {};
 
     // generate new guid
     const guid = () => {
-      const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+      const s4 = () =>
+        Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1);
       return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4() + s4() + s4()}`;
     };
 
     // add guid to first column
     newRow["column0"] = guid();
-    
+
     // add empty strings to the rest of the columns
-    for(let i = 1; i < grid.columnDefinitions.length; i++) {
+    for (let i = 1; i < grid.columnDefinitions.length; i++) {
       newRow[`column${i}`] = "";
     }
 
@@ -123,12 +132,18 @@ function setVSCodeMessageListener() {
 
           // Set rowsData based on extracted data
           grid.rowsData = data.map((rowData: string[]) => {
-            const row : any = {};
+            const row: any = {};
             rowData.forEach((value, index) => {
-              row[`column${index}`] = value.toString().trim();
+              row[`column${index}`] = value?.toString().trim();
             });
             return row;
           });
+
+          // set grid column widths for large number of columns otherwise the output is unintelligible
+          // TODO: replace 150px below with max-content when this is fixed: https://github.com/microsoft/vscode-webview-ui-toolkit/issues/473
+          if (columns.length > 10) {
+            grid.setAttribute("grid-template-columns", columns.map(() => `150px`).join(` `));
+          }
         }
         break;
     }
@@ -212,8 +227,8 @@ function unsetCellEditable(cell: DataGridCell) {
 // Syncs changes made in an editable cell with the
 // underlying data structure of a vscode-data-grid
 function syncCellChanges(cell: DataGridCell) {
-  const column : any = cell.columnDefinition;
-  const row : any = cell.rowData;
+  const column: any = cell.columnDefinition;
+  const row: any = cell.rowData;
   if (column && row) {
     const originalValue = row[column.columnDataKey];
     const newValue = cell.innerText;
@@ -228,7 +243,7 @@ function syncCellChanges(cell: DataGridCell) {
 function saveData() {
   const grid = document.getElementById("data-grid") as DataGrid;
 
-  if(grid.columnDefinitions === null || grid.rowsData === null) {
+  if (grid.columnDefinitions === null || grid.rowsData === null) {
     return;
   }
 
@@ -236,22 +251,22 @@ function saveData() {
     columns: (string | undefined)[];
     data: any[];
   }
-  let gridData : GridData = {
+  let gridData: GridData = {
     columns: [],
     data: []
   };
-  
+
   // Update the gridData object with the latest data
   gridData.columns = grid.columnDefinitions.map((columnDefinition) => columnDefinition.title);
-  gridData.data = grid.rowsData.map((rowData : any) =>
-  grid.columnDefinitions?.map((columnDefinition : any) => rowData[columnDefinition.columnDataKey])
+  gridData.data = grid.rowsData.map((rowData: any) =>
+    grid.columnDefinitions?.map((columnDefinition: any) => rowData[columnDefinition.columnDataKey])
   );
 
   // Send the gridData object to the extension context
   const title = (document.getElementById("title") as HTMLInputElement).innerText;
-  if(title.includes("Resources")) {
+  if (title.includes("Resources")) {
     vscode.postMessage({ command: "saveResourcesData", payload: JSON.stringify(gridData) });
-  } else if(title.includes("Table")) {
+  } else if (title.includes("Table")) {
     vscode.postMessage({ command: "saveTableData", payload: JSON.stringify(gridData) });
   }
 }
