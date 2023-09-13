@@ -21,7 +21,7 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDIF;
 
-:IF Request:QueryString:IsProperty("UserLang");
+:IF Request:QueryString:IsProperty("UserLang") .AND. !Empty(Request:QueryString:UserLang);
 	sUserLang := Request:QueryString:UserLang;
 :ELSE;
 	sUserLang := GetSetting("DEFAULTLANGUAGE");

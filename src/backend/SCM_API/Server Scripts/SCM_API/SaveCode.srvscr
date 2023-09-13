@@ -49,7 +49,7 @@ sCode := "";
 :ENDIF;
 
 /* get language;
-:IF !Empty(oPayload) .AND. oPayload:IsProperty("UserLang");
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("UserLang") .AND. !Empty(oPayload:UserLang);
 	sUserLang := oPayload:UserLang;
 :ELSE;
 	sUserLang := GetSetting("DEFAULTLANGUAGE");

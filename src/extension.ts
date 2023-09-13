@@ -598,7 +598,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
       if (editor) {
         let remoteUri = enterpriseService.getUriFromLocalPath(editor.document.uri.path);
-        enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText(), "");
+        if (await enterpriseService.isCheckedOut(remoteUri)) {
+          enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText(), "");
+        }
       }
     }
   );
