@@ -4,8 +4,8 @@ import { getUri } from "../utilities/getUri";
 import { EnterpriseService } from "../services/enterpriseService";
 import { EnterpriseTreeDataProvider } from "../providers/enterpriseTreeDataProvider";
 
-export class DataViewPanel {
-  public static currentPanel: DataViewPanel | undefined;
+export class ResourcesDataViewPanel {
+  public static currentPanel: ResourcesDataViewPanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
   private disposables: vscode.Disposable[] = [];
   private data: string;
@@ -18,8 +18,13 @@ export class DataViewPanel {
   private extensionUri: vscode.Uri;
   private language: string = "ENG";
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, payload: any, 
-                      enterpriseService: EnterpriseService, enterpriseTree: EnterpriseTreeDataProvider) {
+  private constructor(
+    panel: vscode.WebviewPanel,
+    extensionUri: vscode.Uri,
+    payload: any,
+    enterpriseService: EnterpriseService,
+    enterpriseTree: EnterpriseTreeDataProvider
+  ) {
     this._panel = panel;
     this.data = payload.data;
     this.name = payload.name;
@@ -43,20 +48,29 @@ export class DataViewPanel {
   }
 
   // render the webview panel
-  public static render(extensionUri: vscode.Uri, payload: any, enterpriseService: EnterpriseService,
-                       enterpriseTree: EnterpriseTreeDataProvider) {
+  public static render(
+    extensionUri: vscode.Uri,
+    payload: any,
+    enterpriseService: EnterpriseService,
+    enterpriseTree: EnterpriseTreeDataProvider
+  ) {
     const panel = vscode.window.createWebviewPanel("data-results", payload.title, vscode.ViewColumn.One, {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(extensionUri, "dist")]
     });
 
-    DataViewPanel.currentPanel = new DataViewPanel(panel, extensionUri, payload, enterpriseService,
-                                                   enterpriseTree);
+    ResourcesDataViewPanel.currentPanel = new ResourcesDataViewPanel(
+      panel,
+      extensionUri,
+      payload,
+      enterpriseService,
+      enterpriseTree
+    );
   }
 
   // dispose the webview panel
   public dispose() {
-    DataViewPanel.currentPanel = undefined;
+    ResourcesDataViewPanel.currentPanel = undefined;
 
     this._panel.dispose();
 
@@ -85,15 +99,14 @@ export class DataViewPanel {
     const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
     const codiconUri = getUri(webview, extensionUri, ["dist", "codicon.css"]);
 
-    // insert language options before the webview is rendered, because vscode-dropdown doesn't support a 
+    // insert language options before the webview is rendered, because vscode-dropdown doesn't support a
     // direct manipulation of its options in the same way as a regular HTML select element
     let languageOptions = "";
     for (const language of enterpriseService.languages) {
       // set the selected attribute if the language matches the current language
       if (language[0] === this.language) {
         languageOptions += `<vscode-option value="${language[0]}" selected>${language[1]}</vscode-option>\n`;
-      }
-      else {
+      } else {
         languageOptions += `<vscode-option value="${language[0]}">${language[1]}</vscode-option>\n`;
       }
     }
@@ -163,11 +176,13 @@ export class DataViewPanel {
             const data = jsonDataObj.data;
 
             // convert to XML
-            let xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-              "<ResourcesDataset xmlns=\"http://tempuri.org/ResourcesDataset.xsd\">\n";
+            let xmlData =
+              '<?xml version="1.0" encoding="UTF-8"?>\n' +
+              '<ResourcesDataset xmlns="http://tempuri.org/ResourcesDataset.xsd">\n';
 
             for (const row of data) {
-              xmlData += "\t<ResourcesTable>\n" +
+              xmlData +=
+                "\t<ResourcesTable>\n" +
                 `\t\t<Guid>${row[0]}</Guid>\n` +
                 `\t\t<ResourceId>${row[1]}</ResourceId>\n` +
                 `\t\t<ResourceValue>${row[2]}</ResourceValue>\n` +
@@ -194,30 +209,28 @@ export class DataViewPanel {
             this.language = message.payload;
 
             // check out and re-check in the form under the current language
-            var formUri = this.uri.replace('/Resources', '/XML');
-            this.enterpriseService.checkInItem(formUri, "Edit form resources", lastLanguage).then(
-              (data: any) => {
-                this.enterpriseService.checkOutItem(formUri, this.language).then((data: any) => {
-                  // reload the enterprise tree & checked out tree
-                  this.enterpriseTree.refresh();
-                  
-                  // refresh checked out items
-                  vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+            var formUri = this.uri.replace("/Resources", "/XML");
+            this.enterpriseService.checkInItem(formUri, "Edit form resources", lastLanguage).then((data: any) => {
+              this.enterpriseService.checkOutItem(formUri, this.language).then((data: any) => {
+                // reload the enterprise tree & checked out tree
+                this.enterpriseTree.refresh();
 
-                  // reload the webview with the new language
-                  this.enterpriseService.getFormResources(this.uri, this.language).then((data: any) => {
-                    DataViewPanel.render(this.extensionUri, data, this.enterpriseService, 
-                                         this.enterpriseTree);
-                  });
+                // refresh checked out items
+                vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+
+                // reload the webview with the new language
+                this.enterpriseService.getFormResources(this.uri, this.language).then((data: any) => {
+                  ResourcesDataViewPanel.render(this.extensionUri, data, this.enterpriseService, this.enterpriseTree);
                 });
               });
+            });
             break;
 
-            case "saveTableData":
-              // coming from webview controller after clicking the save button
-              // save the grid data to the file system
-              vscode.window.showErrorMessage("Saving table data is not yet implemented.");
-              break;
+          case "saveTableData":
+            // coming from webview controller after clicking the save button
+            // save the grid data to the file system
+            vscode.window.showErrorMessage("Saving table data is not yet implemented.");
+            break;
         }
       },
       undefined,
