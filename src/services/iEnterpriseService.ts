@@ -24,4 +24,6 @@ export interface IEnterpriseService {
   upgradeBackend(sdpPackage: string): any;
   isCheckedOut(uri: string): any;
   setCheckedOut(uri: string, username: string | null): any;
+  renameItem(uri: string, newName: string): any;
+  deleteItem(uri: string): any;
 }

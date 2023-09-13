@@ -3,7 +3,7 @@
   "displayName": "STARLIMS VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.64",
+  "version": "1.2.67",
   "icon": "resources/extension/starlimsvscode.png",
   "publisher": "MariusPopovici",
   "author": {
@@ -224,6 +224,10 @@
       {
         "command": "STARLIMS.setPassword",
         "title": "Set user password"
+      },
+      {
+        "command": "STARLIMS.Rename",
+        "title": "Rename"
       }
     ],
     "keybindings": [
@@ -395,6 +399,11 @@
           "command": "STARLIMS.GenerateTableDelete",
           "when": "view == STARLIMSMainTree && (viewItem == TABLE)",
           "group": "table"
+        },
+        {
+          "command": "STARLIMS.Rename",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && !(viewItem =~ /CAT/)",
+          "group": "addRemove"
         }
       ],
       "explorer/context": [
