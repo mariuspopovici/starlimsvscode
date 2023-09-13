@@ -7,8 +7,8 @@ import * as path from "path";
 import { IEnterpriseService } from "./iEnterpriseService";
 import { connectBridge } from "../utilities/bridge";
 import { cleanUrl } from "../utilities/miscUtils";
-// import { EnterpriseTextDocumentContentProvider } from "../providers/enterpriseTextContentProvider";
-// import { userInfo } from "os";
+import { DOMParser } from "@xmldom/xmldom";
+
 /**
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
  * at time using the SCM_API REST services in STARLIMS backed.
@@ -16,9 +16,11 @@ import { cleanUrl } from "../utilities/miscUtils";
 export class EnterpriseService implements IEnterpriseService {
   private config: any;
   private baseUrl: string;
+  private rootPath: string = "";
   private refreshSessionInterval: NodeJS.Timeout | undefined;
   private SLVSCODE_FOLDER: string = "SLVSCODE";
   private checkedOutDocuments: Map<string, string> = new Map<string, string>();
+  public languages: string[] = [];
 
   /**
    * Constructor
@@ -285,16 +287,13 @@ export class EnterpriseService implements IEnterpriseService {
   }
 
   /**
-   * 
-   */
-  /**
    * Gets the code and code language (XML, JS, SSL, SLSQL etc.) of the STARLIMS Enterprise Designer referenced
    * by the specified URI.
    * @param uri the URI of the remote STARLIMS script / code item.
    * @returns an object with Language: string and Code: string
    */
-  public async getEnterpriseItemCode(uri: string) {
-    const params = new URLSearchParams([["URI", uri]]);
+  public async getEnterpriseItemCode(uri: string, language: string | undefined) {
+    const params = new URLSearchParams([["URI", uri], ["UserLang", language ?? ""]]);
     const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -328,8 +327,8 @@ export class EnterpriseService implements IEnterpriseService {
    * @param uri  the URI of the remote STARLIMS script / code item.
    * @returns  true if the item was checked out successfully, false otherwise.
    */
-  public async CheckOut(uri: string) {
-    const params = new URLSearchParams([["URI", uri]]);
+  public async checkOutItem(uri: string, language: string | undefined) {
+    const params = new URLSearchParams([["URI", uri], ["UserLang", language ?? ""]]);
     const url = `${this.baseUrl}/SCM_API.CheckOut.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -361,7 +360,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @param reason the reason for checking in the item.
    * @returns true if the item was checked in successfully, false otherwise.
    */
-  public async CheckIn(uri: string, reason: string) {
+  public async checkInItem(uri: string, reason: string, language: string | undefined) {
     // check for empty uri
     if (!uri) {
       vscode.window.showErrorMessage("Could not check in enterprise item. Missing URI.");
@@ -369,6 +368,7 @@ export class EnterpriseService implements IEnterpriseService {
     }
     const params = new URLSearchParams([
       ["URI", uri],
+      ["UserLang", language ?? ""],
       ["Reason", reason]
     ]);
     const url = `${this.baseUrl}/SCM_API.CheckIn.lims?${params}`;
@@ -404,7 +404,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the local file path if returnCode is false, otherwise the code as a string
    */
   public async getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean = false): Promise<string | null> {
-    const item = await this.getEnterpriseItemCode(uri);
+    const item = await this.getEnterpriseItemCode(uri, undefined);
     if (item) {
       // create local file path
       const localFilePath = path.join(workspaceFolder, `${uri}.${item.language.toLowerCase().replace("sql", "slsql")}`);
@@ -434,12 +434,22 @@ export class EnterpriseService implements IEnterpriseService {
     return null;
   }
 
+  /** Get local file path from remote uri
+   * @param uri the URI to the remote script / code item
+   * @param workspaceFolder the local workspace folder where to download the file
+   * @returns the local file path
+   */
+  public getLocalFilePath(uri: string, workspaceFolder: string, extension: string): string {
+    const localFilePath = path.join(workspaceFolder, `${uri}.${extension.toLowerCase().replace("sql", "slsql")}`);
+    return localFilePath;
+  }
+
   /**
    * Saves the code of the STARLIMS Enterprise Designer item referenced by the specified URI.
    * @param uri The URI of the remote STARLIMS script / code item.
    * @param code The code to save.
    */
-  public async saveEnterpriseItemCode(uri: string, code: string) {
+  public async saveEnterpriseItemCode(uri: string, code: string, language: string) {
     // uncomment all occurences of '#include'
     code = code.replace(/^\/\/#include/gm, "#include");
     const url = `${this.baseUrl}/SCM_API.SaveCode.lims`;
@@ -449,7 +459,8 @@ export class EnterpriseService implements IEnterpriseService {
       headers,
       body: JSON.stringify({
         URI: uri,
-        Code: code
+        Code: code,
+        UserLang: language
       })
     };
     // execute transaction
@@ -529,8 +540,10 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the uri of the enterprise item
    */
   public getEnterpriseItemUri(filePath: string, rootPath: string): string {
+    this.rootPath = rootPath;
+
     // remove leading 'starlims:///' from file path
-    var filePath = filePath.replace(/^starlims:\/\/\//, "");
+    filePath = filePath.replace(/^starlims:\/\/\//, "");
 
     // replace backslashes with forward slashes on root path
     rootPath = rootPath.replace(/\\/g, "/");
@@ -920,5 +933,80 @@ export class EnterpriseService implements IEnterpriseService {
     var user = (username === null) ? this.config.username : username;
     uri = uri.replace(/\\/g, "/");
     this.checkedOutDocuments.set(uri, user);
+  }
+
+  /**
+   * Get available languages and store them in config
+   */
+  public async getLanguages() {
+    const url = `${this.baseUrl}/SCM_API.GetLanguages.lims`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+
+      if (success) {
+        this.languages = JSON.parse(data);
+        return true;
+      } else {
+        vscode.window.showErrorMessage("Could not retrieve languages.");
+        console.error(data);
+        return false;
+      }
+    } catch (e: any) {
+      console.error(e);
+      vscode.window.showErrorMessage("Could not retrieve languages.");
+      return false;
+    }
+  }
+
+  /**
+   * Load form resources
+   * @param uri the remote URI of the enterprise item
+   * @returns form resources parameter object for webview
+   */
+  public async getFormResources(uri: string, language: string | undefined) {
+    // get the resources data from server
+    let resourcesData = await this.getEnterpriseItemCode(uri, language);
+
+    if (resourcesData) {
+      const formName = uri.split('/').pop();
+
+      // Create a new DOMParser
+      const parser = new DOMParser();
+
+      // Parse the XML string
+      const xmlDoc = parser.parseFromString(resourcesData.code, 'text/xml');
+
+      // Parse all ResourcesTable nodes
+      const resourcesTableNodes = Array.from(xmlDoc.getElementsByTagName('ResourcesTable'));
+      const resourcesArray: any[][] = [];
+
+      for (const resourcesTableNode of resourcesTableNodes) {
+        const guid = resourcesTableNode.getElementsByTagName('Guid')[0].textContent;
+        const resourceId = resourcesTableNode.getElementsByTagName('ResourceId')[0].textContent;
+        const resourceValue = resourcesTableNode.getElementsByTagName('ResourceValue')[0].textContent;
+
+        resourcesArray.push([guid?.trim(), resourceId?.trim(), resourceValue?.trim()]);
+      }
+
+      // Create a 2D array with header and data
+      const header = ['Guid', 'ResourceId', 'ResourceValue'];
+      const tableData = [header, ...resourcesArray];
+      const filePath = this.getLocalFilePath(uri, this.rootPath!, "xml");
+      const oParams = {
+        name: `Form Resources of ${formName}`,
+        data: JSON.stringify(tableData),
+        title: `Form Resources: ${formName}`,
+        docPath: filePath,
+        uri: uri,
+        language: language
+      };
+      return oParams;
+    }
   }
 }

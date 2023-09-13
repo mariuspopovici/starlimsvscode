@@ -44,7 +44,8 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
     );
     treeItem.iconPath = item.iconPath;
     treeItem.contextValue = item.type;
-    treeItem.label = item.checkedOutBy ? `${item.label} (Checked out by ${item.checkedOutBy})` : item.label;
+    let language = item.language? ", Language: " + item.language : "";
+    treeItem.label = item.checkedOutBy ? `${item.label} (Checked out by ${item.checkedOutBy}${language})` : item.label;
     treeItem.resourceUri = this.getItemResource(item);
     treeItem.tooltip = item.tooltip ?? item.label?.toString() ?? "";
     treeItem.command = {
@@ -177,6 +178,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
       const scriptLanguage = pendingCheckins[i].getElementsByTagName("SCRIPTLANGUAGE")[0]?.childNodes[0].nodeValue?.trim();
       const appCatName = pendingCheckins[i].getElementsByTagName("APPCATNAME")[0]?.childNodes[0].nodeValue?.trim();
       const isSystem = pendingCheckins[i].getElementsByTagName("ISSYSTEM")[0]?.childNodes[0].nodeValue?.trim();
+      const language = pendingCheckins[i].getElementsByTagName("LANGID")[0]?.childNodes[0].nodeValue?.trim();
 
       // create a tree like:
       // - "Applications" > parentName > "HTML Forms" > childName (for parentType = "APP" and scriptLanguage = "HTML")
@@ -205,7 +207,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           rootNode.children = [];
           rootNode.iconPath = this.getIconForType(rootNode.type);
-          rootNode.language = "";
+          rootNode.scriptLanguage = "";
           rootNode.guid = "";
           rootNode.checkedOutBy = "";
           rootNode.filePath = "";
@@ -230,7 +232,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           appCatNode.children = [];
           appCatNode.iconPath = this.getIconForType(appCatNode.type);
-          appCatNode.language = "";
+          appCatNode.scriptLanguage = "";
           appCatNode.guid = "";
           appCatNode.checkedOutBy = "";
           appCatNode.filePath = "";
@@ -255,7 +257,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           appNode.children = [];
           appNode.iconPath = this.getIconForType(appNode.type);
-          appNode.language = "";
+          appNode.scriptLanguage = "";
           appNode.guid = parentID ?? "";
           appNode.checkedOutBy = "";
           appNode.filePath = "";
@@ -281,7 +283,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             htmlFormsCatNode.children = [];
             htmlFormsCatNode.iconPath = this.getIconForType(htmlFormsCatNode.type);
-            htmlFormsCatNode.language = "";
+            htmlFormsCatNode.scriptLanguage = "";
             htmlFormsCatNode.guid = "";
             htmlFormsCatNode.checkedOutBy = "";
             htmlFormsCatNode.filePath = "";
@@ -311,6 +313,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormXmlNode.children = [];
             htmlFormXmlNode.iconPath = this.getIconForType(htmlFormXmlNode.type);
             htmlFormXmlNode.filePath = "";
+            htmlFormXmlNode.language = language ?? "";
             htmlFormXmlNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
 
             htmlFormsCatNode.children?.push(htmlFormXmlNode);
@@ -366,8 +369,37 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormGuideNode.iconPath = this.getIconForType(htmlFormGuideNode.type);
             htmlFormGuideNode.filePath = "";
             htmlFormGuideNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
+            htmlFormGuideNode.language = language ?? "";
 
             htmlFormsCatNode.children?.push(htmlFormGuideNode);
+            this.service.setCheckedOut(uri, checkedOutBy ?? "");
+          }
+
+          // create HTML form resources node
+          var htmlFormResourcesNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
+            (item: TreeEnterpriseItem) => item.label === childName
+          );
+          {
+            let uri = `/Applications/${appCatName}/${parentName}/HTMLForms/Resources/${childName}`;
+
+            htmlFormResourcesNode = new TreeEnterpriseItem(
+              EnterpriseItemType.HTMLFormResources,
+              childName + " [Resources]" ?? "",
+              "XML",
+              uri,
+              vscode.TreeItemCollapsibleState.None
+            );
+
+            htmlFormResourcesNode.guid = childId ?? "";
+            htmlFormResourcesNode.checkedOutBy = checkedOutBy ?? "";
+            htmlFormResourcesNode.isSystem = isSystem ? true : false;
+            htmlFormResourcesNode.children = [];
+            htmlFormResourcesNode.iconPath = this.getIconForType(htmlFormResourcesNode.type);
+            htmlFormResourcesNode.filePath = "";
+            htmlFormResourcesNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
+            htmlFormResourcesNode.language = language ?? "";
+
+            htmlFormsCatNode.children?.push(htmlFormResourcesNode);
             this.service.setCheckedOut(uri, checkedOutBy ?? "");
           }
         } else if (scriptLanguage === "JSCRIPT") {
@@ -387,7 +419,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             xfdFormsCatNode.children = [];
             xfdFormsCatNode.iconPath = this.getIconForType(xfdFormsCatNode.type);
-            xfdFormsCatNode.language = "";
+            xfdFormsCatNode.scriptLanguage = "";
             xfdFormsCatNode.guid = "";
             xfdFormsCatNode.checkedOutBy = "";
             xfdFormsCatNode.filePath = "";
@@ -419,6 +451,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             xfdFormXmlNode.iconPath = this.getIconForType(EnterpriseItemType.XFDFormXML);
             xfdFormXmlNode.filePath = "";
             xfdFormXmlNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
+            xfdFormXmlNode.language = language ?? "";
 
             xfdFormsCatNode.children?.push(xfdFormXmlNode as TreeEnterpriseItem);
             this.service.setCheckedOut(uri, checkedOutBy ?? "");
@@ -450,6 +483,34 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             xfdFormsCatNode.children?.push(xfdFormCodeNode as TreeEnterpriseItem);
             this.service.setCheckedOut(uri, checkedOutBy ?? "");
           }
+
+          // create XFD form resources node
+          var xfdFormResourcesNode: TreeEnterpriseItem | undefined = xfdFormsCatNode.children?.find(
+            (item: TreeEnterpriseItem) => item.label === childName
+          );
+
+          if (!xfdFormResourcesNode) {
+            let uri = `/Applications/${appCatName}/${parentName}/XFDForms/Resources/${childName}`;
+            xfdFormResourcesNode = new TreeEnterpriseItem(
+              EnterpriseItemType.XFDFormResources,
+              childName ?? "",
+              "XML",
+              uri,
+              vscode.TreeItemCollapsibleState.None
+            );
+
+            xfdFormResourcesNode.guid = childId ?? "";
+            xfdFormResourcesNode.checkedOutBy = checkedOutBy ?? "";
+            xfdFormResourcesNode.isSystem = isSystem ? true : false;
+            xfdFormResourcesNode.children = [];
+            xfdFormResourcesNode.iconPath = this.getIconForType(xfdFormResourcesNode.type);
+            xfdFormResourcesNode.filePath = "";
+            xfdFormResourcesNode.tooltip = `Checked out by ${checkedOutBy} on ${checkedOutDate}`;
+            xfdFormResourcesNode.language = language ?? "";
+
+            xfdFormsCatNode.children?.push(xfdFormResourcesNode as TreeEnterpriseItem);
+            this.service.setCheckedOut(uri, checkedOutBy ?? "");
+          }
         }
 
         if (childType === "AppServerScript") {
@@ -469,7 +530,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             appServerScriptsNode.children = [];
             appServerScriptsNode.iconPath = this.getIconForType(appServerScriptsNode.type);
-            appServerScriptsNode.language = "";
+            appServerScriptsNode.scriptLanguage = "";
             appServerScriptsNode.guid = "";
             appServerScriptsNode.checkedOutBy = "";
             appServerScriptsNode.filePath = "";
@@ -524,7 +585,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             appClientScriptsNode.children = [];
             appClientScriptsNode.iconPath = this.getIconForType(appClientScriptsNode.type);
-            appClientScriptsNode.language = "";
+            appClientScriptsNode.scriptLanguage = "";
             appClientScriptsNode.guid = "";
             appClientScriptsNode.checkedOutBy = "";
             appClientScriptsNode.filePath = "";
@@ -579,7 +640,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
             appDataSourcesNode.children = [];
             appDataSourcesNode.iconPath = this.getIconForType(appDataSourcesNode.type);
-            appDataSourcesNode.language = "";
+            appDataSourcesNode.scriptLanguage = "";
             appDataSourcesNode.guid = "";
             appDataSourcesNode.checkedOutBy = "";
             appDataSourcesNode.filePath = "";
@@ -634,7 +695,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           serverScriptsNode.children = [];
           serverScriptsNode.iconPath = this.getIconForType(serverScriptsNode.type);
-          serverScriptsNode.language = "";
+          serverScriptsNode.scriptLanguage = "";
           serverScriptsNode.guid = "";
           serverScriptsNode.checkedOutBy = "";
           serverScriptsNode.filePath = "";
@@ -659,7 +720,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           serverScriptCatNode.children = [];
           serverScriptCatNode.iconPath = this.getIconForType(serverScriptCatNode.type);
-          serverScriptCatNode.language = "";
+          serverScriptCatNode.scriptLanguage = "";
           serverScriptCatNode.guid = "";
           serverScriptCatNode.checkedOutBy = "";
           serverScriptCatNode.filePath = "";
@@ -714,7 +775,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           clientScriptsNode.children = [];
           clientScriptsNode.iconPath = this.getIconForType(clientScriptsNode.type);
-          clientScriptsNode.language = "";
+          clientScriptsNode.scriptLanguage = "";
           clientScriptsNode.guid = "";
           clientScriptsNode.checkedOutBy = "";
           clientScriptsNode.filePath = "";
@@ -739,7 +800,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           clientScriptCatNode.children = [];
           clientScriptCatNode.iconPath = this.getIconForType(clientScriptCatNode.type);
-          clientScriptCatNode.language = "";
+          clientScriptCatNode.scriptLanguage = "";
           clientScriptCatNode.guid = "";
           clientScriptCatNode.checkedOutBy = "";
           clientScriptCatNode.filePath = "";
@@ -794,7 +855,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           dataSourcesNode.children = [];
           dataSourcesNode.iconPath = this.getIconForType(dataSourcesNode.type);
-          dataSourcesNode.language = "";
+          dataSourcesNode.scriptLanguage = "";
           dataSourcesNode.guid = "";
           dataSourcesNode.checkedOutBy = "";
           dataSourcesNode.filePath = "";
@@ -819,7 +880,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           dataSourceCatNode.children = [];
           dataSourceCatNode.iconPath = this.getIconForType(dataSourceCatNode.type);
-          dataSourceCatNode.language = "";
+          dataSourceCatNode.scriptLanguage = "";
           dataSourceCatNode.guid = "";
           dataSourceCatNode.checkedOutBy = "";
           dataSourceCatNode.filePath = "";
