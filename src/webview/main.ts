@@ -243,7 +243,7 @@ function saveData() {
   
   // Update the gridData object with the latest data
   gridData.columns = grid.columnDefinitions.map((columnDefinition) => columnDefinition.title);
-  gridData.data = grid.rowsData.map((rowData) =>
+  gridData.data = grid.rowsData.map((rowData : any) =>
   grid.columnDefinitions?.map((columnDefinition : any) => rowData[columnDefinition.columnDataKey])
   );
 
