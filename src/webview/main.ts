@@ -212,8 +212,8 @@ function unsetCellEditable(cell: DataGridCell) {
 // Syncs changes made in an editable cell with the
 // underlying data structure of a vscode-data-grid
 function syncCellChanges(cell: DataGridCell) {
-  const column = cell.columnDefinition;
-  const row = cell.rowData;
+  const column : any = cell.columnDefinition;
+  const row : any = cell.rowData;
   if (column && row) {
     const originalValue = row[column.columnDataKey];
     const newValue = cell.innerText;
