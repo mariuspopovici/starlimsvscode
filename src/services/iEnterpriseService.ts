@@ -18,7 +18,7 @@ export interface IEnterpriseService {
   getTableCommand(uri: string, type: string): any;
   getUriFromLocalPath(localPath: string): any;
   getCheckedOutItems(): any;
-  checkInAllItems(): any;
+  checkInAllItems(reason: string | undefined): any;
   getTableDefinition(uri: string): any;
   getVersion(): any;
   upgradeBackend(sdpPackage: string): any;

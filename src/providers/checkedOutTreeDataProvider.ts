@@ -118,6 +118,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         return this.getCustomIcon("json.svg");
 
       case EnterpriseItemType.XFDFormXML:
+      case EnterpriseItemType.XFDFormResources:
       case EnterpriseItemType.HTMLFormXML:
       case EnterpriseItemType.HTMLFormResources:
         return this.getCustomIcon("xml.svg");
@@ -218,7 +219,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create application category node
         var appCatNode: TreeEnterpriseItem | undefined = rootNode?.children?.find(
-          (item: TreeEnterpriseItem) => item.label === appCatName
+          (item: TreeEnterpriseItem) => item.label === appCatName && item.type === EnterpriseItemType.AppCategory
         );
 
         if (!appCatNode) {
@@ -243,7 +244,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create application node
         var appNode: TreeEnterpriseItem | undefined = appCatNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === parentName
+          (item: TreeEnterpriseItem) => item.label === parentName && item.type === EnterpriseItemType.Application
         );
 
         if (!appNode) {
@@ -269,7 +270,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         if (scriptLanguage === "HTML") {
           // create "HTML Forms" node
           var htmlFormsCatNode: TreeEnterpriseItem | undefined = appNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === "HTML Forms"
+            (item: TreeEnterpriseItem) => item.label === "HTML Forms" && item.type === EnterpriseItemType.HTMLFormCategory
           );
 
           if (!htmlFormsCatNode) {
@@ -294,14 +295,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create HTML form XML node
           var htmlFormXmlNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.HTMLFormXML
           );
           {
             let uri = `/Applications/${appCatName}/${parentName}/HTMLForms/XML/${childName}`;
 
             htmlFormXmlNode = new TreeEnterpriseItem(
               EnterpriseItemType.HTMLFormXML,
-              childName + " [XML]" ?? "",
+              childName + " [XML]",
               "XML",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -322,14 +323,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create HTML form code behind node
           var htmlFormCodeNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.HTMLFormCode
           );
           {
             let uri = `/Applications/${appCatName}/${parentName}/HTMLForms/CodeBehind/${childName}`;
 
             htmlFormCodeNode = new TreeEnterpriseItem(
               EnterpriseItemType.HTMLFormCode,
-              childName + " [Code Behind]" ?? "",
+              childName + " [Code Behind]",
               "JS",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -349,14 +350,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create HTML form guide node
           var htmlFormGuideNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.HTMLFormGuide
           );
           {
             let uri = `/Applications/${appCatName}/${parentName}/HTMLForms/Guide/${childName}`;
 
             htmlFormGuideNode = new TreeEnterpriseItem(
               EnterpriseItemType.HTMLFormGuide,
-              childName + " [Guide]" ?? "",
+              childName + " [Guide]",
               "GUIDE",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -377,14 +378,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create HTML form resources node
           var htmlFormResourcesNode: TreeEnterpriseItem | undefined = htmlFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.HTMLFormResources
           );
           {
             let uri = `/Applications/${appCatName}/${parentName}/HTMLForms/Resources/${childName}`;
 
             htmlFormResourcesNode = new TreeEnterpriseItem(
               EnterpriseItemType.HTMLFormResources,
-              childName + " [Resources]" ?? "",
+              childName + " [Resources]",
               "XML",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -402,10 +403,10 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             htmlFormsCatNode.children?.push(htmlFormResourcesNode);
             this.service.setCheckedOut(uri, checkedOutBy ?? "");
           }
-        } else if (scriptLanguage === "JSCRIPT") {
+        } else if (scriptLanguage === "XFD") {
           // create "XFD Forms" node
           var xfdFormsCatNode: TreeEnterpriseItem | undefined = appNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === "XFD Forms"
+            (item: TreeEnterpriseItem) => item.label === "XFD Forms" && item.type === EnterpriseItemType.XFDFormCategory
           );
 
           if (!xfdFormsCatNode) {
@@ -430,7 +431,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create XFD form XML node
           var xfdFormXmlNode: TreeEnterpriseItem | undefined = xfdFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.XFDFormXML
           );
 
           if (!xfdFormXmlNode) {
@@ -438,7 +439,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
             
             xfdFormXmlNode = new TreeEnterpriseItem(
               EnterpriseItemType.XFDFormXML,
-              childName ?? "",
+              childName + " [XML]",
               "XML",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -459,14 +460,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create XFD form code behind node
           var xfdFormCodeNode: TreeEnterpriseItem | undefined = xfdFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.XFDFormCode
           );
 
           if (!xfdFormCodeNode) {
             let uri = `/Applications/${appCatName}/${parentName}/XFDForms/CodeBehind/${childName}`;
             xfdFormCodeNode = new TreeEnterpriseItem(
               EnterpriseItemType.XFDFormCode,
-              childName ?? "",
+              childName + " [Code Behind]",
               "JS",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -486,14 +487,14 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create XFD form resources node
           var xfdFormResourcesNode: TreeEnterpriseItem | undefined = xfdFormsCatNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.XFDFormResources
           );
 
           if (!xfdFormResourcesNode) {
             let uri = `/Applications/${appCatName}/${parentName}/XFDForms/Resources/${childName}`;
             xfdFormResourcesNode = new TreeEnterpriseItem(
               EnterpriseItemType.XFDFormResources,
-              childName ?? "",
+              childName + " [Resources]",
               "XML",
               uri,
               vscode.TreeItemCollapsibleState.None
@@ -516,7 +517,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         if (childType === "AppServerScript") {
           // create "Server Scripts" node
           var appServerScriptsNode: TreeEnterpriseItem | undefined = appNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === "Server Scripts"
+            (item: TreeEnterpriseItem) => item.label === "Server Scripts" && item.type === EnterpriseItemType.AppServerScriptCategory
           );
 
           if (!appServerScriptsNode) {
@@ -541,7 +542,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create server script node
           var appServerScriptNode: TreeEnterpriseItem | undefined = appServerScriptsNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.AppServerScript
           );
 
           if (!appServerScriptNode) {
@@ -571,7 +572,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         if (childType === "AppClientScript") {
           // create "Client Scripts" node
           var appClientScriptsNode: TreeEnterpriseItem | undefined = appNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === "Client Scripts"
+            (item: TreeEnterpriseItem) => item.label === "Client Scripts" && item.type === EnterpriseItemType.AppClientScriptCategory
           );
 
           if (!appClientScriptsNode) {
@@ -596,7 +597,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create client script node
           var appClientScriptNode: TreeEnterpriseItem | undefined = appClientScriptsNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.AppClientScript
           );
 
           if (!appClientScriptNode) {
@@ -626,7 +627,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
         if (childType === "AppDataSource") {
           // create "Data Sources" node
           var appDataSourcesNode: TreeEnterpriseItem | undefined = appNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === "Data Sources"
+            (item: TreeEnterpriseItem) => item.label === "Data Sources" && item.type === EnterpriseItemType.AppDataSourceCategory
           );
 
           if (!appDataSourcesNode) {
@@ -651,7 +652,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
           // create data source node
           var appDataSourceNode: TreeEnterpriseItem | undefined = appDataSourcesNode.children?.find(
-            (item: TreeEnterpriseItem) => item.label === childName
+            (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.AppDataSource
           );
 
           if (!appDataSourceNode) {
@@ -681,7 +682,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
       if (parentType === "SSC") {
         // create "Server Scripts" root node
         var serverScriptsNode: TreeEnterpriseItem | undefined = data.find(
-          (item: TreeEnterpriseItem) => item.label === "Server Scripts"
+          (item: TreeEnterpriseItem) => item.label === "Server Scripts" && item.type === EnterpriseItemType.ServerScriptCategory
         );
 
         if (!serverScriptsNode) {
@@ -706,7 +707,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create server script category node
         var serverScriptCatNode: TreeEnterpriseItem | undefined = serverScriptsNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === parentName
+          (item: TreeEnterpriseItem) => item.label === parentName && item.type === EnterpriseItemType.ServerScriptCategory
         );
 
         if (!serverScriptCatNode) {
@@ -731,7 +732,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create server script node
         var serverScriptNode: TreeEnterpriseItem | undefined = serverScriptCatNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === childName
+          (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.ServerScript
         );
 
         if (!serverScriptNode) {
@@ -761,7 +762,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
       if (parentType === "CSC") {
         // create "Client Scripts" root node
         var clientScriptsNode: TreeEnterpriseItem | undefined = data.find(
-          (item: TreeEnterpriseItem) => item.label === "Client Scripts"
+          (item: TreeEnterpriseItem) => item.label === "Client Scripts" && item.type === EnterpriseItemType.ClientScriptCategory
         );
 
         if (!clientScriptsNode) {
@@ -786,7 +787,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create client script category node
         var clientScriptCatNode: TreeEnterpriseItem | undefined = clientScriptsNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === parentName
+          (item: TreeEnterpriseItem) => item.label === parentName && item.type === EnterpriseItemType.ClientScriptCategory
         );
 
         if (!clientScriptCatNode) {
@@ -811,7 +812,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create client script node
         var clientScriptNode: TreeEnterpriseItem | undefined = clientScriptCatNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === childName
+          (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.ClientScript
         );
 
         if (!clientScriptNode) {
@@ -841,7 +842,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
       if (parentType === "DSC") {
         // create "Data Sources" category node
         var dataSourcesNode: TreeEnterpriseItem | undefined = data.find(
-          (item: TreeEnterpriseItem) => item.label === "Data Sources"
+          (item: TreeEnterpriseItem) => item.label === "Data Sources" && item.type === EnterpriseItemType.DataSourceCategory
         );
 
         if (!dataSourcesNode) {
@@ -866,7 +867,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create data source category node
         var dataSourceCatNode: TreeEnterpriseItem | undefined = dataSourcesNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === parentName
+          (item: TreeEnterpriseItem) => item.label === parentName && item.type === EnterpriseItemType.DataSourceCategory
         );
 
         if (!dataSourceCatNode) {
@@ -891,7 +892,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
 
         // create data source node
         var dataSourceNode: TreeEnterpriseItem | undefined = dataSourceCatNode.children?.find(
-          (item: TreeEnterpriseItem) => item.label === childName
+          (item: TreeEnterpriseItem) => item.label === childName && item.type === EnterpriseItemType.DataSource
         );
 
         if (!dataSourceNode) {

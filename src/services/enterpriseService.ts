@@ -850,8 +850,8 @@ export class EnterpriseService implements IEnterpriseService {
    * Check in all checked out items
    * @returns true if all items were checked in successfully, false otherwise
    */
-  public async checkInAllItems() {
-    const url = `${this.baseUrl}/SCM_API.CheckInAll.lims`;
+  public async checkInAllItems(reason : string | undefined) {
+    const url = `${this.baseUrl}/SCM_API.CheckInAll.lims?Reason=${reason}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
       method: "GET",
