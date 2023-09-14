@@ -8,8 +8,17 @@ oResponse := CreateUDObject({
 	{"success", .T.}
 });
 
-bAllUsers := .F.;
-sReason := "Checked in by " + MYUSERNAME + " from VSCODE";
+:IF Request:QueryString:IsProperty("AllUsers");
+    bAllUsers := Request:QueryString:AllUsers;
+:ELSE;
+    bAllUsers := .F.;
+:ENDIF;
+
+:IF Request:QueryString:IsProperty("Reason");
+	sReason := Request:QueryString:Reason;
+:ELSE;
+    sReason := "";
+:ENDIF;
 
 aResult := DoProc("Enterprise_Data_Providers.CheckInProvider.GetPendingCheckins", {bAllUsers});
 ds := DoProc("Enterprise_Data_Providers.Utils.ConvertXMLStringToDataset", {aResult});

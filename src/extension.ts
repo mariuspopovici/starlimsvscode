@@ -232,9 +232,17 @@ export async function activate(context: vscode.ExtensionContext) {
       if (confirm !== "Yes") {
         return;
       }
-      await enterpriseService.checkInAllItems();
+
+      // ask for checkin reason
+      const checkinReason = await vscode.window.showInputBox({
+        title: "Check in all items",
+        prompt: "Enter check in reason:",
+        ignoreFocusOut: true,
+      });
+
       // refresh tree
-      vscode.commands.executeCommand("STARLIMS.GetAllCheckedOutItems");
+      await enterpriseService.checkInAllItems(checkinReason);
+      vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
     }
   );
 
@@ -555,9 +563,13 @@ export async function activate(context: vscode.ExtensionContext) {
         item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false);
       }
 
+      // remove text in brackets from item name to get the real item name
+      let sItemName = item.label.toString();
+      sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
-        `Are you sure you want to undo checkout of '${item.label}' and lose all changes?`,
+        `Are you sure you want to undo checkout of '${sItemName}' and lose all changes?`,
         { modal: true },
         "Yes"
       );
