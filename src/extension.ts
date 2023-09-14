@@ -639,7 +639,7 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
       executeWithProgress(async () => {
-        await enterpriseTreeProvider.search(itemName, "", false, false);
+        await enterpriseTreeProvider.search(itemName, "", false, false, false);
       }, "Searching STARLIMS Enterprise...");
     }
   );
@@ -1413,7 +1413,7 @@ export async function activate(context: vscode.ExtensionContext) {
           },
           async (progress, token) => {
             // find all items matching the search term
-            await enterpriseTreeProvider.search(searchTerm, itemTypesString, false, true);
+            await enterpriseTreeProvider.search(searchTerm, itemTypesString, false, true, false);
           }
         );
       }
