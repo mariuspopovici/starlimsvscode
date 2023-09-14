@@ -22,7 +22,7 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDIF;
 
-:IF Request:QueryString:IsProperty("UserLang");
+:IF Request:QueryString:IsProperty("UserLang") .AND. !Empty(Request:QueryString:UserLang);
 	sUserLang := Request:QueryString:UserLang;
 :ELSE;
 	sUserLang := GetSetting("DEFAULTLANGUAGE");
@@ -83,7 +83,7 @@ sType := oEnterpriseItem:Type;
 		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppDataSourceScript", NIL, sReason, NIL, .F.});
 	:EXITCASE;
 	:CASE sType == "HTMLFORMXML" .OR. sType == "HTMLFORMCODE" .OR.
-		sType == "XFDFORMXML" .OR. sType == "XFDFORMCODE";
+		sType == "XFDFORMXML" .OR. sType == "XFDFORMCODE" .OR. sType == "HTMLFORMGUIDE";
 		sItemName := sAppName + "." + sItemName;
 		sItemID := oUtils:GetItemGUID(sItemName, sType);
 		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "Form", sUserLang, sReason, NIL, .F.});

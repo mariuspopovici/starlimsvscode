@@ -135,3 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated icons
 - Storing user password is secure storage vs settings.json
 - Show form resources for HTML and XFD forms
+
+## [1.2.67] - 2023-09-13
+
+- Initial support for editing form resources for HTML and XFD forms

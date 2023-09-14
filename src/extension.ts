@@ -7,7 +7,8 @@ import { EnterpriseItemType, EnterpriseTreeDataProvider, TreeEnterpriseItem } fr
 import { EnterpriseService } from "./services/enterpriseService";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 import path = require("path");
-import { DataViewPanel } from "./panels/DataViewPanel";
+import { ResourcesDataViewPanel } from "./panels/ResourcesDataViewPanel";
+import { GenericDataViewPanel } from "./panels/GenericDataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
 
@@ -134,6 +135,11 @@ export async function activate(context: vscode.ExtensionContext) {
           const sdpPackage = context.asAbsolutePath("dist/SCM_API.sdp");
           executeWithProgress(async () => {
             await enterpriseService.upgradeBackend(sdpPackage);
+            const selection = await vscode.window.showInformationMessage(`We recommend that you restart Visual Studio Code.`,
+              'Restart', 'Cancel');
+            if (selection === "Restart") {
+              vscode.commands.executeCommand("workbench.action.reloadWindow");
+            }
           }, "Upgrading the extension backend API.");
         }
       }
@@ -319,13 +325,11 @@ export async function activate(context: vscode.ExtensionContext) {
     const result = await enterpriseService.getTableDefinition(item.uri);
     const tableName = item.uri.split('/').pop();
     if (result) {
-      DataViewPanel.render(context.extensionUri, {
+      GenericDataViewPanel.render(context.extensionUri, {
         name: tableName,
         data: result,
         title: `Table Definition: ${tableName}`
-      },
-        enterpriseService,
-        enterpriseTreeProvider);
+      });
     }
   }
 
@@ -341,7 +345,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let oParams = await enterpriseService.getFormResources(remoteUri, item.language);
 
     // render the data view panel
-    DataViewPanel.render(context.extensionUri, oParams, enterpriseService, 
+    ResourcesDataViewPanel.render(context.extensionUri, oParams, enterpriseService, 
                          enterpriseTreeProvider);
   }
 
@@ -594,7 +598,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
       if (editor) {
         let remoteUri = enterpriseService.getUriFromLocalPath(editor.document.uri.path);
-        enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText(), "");
+        if (await enterpriseService.isCheckedOut(remoteUri)) {
+          enterpriseService.saveEnterpriseItemCode(remoteUri, editor.document.getText(), "");
+        }
       }
     }
   );
@@ -1053,13 +1059,11 @@ export async function activate(context: vscode.ExtensionContext) {
         const result = await enterpriseService.runScript(remoteUri);
         if (result?.success) {
           const dataSourceName = remoteUri.split('/').pop();
-          DataViewPanel.render(context.extensionUri, {
+          GenericDataViewPanel.render(context.extensionUri, {
             name: dataSourceName,
             data: result.data,
             title: `Data Source Output: ${dataSourceName}`
-          },
-            enterpriseService,
-            enterpriseTreeProvider);
+          });
         }
         outputChannel.appendLine(result.data);
         outputChannel.show();

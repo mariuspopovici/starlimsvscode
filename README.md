@@ -52,7 +52,6 @@ Features:
 To Do:
 
 - Move forms and scripts
-- Edit form resources
 - Create a HTML form designer
 - Implement table support including a schema and ERD generator / viewer
 - Rename items
