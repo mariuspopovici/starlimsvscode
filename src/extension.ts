@@ -491,8 +491,11 @@ export async function activate(context: vscode.ExtensionContext) {
       // choose language for forms only
       let language;
       if (item.type === EnterpriseItemType.XFDFormXML ||
-        item.type === EnterpriseItemType.HTMLFormXML ||
         item.type === EnterpriseItemType.XFDFormResources ||
+        item.type === EnterpriseItemType.XFDFormCode ||
+        item.type === EnterpriseItemType.HTMLFormXML ||
+        item.type === EnterpriseItemType.HTMLFormCode ||
+        item.type === EnterpriseItemType.HTMLFormGuide ||
         item.type === EnterpriseItemType.HTMLFormResources) {
         let oReturn = await vscode.window.showQuickPick(
           languages,
@@ -992,7 +995,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the delete item command
   vscode.commands.registerCommand("STARLIMS.Delete",
     async () => {
-      if (selectedItem === undefined) {
+      if (selectedItem === undefined || selectedItem.label === undefined) {
         vscode.window.showErrorMessage("Please select an item to delete.");
         return;
       }
@@ -1005,9 +1008,13 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      // remove text in brackets from item name to get the real item name
+      let sItemName = selectedItem.label.toString();
+      sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
-        `Are you sure you want to delete ${selectedItem.label}?`,
+        `Are you sure you want to delete '${sItemName}'?`,
         { modal: true },
         "Yes"
       );
