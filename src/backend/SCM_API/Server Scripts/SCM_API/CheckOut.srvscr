@@ -75,7 +75,6 @@ sType := oEnterpriseItem:Type;
 		sType == "HTMLFORMRESOURCES" .OR. sType == "XFDFORMRESOURCES" .OR. sType == "HTMLFORMGUIDE";
 		sItemName := sAppName + "." + sItemName;
 		sItemID := oUtils:GetItemGUID(sItemName, sType);
-		usrmes("sUserLang", sUserLang);
 		DoProc("Enterprise_Data_Providers.CheckOutProvider.CheckOutItem", {sItemID, "Form", sUserLang});
 	:EXITCASE;
 	:CASE sType == "TABLE";
