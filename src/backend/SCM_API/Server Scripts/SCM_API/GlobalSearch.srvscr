@@ -3,7 +3,7 @@ Description.. :	Full text search for items in the LIMS
 Author....... :	DC
 Date......... : 2023-08-10
 *******************************************************************************/;
-:DECLARE sSQL, ssearchString, sItemTypes, aItems, oResult, oUtils, nLayerID, String;
+:DECLARE sSQL, sSearchString, sItemTypes, aItems, oResult, oUtils, nLayerID, String;
 String := "";
 oUtils := CreateUDObject("SCM_API.Utils", {});
 oResponse := CreateUDObject({
@@ -12,7 +12,7 @@ oResponse := CreateUDObject({
 });
 
 :IF Request:QueryString:IsProperty("searchString");
-	ssearchString := Request:QueryString:searchString;
+	sSearchString := Request:QueryString:searchString;
 :ELSE;
 	Response:StatusCode := 400;
 	oResponse:success := .F.;
@@ -48,7 +48,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][8]},
             {"language", "XML"},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][5]}
+            {"guid", aDataSet[i][5]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
@@ -68,7 +69,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][8]},
             {"language", "XML"},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][5]}
+            {"guid", aDataSet[i][5]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
@@ -87,7 +89,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][8]},
             {"language", "XML"},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][5]}
+            {"guid", aDataSet[i][5]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
@@ -106,7 +109,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][8]},
             {"language", "XML"},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][5]}
+            {"guid", aDataSet[i][5]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
@@ -125,7 +129,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][7]},
             {"language", "SSL"},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][3]}
+            {"guid", aDataSet[i][3]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
@@ -144,7 +149,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][7]},
             {"language", iif((aDataSet[i][6] == "STARLIMS"), "SSL", "SQL")},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][3]}
+            {"guid", aDataSet[i][3]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
@@ -163,7 +169,8 @@ aResultItems := {};
             {"checkedOutBy", aDataSet[i][7]},
             {"language", "JS"},
             {"isFolder", .F.},
-            {"guid", aDataSet[i][3]}
+            {"guid", aDataSet[i][3]},
+            {"globalSearchTerm", sSearchString}
         }));
         AAdd(aResultItems, oItem);
     :NEXT;
