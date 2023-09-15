@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
 import { getUri } from "../utilities/getUri";
-//import { platform } from "os";
 
-export class DataViewPanel {
-  public static currentPanel: DataViewPanel | undefined;
+export class GenericDataViewPanel {
+  public static currentPanel: GenericDataViewPanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
   private _data: string;
@@ -35,11 +34,11 @@ export class DataViewPanel {
       localResourceRoots: [vscode.Uri.joinPath(extensionUri, "dist")]
     });
 
-    DataViewPanel.currentPanel = new DataViewPanel(panel, extensionUri, payload);
+    GenericDataViewPanel.currentPanel = new GenericDataViewPanel(panel, extensionUri, payload);
   }
 
   public dispose() {
-    DataViewPanel.currentPanel = undefined;
+    GenericDataViewPanel.currentPanel = undefined;
 
     this._panel.dispose();
 
@@ -66,6 +65,7 @@ export class DataViewPanel {
     const nonce = getNonce();
     const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
     const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
+    const codiconUri = getUri(webview, extensionUri, ["dist", "codicon.css"]);
 
     // TIP: Install the es6-string-html VS Code extension to enable code highlighting below
     const html = /*html*/ `
@@ -76,10 +76,11 @@ export class DataViewPanel {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; font-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" href="${styleUri}">
-          <title>Data</title>
+          <link rel="stylesheet" href="${codiconUri}">
+          <title>${this._title}</title>
         </head>
         <body>
-          <h1 id="title"></h1>
+          <h1 id="title">${this._title}</h1>
           <section>
             <vscode-data-grid id="data-grid" generate-header="sticky" aria-label="Data Source Results"></vscode-data-grid>
           </section>
@@ -108,9 +109,7 @@ export class DataViewPanel {
             // we send it the data using a receiveData message
             webview.postMessage({
               command: "receiveData",
-              payload: this._data,
-              name: this._name,
-              title: this._title
+              payload: this._data
             });
             break;
         }

@@ -3,7 +3,7 @@
   "displayName": "STARLIMS VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.67",
+  "version": "1.2.70",
   "icon": "resources/extension/starlimsvscode.png",
   "publisher": "MariusPopovici",
   "author": {
@@ -665,6 +665,7 @@
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "@xmldom/xmldom": "^0.7.13",
     "jsdom": "^22.1.0",
-    "node-fetch": "^2.6.12"
+    "node-fetch": "^2.6.12",
+    "react": "^18.2.0"
   }
 }

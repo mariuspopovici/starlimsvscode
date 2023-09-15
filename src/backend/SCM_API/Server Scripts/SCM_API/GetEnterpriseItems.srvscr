@@ -5,7 +5,7 @@ Date......... : 2018-11-06
 *******************************************************************************/;
 :DECLARE sOutType, aItems, aEnterpriseCategories, i, oResult, sDataSet, oDataSet, bFolder,
 		 aApplicationSubCategories, aTablesSubCategories, sURI, oRow, sGUID, sCheckedOutBy,
-		 sItemName;
+		 sItemName, oUtils, oEnterpriseItem, sLang;
 
 :IF Request:QueryString:IsProperty("URI");
 	sURI := Request:QueryString:URI;
@@ -13,34 +13,43 @@ Date......... : 2018-11-06
 	sURI:= "";
 :ENDIF;
 
-:DECLARE oUtils;
 oUtils := CreateUDObject("SCM_API.Utils", {});
 
-:DECLARE oEnterpriseItem;
 oEnterpriseItem := oUtils:ParseURI(sURI);
+
+:IF Empty(oEnterpriseItem:Type);
+	oResult := CreateUDObject({
+		{"success", .F.},
+		{"error", "Invalid Type"}
+	});
+	Response:StatusCode := 400;
+	:RETURN oResult;
+:ENDIF;
+
+/*usrmes("type:", oEnterpriseItem:Type);
 
 aItems := {};
 
 aEnterpriseCategories := {
-	{"Applications", "CATEGORY", "N/A", sURI + "/Applications", NIL, NIL},
-	{"Server Scripts", "CATEGORY", "N/A", sURI + "/ServerScripts", NIL, NIL},
-	{"Client Scripts", "CATEGORY", "N/A", sURI + "/ClientScripts", NIL, NIL},
-	{"Data Sources", "CATEGORY", "N/A", sURI + "/DataSources", NIL, NIL},
-	{"Tables", "CATEGORY", "N/A", sURI + "/Tables", NIL, NIL},
-	{"Server Logs", "CATEGORY", "N/A", sURI + "/ServerLogs", NIL, NIL}
+	{"Applications", "CATEGORY", "N/A", sURI + "/Applications", NIL, NIL, NIL},
+	{"Server Scripts", "CATEGORY", "N/A", sURI + "/ServerScripts", NIL, NIL, NIL},
+	{"Client Scripts", "CATEGORY", "N/A", sURI + "/ClientScripts", NIL, NIL, NIL},
+	{"Data Sources", "CATEGORY", "N/A", sURI + "/DataSources", NIL, NIL, NIL},
+	{"Tables", "CATEGORY", "N/A", sURI + "/Tables", NIL, NIL, NIL},
+	{"Server Logs", "CATEGORY", "N/A", sURI + "/ServerLogs", NIL, NIL, NIL}
 };
 
 aTablesSubCategories := {
-	{"Database", "ENT_TABLES_DATABASE", "N/A", sURI + "/Database", NIL, NIL},
-	{"Dictionary", "ENT_TABLES_DICTIONARY", "N/A", sURI + "/Dictionary", NIL, NIL}
+	{"Database", "ENT_TABLES_DATABASE", "N/A", sURI + "/Database", NIL, NIL, NIL},
+	{"Dictionary", "ENT_TABLES_DICTIONARY", "N/A", sURI + "/Dictionary", NIL, NIL, NIL}
 };
 
 aApplicationSubCategories := {
-	{"HTML Forms", "ENT_APP_HTML_FRM", "N/A", sURI + "/HTMLForms", NIL, NIL},
-	{"XFD Forms", "ENT_APP_XFD_FRM", "N/A", sURI + "/XFDForms", NIL, NIL},
-	{"Server Scripts", "ENT_APP_SS", "N/A", sURI + "/ServerScripts", NIL, NIL},
-	{"Client Scripts", "ENT_APP_CS", "N/A", sURI + "/ClientScripts", NIL, NIL},
-	{"Data Sources", "ENT_APP_DS", "N/A", sURI + "/DataSources", NIL, NIL}
+	{"HTML Forms", "ENT_APP_HTML_FRM", "N/A", sURI + "/HTMLForms", NIL, NIL, NIL},
+	{"XFD Forms", "ENT_APP_XFD_FRM", "N/A", sURI + "/XFDForms", NIL, NIL, NIL},
+	{"Server Scripts", "ENT_APP_SS", "N/A", sURI + "/ServerScripts", NIL, NIL, NIL},
+	{"Client Scripts", "ENT_APP_CS", "N/A", sURI + "/ClientScripts", NIL, NIL, NIL},
+	{"Data Sources", "ENT_APP_DS", "N/A", sURI + "/DataSources", NIL, NIL, NIL}
 };
 
 bFolder := .T.;
@@ -88,7 +97,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["APPNAME"], sOutType, "N/A", sURI + "/" + oRow["APPNAME"], NIL, NIL});
+			AAdd(aItems, {oRow["APPNAME"], sOutType, "N/A", sURI + "/" + oRow["APPNAME"], NIL, NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 
@@ -99,7 +108,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 
@@ -110,7 +119,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["DSNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["DSNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["DSNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["DSNAME"], oRow["CHECKEDOUTBY"], NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 	
@@ -123,10 +132,11 @@ bFolder := .T.;
 			oRow := oDataSet:Tables[0]:Rows[i];
 			sFormName := oEnterpriseItem:AppName + "." + oRow["FORMNAME"];
 			sGUID := oRow["FORMID"];
-			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "HTMLFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Guide]", "HTMLFORMGUIDE", "JSON", sURI + "/Guide/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Resources]", "HTMLFORMRESOURCES", "XML", sURI + "/Resources/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID});
+			sLang := DoProc("_GetCheckOutLang", {sGUID});
+			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "HTMLFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, sLang});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "HTMLFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, NIL});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Guide]", "HTMLFORMGUIDE", "JSON", sURI + "/Guide/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, sLang});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Resources]", "HTMLFORMRESOURCES", "XML", sURI + "/Resources/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, sLang});
 		:NEXT;
 	:EXITCASE;
 	
@@ -136,9 +146,11 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "XFDFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], NIL});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "XFDFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], NIL});
-			AAdd(aItems, {oRow["FORMNAME"] + " [Resources]", "XFDFORMRESOURCES", "XML", sURI + "/Resources/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], NIL});
+			sGUID := oRow["FORMID"];
+			sLang := DoProc("_GetCheckOutLang", {sGUID});
+			AAdd(aItems, {oRow["FORMNAME"] + " [XML]", "XFDFORMXML", "XML", sURI + "/XML/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, sLang});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Code Behind]", "XFDFORMCODE", "JS", sURI + "/CodeBehind/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, NIL});
+			AAdd(aItems, {oRow["FORMNAME"] + " [Resources]", "XFDFORMRESOURCES", "XML", sURI + "/Resources/" + oRow["FORMNAME"], oRow["CHECKEDOUTBY"], sGUID, sLang});
 		:NEXT;
 	:EXITCASE;
 	
@@ -149,7 +161,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 	
@@ -160,7 +172,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 
@@ -171,7 +183,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["SCRIPTNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["SCRIPTNAME"], oRow["CHECKEDOUTBY"], NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 	
@@ -182,7 +194,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["DSNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["DSNAME"], oRow["CHECKEDOUTBY"], NIL});
+			AAdd(aItems, {oRow["DSNAME"], sOutType, oRow["SCRIPTLANGUAGE"], sURI + "/" + oRow["DSNAME"], oRow["CHECKEDOUTBY"], NIL, NIL});
 		:NEXT;
 	:EXITCASE;
 	
@@ -192,10 +204,9 @@ bFolder := .T.;
 		:DECLARE aDataSet;
 		aDataSet := DoProc("Enterprise_Data_Providers.EnterpriseUtilsProvider.GetUsersWithLog");
 		:FOR i := 1 :TO Len(aDataSet);
-			AAdd(aItems, {aDataSet[i], sOutType, sOutType, sURI + "/" + aDataSet[i], "", NIL});
+			AAdd(aItems, {aDataSet[i], sOutType, sOutType, sURI + "/" + aDataSet[i], "", NIL, NIL});
 		:NEXT;
 	:EXITCASE; 
-	
 	:CASE AScanExact({"APPSS", "APPCS", "APPDS", "HTMLFORMXML", "HTMLFORMGUIDE", 
 			"HTMLFORMCODE", "XFDFORMXML", "XFDFORMCODE", "CS", "DS", "SS", "SERVERLOG"}, 
 			oEnterpriseItem:Type) > 0;
@@ -211,14 +222,16 @@ bFolder := .T.;
 		sGUID := oUtils:GetItemGUID(sItemName, oEnterpriseItem:Type);
 		
 		/* get checked out by user;
-		sSQL := "select CHECKEDOUTBY from LIMSSOURCECONTROL where ITEMID = ? and DONE = 0";
+		sSQL := "select CHECKEDOUTBY, LANGID from LIMSSOURCECONTROL where ITEMID = ? and DONE = 0";
 		aReturn := LSelect(sSQL,, "DICTIONARY", {sGUID});
 		:IF Empty(aReturn);
 			sCheckedOutBy := "";
+			sLanguage := "";
 		:ELSE;
 			sCheckedOutBy := aReturn[1][1];
+			sLanguage := aReturn[1][2];
 		:ENDIF;
-		AAdd(aItems, {oEnterpriseItem:Type, sOutType, sOutType, sURI, sCheckedOutBy, sGUID});
+		AAdd(aItems, {oEnterpriseItem:Type, sOutType, sOutType, sURI, sCheckedOutBy, sGUID, sLanguage});
 	:EXITCASE; 
 	
 	:CASE oEnterpriseItem:Type == "ENT_CAT_TABLES";
@@ -233,7 +246,7 @@ bFolder := .T.;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["TABLENAME"], sOutType, sOutType, sURI + "/" + oRow["TABLENAME"], oRow["CHECKEDOUTBY"], oRow["TABLEID"]});
+			AAdd(aItems, {oRow["TABLENAME"], sOutType, sOutType, sURI + "/" + oRow["TABLENAME"], oRow["CHECKEDOUTBY"], oRow["TABLEID"], NIL});
 		:NEXT;		
 		bFolder := .F.;
 	:EXITCASE;
@@ -243,17 +256,17 @@ bFolder := .T.;
 :DECLARE aResultItems;
 aResultItems := {};
 :FOR i := 1 :TO Len(aItems);
-	:DECLARE sLanguage;
-	sLanguage := aItems[i][3];
+	:DECLARE sScriptLang;
+	sScriptLang := aItems[i][3];
 	:BEGINCASE;
-		:CASE Upper(sLanguage) == "STARLIMS";
-			sLanguage := "SSL";
+		:CASE Upper(sScriptLang) == "STARLIMS";
+			sScriptLang := "SSL";
 		:EXITCASE;
-		:CASE Upper(sLanguage) == "JSCRIPT";
-			sLanguage := "JS";
+		:CASE Upper(sScriptLang) == "JSCRIPT";
+			sScriptLang := "JS";
 		:EXITCASE;
-		:CASE Upper(sLanguage) == "SERVERLOG";
-			sLanguage := "SERVERLOG";
+		:CASE Upper(sScriptLang) == "SERVERLOG";
+			sScriptLang := "SERVERLOG";
 		:EXITCASE;
 	:ENDCASE;
 	
@@ -264,9 +277,10 @@ aResultItems := {};
 		{"type", aItems[i][2]},
 		{"uri", aItems[i][4]},
 		{"checkedOutBy", aItems[i][5]},
-		{"language", sLanguage},
+		{"scriptLanguage", sScriptLang},
 		{"isFolder", bFolder},
-		{"guid", aItems[i][6]}
+		{"guid", aItems[i][6]},
+		{"language", aItems[i][7]}
 	}));
 	AAdd(aResultItems, oItem);
 :NEXT;
@@ -291,9 +305,21 @@ Response:StatusCode := 200;
 		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
 		:FOR i := 0 :TO oDataSet:Tables[0]:Rows:Count - 1;
 			oRow := oDataSet:Tables[0]:Rows[i];
-			AAdd(aItems, {oRow["CATNAME"], sOutType, "N/A", sURI + "/" + oRow["CATNAME"], NIL, NIL});
+			AAdd(aItems, {oRow["CATNAME"], sOutType, "N/A", sURI + "/" + oRow["CATNAME"], NIL, NIL, NIL});
 		:NEXT;
 	:ENDIF;
 
 	:RETURN aItems;
+:ENDPROC;
+
+:PROCEDURE _GetCheckOutLang;
+:PARAMETERS sGUID;
+:DECLARE sSQL, aReturn;
+	sSQL := "select LANGID from LIMSSOURCECONTROL where ITEMID = ? and DONE = 0";
+	aReturn := LSelect(sSQL,, "DICTIONARY", {sGUID});
+	:IF Empty(aReturn);
+		:RETURN "";
+	:ELSE;
+		:RETURN aReturn[1][1];
+	:ENDIF;
 :ENDPROC;

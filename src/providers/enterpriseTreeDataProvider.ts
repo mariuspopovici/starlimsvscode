@@ -114,17 +114,19 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         let newItem = new TreeEnterpriseItem(
           item.type,
           item.name,
-          item.language,
+          item.scriptLanguage,
           item.uri,
           item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
           item.command,
           item.filePath,
-          item.guid
+          item.guid,
+          item.language
         );
 
         newItem.contextValue = item.type;
         newItem.iconPath = _this.getItemIcon(item);
-        newItem.label = item.checkedOutBy ? `${newItem.label} (Checked out by ${item.checkedOutBy})` : newItem.label;
+        let language = item.language? ", Language: " + item.language : "";
+        newItem.label = item.checkedOutBy ? `${newItem.label} (Checked out by ${item.checkedOutBy}${language})` : newItem.label;
         newItem.checkedOutBy = item.checkedOutBy;
         newItem.resourceUri = _this.getItemResource(item);
 
@@ -177,12 +179,13 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     let newItem = new TreeEnterpriseItem(
       item.type,
       item.name,
-      item.language,
+      item.scriptLanguage,
       item.uri,
       item.isFolder ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
       item.command,
       item.filePath,
-      item.guid
+      item.guid,
+      item.language
     );
 
     newItem.checkedOutBy = item.checkedOutBy;
@@ -457,6 +460,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
             codeBehindNode.checkedOutBy = item.checkedOutBy;
             codeBehindNode.filePath = item.filePath;
             codeBehindNode.isSystem = item.isSystem;
+            codeBehindNode.globalSearchTerm = item.globalSearchTerm;
             htmlFormsNode?.children?.push(codeBehindNode);
           }
 
@@ -552,6 +556,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
               xfdCodeBehindNode.checkedOutBy = item.checkedOutBy;
               xfdCodeBehindNode.filePath = item.filePath;
               xfdCodeBehindNode.isSystem = item.isSystem;
+              xfdCodeBehindNode.globalSearchTerm = item.globalSearchTerm;
               xfdFormsNode?.children?.push(xfdCodeBehindNode);
             }
 
@@ -659,6 +664,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           appClientScriptNode.checkedOutBy = item.checkedOutBy;
           appClientScriptNode.filePath = item.filePath;
           appClientScriptNode.isSystem = item.isSystem;
+          appClientScriptNode.globalSearchTerm = item.globalSearchTerm;
           appClientScriptsNode?.children?.push(appClientScriptNode);
         }
 
@@ -700,6 +706,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
           appDataSourceNode.checkedOutBy = item.checkedOutBy;
           appDataSourceNode.filePath = item.filePath;
           appDataSourceNode.isSystem = item.isSystem;
+          appDataSourceNode.globalSearchTerm = item.globalSearchTerm;
           appDataSourcesNode?.children?.push(appDataSourceNode);
         }
       }
@@ -764,6 +771,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         glbServerScriptNode.checkedOutBy = item.checkedOutBy;
         glbServerScriptNode.filePath = item.filePath;
         glbServerScriptNode.isSystem = item.isSystem;
+        glbServerScriptNode.globalSearchTerm = item.globalSearchTerm;
         glbServerScriptCatNode?.children?.push(glbServerScriptNode);
       }
 
@@ -827,6 +835,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         glbClientScriptNode.checkedOutBy = item.checkedOutBy;
         glbClientScriptNode.filePath = item.filePath;
         glbClientScriptNode.isSystem = item.isSystem;
+        glbClientScriptNode.globalSearchTerm = item.globalSearchTerm;
         glbClientScriptCatNode?.children?.push(glbClientScriptNode);
       }
 
@@ -890,6 +899,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
         glbDataSourceNode.checkedOutBy = item.checkedOutBy;
         glbDataSourceNode.filePath = item.filePath;
         glbDataSourceNode.isSystem = item.isSystem;
+        glbDataSourceNode.globalSearchTerm = item.globalSearchTerm;
         glbDataSourceCatNode?.children?.push(glbDataSourceNode);
       }
 
@@ -961,6 +971,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
  */
 export class TreeEnterpriseItem extends vscode.TreeItem {
   type: EnterpriseItemType;
+  scriptLanguage: string;
   language: string;
   uri: string;
   filePath: string | undefined;
@@ -976,25 +987,28 @@ export class TreeEnterpriseItem extends vscode.TreeItem {
     | { light: string | vscode.Uri; dark: string | vscode.Uri }
     | vscode.ThemeIcon
     | undefined;
+  globalSearchTerm?: string | undefined;
 
   constructor(
     type: EnterpriseItemType,
     label: string,
-    language: string,
+    scriptLanguage: string,
     uri: string,
     collapsibleState: vscode.TreeItemCollapsibleState,
     command?: vscode.Command,
     filePath?: string,
-    guid?: string
+    guid?: string,
+    language?: string
   ) {
     super(label, collapsibleState);
     this.label = label;
     this.type = type;
-    this.language = language;
+    this.scriptLanguage = scriptLanguage;
     this.command = command;
     this.uri = uri;
     this.filePath = filePath;
     this.guid = guid;
+    this.language = language ?? "";
   }
 }
 

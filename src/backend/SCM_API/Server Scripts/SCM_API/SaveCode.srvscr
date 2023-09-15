@@ -3,7 +3,7 @@ Description.. :	Script to save code of an Enterprise item
 Author....... :	DC, MARIUS
 Date......... : 2023-06-02
 *******************************************************************************/;
-:DECLARE oPayload, oResponse, oResult, sURI, String, oUtils, sRequestAsFile, oEnterpriseItem, sCode;
+:DECLARE oPayload, oResponse, oResult, sURI, String, oUtils, sRequestAsFile, oEnterpriseItem, sCode, sUserLang;
 String := "";
 
 oResult := CreateUDObject();
@@ -47,8 +47,15 @@ sCode := "";
 	oResponse:data := String:Format("Missing required property '{0}'", "Code");
 	:RETURN oResponse;
 :ENDIF;
- 
-:DECLARE sLang, sItemName, sItemID, sType, sAppName, sCategory;
+
+/* get language;
+:IF !Empty(oPayload) .AND. oPayload:IsProperty("UserLang") .AND. !Empty(oPayload:UserLang);
+	sUserLang := oPayload:UserLang;
+:ELSE;
+	sUserLang := GetSetting("DEFAULTLANGUAGE");
+:ENDIF;
+
+:DECLARE sItemName, sItemID, sType, sAppName, sCategory;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1];
 sType := oEnterpriseItem:Type;
 
@@ -59,8 +66,6 @@ sType := oEnterpriseItem:Type;
 :IF oEnterpriseItem:IsProperty("AppName");
 	sAppName := oEnterpriseItem:AppName;
 :ENDIF;
-
-sLang := GetSetting("DEFAULTLANGUAGE");
 
 :TRY;
 	:BEGINCASE;
@@ -97,7 +102,7 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 		:CASE sType == "HTMLFORMXML" .OR. sType == "XFDFORMXML";
 			sItemName := sAppName + "." + sItemName;
 			sItemID := oUtils:GetItemGUID(sItemName, sType);
-			DoProc("Enterprise_Data_Providers.FormProvider.SaveXFDDocument", {sItemID, sLang, sCode});
+			DoProc("Enterprise_Data_Providers.FormProvider.SaveXFDDocument", {sItemID, sUserLang, sCode});
 		:EXITCASE;
 		:CASE sType == "HTMLFORMCODE" .OR. sType == "XFDFORMCODE";
 			sItemName := sAppName + "." + sItemName;
@@ -107,8 +112,12 @@ sLang := GetSetting("DEFAULTLANGUAGE");
 		:CASE sType == "HTMLFORMGUIDE";
 			sItemName := sAppName + "." + sItemName;
 			sItemID := oUtils:GetItemGUID(sItemName, sType);
-			DoProc("SaveGuideScript", {sItemId, sCode, sLang});
+			DoProc("SaveGuideScript", {sItemId, sCode, sUserLang});
 		:EXITCASE;
+		:CASE sType == "HTMLFORMRESOURCES" .OR. sType == "XFDFORMRESOURCES";
+			sItemName := sAppName + "." + sItemName;
+			sItemID := oUtils:GetItemGUID(sItemName, sType);
+			DoProc("Enterprise_Data_Providers.FormProvider.SaveProgramaticXfdResources", {sItemID, sUserLang, sCode});
 	:ENDCASE;  
 :CATCH;
 	:DECLARE Error;
@@ -130,11 +139,11 @@ oResponse:data := "Done";
 :RETURN oResponse;
 
 :PROCEDURE SaveGuideScript;
-:PARAMETERS sItemId, sCode, sLang;
-:DEFAULT sLang, GetSetting("DEFAULTLANGUAGE");
+:PARAMETERS sItemId, sCode, sUserLang;
+:DEFAULT sUserLang, GetSetting("DEFAULTLANGUAGE");
 
 	:DECLARE sResourcesXML, oResourcesDS, nIterator, sKey, bFound;
-	sResourcesXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {sItemID, sLang}));
+	sResourcesXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {sItemID, sUserLang}));
 	oResourcesDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sResourcesXML});
 	bFound := .F.;
 	
@@ -159,12 +168,10 @@ oResponse:data := "Done";
 	:ENDIF;
 	
 	sResourcesXML := DoProc("DStoString", {oResourcesDS});				
-	DoProc("Enterprise_Data_Providers.FormProvider.SaveProgramaticXfdResources", {sItemID, sLang, sResourcesXML});
-
+	DoProc("Enterprise_Data_Providers.FormProvider.SaveProgramaticXfdResources", {sItemID, sUserLang, sResourcesXML});
 :ENDPROC;
 
 :PROCEDURE CreateResourceDataSet;
-
 	:DECLARE oDataSet, oDataTable, oPKColumn;
 	oDataSet := LimsNetConnect("", "System.Data.DataSet", {"ResourcesDataset"});
 	oDataTable := LimsNetConnect("", "System.Data.DataTable", {"ResourcesTable"});
@@ -173,16 +180,14 @@ oResponse:data := "Done";
 	oDataTable:Columns:Add("ResourceValue");
 	oDataTable:PrimaryKey := LimsNetCast({oPKColumn}, "System.Data.DataColumn[]");
 	oDataSet:Tables:Add(oDataTable);
-
 	:RETURN oDataSet;
 :ENDPROC;
 
 :PROCEDURE DSToString;
 :PARAMETERS oDataSet, bAddXmlHeader;
 :DEFAULT bAddXmlHeader, .F.;
-
 	:DECLARE oStringWriter, sXmlDataSet;
-	
+
 	oStringWriter := LimsNETConnect("", "System.IO.StringWriter");
 	oDataSet:WriteXml(oStringWriter);
 	sXmlDataSet := oStringWriter:ToString();

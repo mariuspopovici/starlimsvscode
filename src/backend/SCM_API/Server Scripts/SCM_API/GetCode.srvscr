@@ -3,17 +3,14 @@ Description.. :	Script to get the code of an Enterprise item
 Author....... :	MARIUS
 Date......... : 2018-11-07
 *******************************************************************************/;
-:DECLARE String;
+:DECLARE String, sUserLang, oResponse, oResult, sURI, oUtils, oEnterpriseItem, sItemID,
+		 oDataSet, sDataSet, sItemName, sItemType, nRowNo;
 String := "";
-
-:DECLARE oResponse, oResult;
 oResult := CreateUDObject();
 oResponse := CreateUDObject({
 	{"success", .T.},
 	{"data", NIL}
 });
-
-:DECLARE sURI;
 
 :IF Request:QueryString:IsProperty("URI");
 	sURI := Request:QueryString:URI;
@@ -24,19 +21,19 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDIF;
 
+:IF Request:QueryString:IsProperty("UserLang") .AND. !Empty(Request:QueryString:UserLang);
+	sUserLang := Request:QueryString:UserLang;
+:ELSE;
+	sUserLang := GetSetting("DEFAULTLANGUAGE");
+:ENDIF;
+
 oResult:language := "";
 oResult:code := "";
-
-:DECLARE oUtils;
 oUtils := CreateUDObject("SCM_API.Utils", {});
 
-:DECLARE oEnterpriseItem, sItemID;
 oEnterpriseItem := oUtils:ParseURI(sURI);
-
-:DECLARE oDataSet, sDataSet, sItemName, sItemType, nRowNo, sUserLang;
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
 sItemType := oEnterpriseItem:Type;
-sUserLang := GetSetting("DEFAULTLANGUAGE");
 
 :BEGINCASE;	
 	:CASE sItemType == "SS";
@@ -87,7 +84,8 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 		:ELSE;
 			nRowNo := 0;
 		:ENDIF;
-		oResult:code := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]}));
+		oResult:code := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument",
+										 {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]}, sUserLang));
 		oResult:language := "XML";
 	:EXITCASE;
 	:CASE sItemType == "HTMLFORMCODE" .OR. sItemType == "XFDFORMCODE";
@@ -101,7 +99,8 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 			nRowNo := 0;
 		:ENDIF;
 		
-		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetCodeBehind", {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
+		oResult:code := DoProc("Enterprise_Data_Providers.FormProvider.GetCodeBehind",
+							  {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]});
 		oResult:language := "JS";
 	:EXITCASE;
 	:CASE sItemType == "HTMLFORMGUIDE";
@@ -116,9 +115,8 @@ sUserLang := GetSetting("DEFAULTLANGUAGE");
 		:ENDIF;
 		
 		:DECLARE sProgramaticResourceXML, oResourceDS, sResourceID;
-		sProgramaticResourceXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources", {
-			oDataSet:Tables[0]:Rows[nRowNo]["FORMID"], sUserLang
-		})); 
+		sProgramaticResourceXML := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetProgramaticXfdResources",
+											 {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"], sUserLang}));
 
 		oResourceDS := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sProgramaticResourceXML});
 		oResult:code := "[]";

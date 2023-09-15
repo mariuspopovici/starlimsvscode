@@ -1,0 +1,30 @@
+/******************************************************************************
+Description.. :	Get available system languages
+Author....... :	DC
+Date......... : 2023-09-12
+*******************************************************************************/;
+:DECLARE json, oResponse, aResult, i;
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+aResult := SqlExecute("select LANGID, LANGUAGE from limsLanguages order by LANGUAGE", "DICTIONARY");
+
+:IF !Empty(aResult);
+    json := "[";
+    :FOR i:=1 :TO Len(aResult);
+        json += '["' + aResult[i][1] + '","' + aResult[i][2] + '"]';
+        json += iif(i < Len(aResult), ",", "");
+    :NEXT;
+    json += "]";
+    Response:StatusCode := 200;
+    oResponse:success := .T.;
+    oResponse:data := json;
+:ELSE;
+    Response:StatusCode := 500;
+    oResponse:success := .F.;
+    oResponse:data := "No languages found";
+:ENDIF;
+
+:RETURN oResponse;

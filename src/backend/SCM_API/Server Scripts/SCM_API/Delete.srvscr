@@ -3,10 +3,8 @@ Description.. :	Delete enterprise item
 Author....... :	DC
 Date......... : 2023-07-10
 *******************************************************************************/;
-:DECLARE String;
+:DECLARE String, oResponse, oResult, oPayload, oUtils, oEnterpriseItem, sItemName, sItemType, sAppName, sCategory;
 String := "";
-
-:DECLARE oResponse, oResult, oPayload;
 oResult := CreateUDObject();
 oResponse := CreateUDObject({
 	{"success", .T.},
@@ -23,10 +21,7 @@ oResponse := CreateUDObject({
 	:RETURN oResponse;
 :ENDIF;
 
-:DECLARE oUtils; 
 oUtils := CreateUDObject("SCM_API.Utils", {});
-
-:DECLARE oEnterpriseItem, sItemName, sItemType, sAppName, sCategory;
 oEnterpriseItem := oUtils:ParseURI(sURI);
 
 sItemName := oEnterpriseItem:Name;
@@ -38,7 +33,8 @@ sCategory := oEnterpriseItem:Category;
 
 /* don't allow to delete document types;
 :IF sItemName == "ServerScripts" .OR. sItemName == "HTMLForms" .OR. sItemName == "XFDForms" .OR. 
-	sItemName == "ServerScripts" .OR. sItemName == "ClientScripts" .OR. sItemName == "DataSources";
+	sItemName == "ServerScripts" .OR. sItemName == "ClientScripts" .OR. sItemName == "DataSources" .OR.
+	sItemName == "Applications";
 	Response:ContentType := "application/problem+json";
 	Response:StatusCode := 400;
 	oResponse:success := .F.;
@@ -59,13 +55,15 @@ sCategory := oEnterpriseItem:Category;
 			DoProc("Enterprise_Data_Providers.AppProvider.Delete", {sItemID});
 		:EXITCASE;
 
-		:CASE sItemType == "HTMLFORMXML";
+		:CASE sItemType == "HTMLFORMXML" .OR. sItemType == "HTMLFORMCODE" .OR.
+			  sItemType == "HTMLFORMGUIDE" .OR. sItemType == "HTMLFORMRESOURCES";
 			sItemName := sAppName + "." + sItemName;
 			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
 			DoProc("Enterprise_Data_Providers.FormProvider.Delete", {sItemID});
 		:EXITCASE;
 
-		:CASE sItemType == "XFDFORMXML";
+		:CASE sItemType == "XFDFORMXML" .OR. sItemType == "XFDFORMCODE" .OR.
+			  sItemType == "XFDFORMRESOURCES";
 			sItemName := sAppName + "." + sItemName;
 			sItemID := oUtils:GetItemGUID(sItemName, sItemType);
 			DoProc("Enterprise_Data_Providers.FormProvider.Delete", {sItemID});

@@ -52,7 +52,6 @@ Features:
 To Do:
 
 - Move forms and scripts
-- Edit form resources
 - Create a HTML form designer
 - Implement table support including a schema and ERD generator / viewer
 - Rename items
@@ -117,5 +116,5 @@ New features:
 - Go to script/form under the cursor
 - View checked out items, check in pending, undo check out, view checked out items from all uses, refresh checked out items tree
 - Global search / full text search in code items
-- View form resources
+- View and edit form resources
 - Misc. bug fixes
