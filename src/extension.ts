@@ -367,6 +367,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const openDocument = vscode.workspace.textDocuments.find(
       (doc) => doc.uri.fsPath.toLowerCase() === item.filePath?.toLowerCase()
     );
+    
     if (openDocument) {
       // reload document, if it is a log file
       if (openDocument.uri.toString().endsWith(".log")) {
@@ -387,6 +388,7 @@ export async function activate(context: vscode.ExtensionContext) {
       } else {
         // other file types, just show the document
         await vscode.window.showTextDocument(openDocument);
+        highlightGlobalSearchMatches(item, vscode.Uri.file(item.filePath!));
       }
     } else {
       // get local copy of the item
@@ -400,6 +402,7 @@ export async function activate(context: vscode.ExtensionContext) {
         item.filePath = localFilePath;
         let localUri: vscode.Uri = vscode.Uri.file(localFilePath);
         await vscode.window.showTextDocument(localUri, { preview: false });
+        highlightGlobalSearchMatches(item, localUri);
 
         // scroll to bottom of log files
         if (localUri.toString().endsWith(".log")) {
@@ -1422,6 +1425,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // convert item types to string
       const itemTypesString = itemTypes.map(itemType => itemType.itemType).join(",");
 
+      // remove all breakpoints
+      vscode.debug.removeBreakpoints(vscode.debug.breakpoints);
+
       if (searchTerm) {
         // display a progress message
         vscode.window.withProgress(
@@ -1446,6 +1452,49 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.window.showInformationMessage(
     `Connected to STARLIMS on ${config.url}.`
   );
+}
+
+async function highlightGlobalSearchMatches(item : TreeEnterpriseItem, localUri : vscode.Uri) {
+    // mark all occurrences of the global search term 
+    if (item.globalSearchTerm) {
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const text = editor.document.getText();
+        const regex = new RegExp(item.globalSearchTerm, "mig");
+        const matches = text.matchAll(regex);
+        if (matches) {
+          // get positions of matches
+          var positions = new Array<vscode.Range>();
+          for (const match of matches) {
+            if(match.index === undefined) {
+              continue; // skip invalid matches
+            }
+            var start = editor.document.positionAt(match.index);
+            var end = editor.document.positionAt(match.index + match[0].length);
+            positions.push(new vscode.Range(start, end));
+          }
+
+          // highlight matches
+          var decorationType = vscode.window.createTextEditorDecorationType({
+            backgroundColor: new vscode.ThemeColor("editor.findMatchHighlightBackground"),
+            isWholeLine: false
+          });
+          const decorations = positions.map((range) => ({ range, hoverMessage: 'Matched text' }));
+          editor.setDecorations(decorationType, decorations);
+
+          // scroll to first match
+          editor.revealRange(positions[0], vscode.TextEditorRevealType.InCenter);
+
+          // set breakpoints on matches
+          var breakpoints = new Array<vscode.SourceBreakpoint>();
+          positions.forEach((position) => {
+            var location = new vscode.Location(localUri, position);
+            breakpoints.push(new vscode.SourceBreakpoint(location));
+          });
+          vscode.debug.addBreakpoints(breakpoints);
+        }
+      }
+    }
 }
 
 // this method is called when your extension is deactivated
