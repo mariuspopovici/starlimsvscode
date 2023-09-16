@@ -32,6 +32,37 @@ export class EnterpriseService implements IEnterpriseService {
   }
 
   /**
+   * Renames the item specified via uri
+   * @param uri the URI of the item
+   * @param newName the new name
+   */
+  async renameItem(uri: string, newName: string) {
+    const url = `${this.baseUrl}/SCM_API.Rename.lims?URI=${uri}&NewName=${newName}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Item renamed successfully.");
+        return true;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
+        return false;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not rename item.");
+      console.error(e);
+      return false;
+    }
+  }
+
+  /**
    * Deploys the current version of the SCM_API.sdp on the STARLIMS server.
    */
   async upgradeBackend(sdpPackage: string) {

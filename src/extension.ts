@@ -1445,6 +1445,49 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // register the Rename command
+  vscode.commands.registerCommand(
+    "STARLIMS.Rename",
+    async () => {
+      if (selectedItem === undefined) {
+        vscode.window.showErrorMessage("Please select an item to rename.");
+        return;
+      }
+      
+      if (selectedItem.type === EnterpriseItemType.ServerLog) {
+        vscode.window.showErrorMessage("Server Logs cannot be deleted.");
+        return;
+      }
+
+      let aUri = selectedItem.uri.split("/");
+      const oldName = aUri.pop() || "";
+
+      // ask for confirmation
+      const newName: string = await vscode.window.showInputBox({
+        title: "Rename Enterprise Item",
+        placeHolder: "New item name...",
+        prompt: "Enter a new item name",
+        ignoreFocusOut: true,
+        value: oldName
+      }) || "";
+
+      // rename the item
+      if (newName) {
+        const bSuccess = await enterpriseService.renameItem(selectedItem.uri, newName);
+        if (bSuccess) {
+          enterpriseTreeProvider.refresh();
+          // close and delete (local copies) open documents with the old name
+          const filteredTextDocuments = vscode.workspace.textDocuments.filter(td => td.fileName.indexOf(oldName) > 0);
+          for (const td of filteredTextDocuments) {
+            await vscode.window.showTextDocument(td, { preview: true, preserveFocus: false });
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+            await vscode.workspace.fs.delete(td.uri);
+          }
+        }
+      }
+    }
+  );
+
   // refresh the checked out items tree
   vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
 

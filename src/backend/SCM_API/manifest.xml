@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>0BA1D761-C6A7-4095-847F-E47D7FEDD030</ItemID>
+  <ItemID>686F91B3-FD3C-4626-93B8-DB34E60721B5</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-09-12T14:19:03.3209993+02:00</PackageDate>
+  <PackageDate>2023-09-15T20:19:46.9485192-04:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
   <OverwriteLayer>false</OverwriteLayer>
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
+      <ItemID>069AD641-5BC8-4D98-84CD-8B1B1D3E6C95</ItemID>
       <ItemName>SCM_API</ItemName>
       <LayerId>300</LayerId>
       <ItemDescription />
@@ -59,7 +59,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
+          <ItemID>55796A78-5B64-4CF4-A11D-662C95991EDC</ItemID>
           <ItemName>CheckOut</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -111,7 +111,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
+          <ItemID>2125F634-42D7-4E95-B40D-B376A7F2F87F</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -124,7 +124,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
+          <ItemID>C70E01EB-5FBA-46E6-912B-A04C6127A0C8</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -176,7 +176,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>5A682FAB-C29C-4E87-9831-8A4F7361A817</ItemID>
+          <ItemID>E3AF9503-008A-4D3B-AB38-D56B91ADA572</ItemID>
           <ItemName>GlobalSearch</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -202,7 +202,20 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
+          <ItemID>4F5154F8-1858-454C-A1B0-F7CD4BAE6B03</ItemID>
+          <ItemName>Rename</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\Rename.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
+          <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
           <ItemName>RunScript</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -280,7 +293,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
+          <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
           <ItemName>Utils</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />

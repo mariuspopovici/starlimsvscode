@@ -3,7 +3,7 @@
   "displayName": "STARLIMS VS Code Extension",
   "description": "Unofficial dictionary explorer (and more) for STARLIMS.",
   "license": "SEE LICENSE IN LICENSE.md",
-  "version": "1.2.70",
+  "version": "1.2.71",
   "icon": "resources/extension/starlimsvscode.png",
   "publisher": "MariusPopovici",
   "author": {
@@ -224,6 +224,10 @@
       {
         "command": "STARLIMS.setPassword",
         "title": "Set user password"
+      },
+      {
+        "command": "STARLIMS.Rename",
+        "title": "Rename"
       }
     ],
     "keybindings": [
@@ -329,17 +333,17 @@
         },
         {
           "command": "STARLIMS.CheckOut",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != APP && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
           "group": "sourceControl"
         },
         {
           "command": "STARLIMS.Checkin",
-          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /CAT/) && viewItem != APP",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /CAT/) && viewItem != APP && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
           "group": "sourceControl"
         },
         {
           "command": "STARLIMS.UndoCheckOut",
-          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /CAT/) && viewItem != APP",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /CAT/) && viewItem != APP && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
           "group": "sourceControl"
         },
         {
@@ -358,12 +362,12 @@
         },
         {
           "command": "STARLIMS.Delete",
-          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /cat/i) && viewItem != APPLICATION",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && !(viewItem =~ /cat/i) && viewItem != APPLICATION && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY && viewItem != TABLE",
           "group": "addRemove"
         },
         {
           "command": "STARLIMS.Add",
-          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem =~ /cat/i || viewItem == APPLICATION)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && (viewItem =~ /cat/i || viewItem != APPLICATION) && viewItem != TABLE && viewItem != SERVERLOG && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
           "group": "addRemove"
         },
         {
@@ -395,6 +399,11 @@
           "command": "STARLIMS.GenerateTableDelete",
           "when": "view == STARLIMSMainTree && (viewItem == TABLE)",
           "group": "table"
+        },
+        {
+          "command": "STARLIMS.Rename",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
+          "group": "addRemove"
         }
       ],
       "explorer/context": [
