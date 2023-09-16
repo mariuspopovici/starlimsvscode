@@ -29,7 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
     url = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (1/4)",
       placeHolder: "STARLIMS URL (e. g. https://my.starlims.server.com/STARLIMS/)",
       prompt: "Please enter your STARLIMS URL.",
       ignoreFocusOut: true
@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the setPassword command
   vscode.commands.registerCommand('STARLIMS.setPassword', async () => {
     const passwordInput: string = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (2/4)",
       placeHolder: "STARLIMS Password",
       prompt: `Please enter the password for the STARLIMS User '${user}'.`,
       password: true,
@@ -61,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure Starlims user name is defined and prompt for it if not
   if (!user) {
     user = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (3/4)",
       placeHolder: "STARLIMS Username",
       prompt: "Please enter your STARLIMS Username.",
       ignoreFocusOut: true
@@ -87,7 +87,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure base path is defined and prompt for value if not
   if (!rootPath) {
     let newRootPath = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (4/4)",
       placeHolder: "STARLIMS VS Code Root Path (e. g. C:\\STARLIMS\\VSCode)",
       prompt: "Please enter a root path for the STARLIMS VS Code extension.",
       ignoreFocusOut: true
