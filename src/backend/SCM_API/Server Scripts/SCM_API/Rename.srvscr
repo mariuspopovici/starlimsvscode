@@ -51,19 +51,23 @@ oEnterpriseItem := oUtils:ParseURI(sURI);
 sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
 sItemType := oEnterpriseItem:Type;
 sUserLang := GetSetting("DEFAULTLANGUAGE");
-sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
+
 
 :BEGINCASE;	
 	:CASE sItemType == "APPCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 		DoProc("Enterprise_Data_Providers.AppCategProvider.Modify", {sItemGUID, sNewName});
 	:EXITCASE;
 	:CASE sItemType == "SSCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 		DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Modify", {sItemGUID, sNewName});
 	:EXITCASE;
 	:CASE sItemType == "DSCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 		DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Modify", {sItemGUID, sNewName});
 	:EXITCASE;
 	:CASE sItemType == "CSCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 		DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Modify", {sItemGUID, sNewName});
 	:EXITCASE;
 	:CASE sItemType == "SS";
@@ -73,6 +77,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
 		DoProc("Enterprise_Data_Providers.ServerScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
 	:EXITCASE;
 	:CASE sItemType == "APPSS";
@@ -82,6 +87,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 		
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
 		DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
 	:EXITCASE;
 	:CASE sItemType == "CS";
@@ -91,6 +97,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
 		DoProc("Enterprise_Data_Providers.ClientScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
 	:EXITCASE;
 	:CASE sItemType == "APPCS";
@@ -100,6 +107,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
 		DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
 	:EXITCASE;
 	:CASE sItemType == "DS";
@@ -109,6 +117,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["DSDESCRIPTION"];
+		sItemGUID := oRow["DATASOURCEID"];
 		sScriptLanguage := oRow["SCRIPTLANGUAGE"];
 		DoProc("Enterprise_Data_Providers.DataSourceProvider.Modify", {sItemGUID, sNewName, sDescription, sScriptLanguage});
 	:EXITCASE;
@@ -120,6 +129,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["DSDESCRIPTION"];
 		sScriptLanguage := oRow["SCRIPTLANGUAGE"];
+		sItemGUID := oRow["DATASOURCEID"];
 		DoProc("Enterprise_Data_Providers.AppDataSourceProvider.Modify", {sItemGUID, sNewName, sDescription, sScriptLanguage});
 	:EXITCASE;
 	:CASE AScanExact({"HTMLFORMXML", "XFDFORMXML", "HTMLFORMCODE", "XFDFORMCODE", 
@@ -130,6 +140,7 @@ sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
 
 		oRow := oDataSet:Tables[0]:Rows[0];
 		sDescription := oRow["FORMDESCRIPTION"];
+		sItemGUID := oRow["FORMID"];
 		sIsOffline := oRow["ISOFFLINE"];
 		sVersionString := "";
 		DoProc("Enterprise_Data_Providers.FormProvider.Modify", {sItemGUID, sNewName, sDescription, sVersionString, sIsOffline});
