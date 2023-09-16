@@ -1465,8 +1465,10 @@ export async function activate(context: vscode.ExtensionContext) {
       // ask for confirmation
       const newName: string = await vscode.window.showInputBox({
         title: "Rename Enterprise Item",
-        prompt: "Enter new name",
+        placeHolder: "New item name...",
+        prompt: "Enter a new item name",
         ignoreFocusOut: true,
+        value: oldName
       }) || "";
 
       // rename the item
