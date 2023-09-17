@@ -29,7 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
     url = await vscode.window.showInputBox({
-      title: "Configure STARLIMS (1/4)",
+      title: "Configure STARLIMS",
       placeHolder: "STARLIMS URL (e. g. https://my.starlims.server.com/STARLIMS/)",
       prompt: "Please enter your STARLIMS URL.",
       ignoreFocusOut: true
@@ -1455,7 +1455,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
       
       if (selectedItem.type === EnterpriseItemType.ServerLog) {
-        vscode.window.showErrorMessage("Server Logs cannot be deleted.");
+        vscode.window.showErrorMessage("Server Logs cannot be renamed.");
         return;
       }
 
@@ -1484,6 +1484,88 @@ export async function activate(context: vscode.ExtensionContext) {
             await vscode.workspace.fs.delete(td.uri);
           }
         }
+      }
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.Move",
+    async () => {
+      if (selectedItem === undefined) {
+        vscode.window.showErrorMessage("Please select an item to move.");
+        return;
+      }
+      
+      if (selectedItem.type === EnterpriseItemType.ServerLog) {
+        vscode.window.showErrorMessage("Server Logs cannot be renamed.");
+        return;
+      }
+
+      switch (selectedItem.type) {
+        case EnterpriseItemType.AppClientScript:
+        case EnterpriseItemType.AppDataSource:
+        case EnterpriseItemType.AppServerScript:  
+        case EnterpriseItemType.HTMLFormCode:
+        case EnterpriseItemType.HTMLFormGuide:  
+        case EnterpriseItemType.HTMLFormResources:  
+        case EnterpriseItemType.HTMLFormXML:  
+        case EnterpriseItemType.XFDFormCode:
+        case EnterpriseItemType.XFDFormResources:  
+        case EnterpriseItemType.XFDFormXML:
+          const appItems = await enterpriseService.getEnterpriseItems("/Applications");
+          const applications = appItems.map(({name}: any) => ({ label: name, description: name }));
+          const application = await vscode.window.showQuickPick(
+            applications,
+            {
+              title: "Select Application",
+              placeHolder: "Select the application where to move the selected item...",
+              canPickMany: false,
+              ignoreFocusOut: true
+            }
+          );
+          break;
+          case EnterpriseItemType.ServerScript:
+            const ssCategoryItems = await enterpriseService.getEnterpriseItems("/ServerScripts");
+            const ssCategories = ssCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+            const ssCategory = await vscode.window.showQuickPick(
+              ssCategories,
+              {
+                title: "Select Server Script Category",
+                placeHolder: "Select the server scripts category where to move the selected item...",
+                canPickMany: false,
+                ignoreFocusOut: true
+              }
+            ); 
+            break;
+          case EnterpriseItemType.DataSource:
+              const dsCategoryItems = await enterpriseService.getEnterpriseItems("/DataSources");
+              const dsCategories = dsCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+              const dsCategory = await vscode.window.showQuickPick(
+                dsCategories,
+                {
+                  title: "Select Data Source Category",
+                  placeHolder: "Select the data sources category where to move the selected item...",
+                  canPickMany: false,
+                  ignoreFocusOut: true
+                }
+              ); 
+              break;
+          case EnterpriseItemType.DataSource:
+              const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
+              const csCategories = csCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+              const csCategory = await vscode.window.showQuickPick(
+                csCategories,
+                {
+                  title: "Select Client Script Category",
+                  placeHolder: "Select the client scripts category where to move the selected item...",
+                  canPickMany: false,
+                  ignoreFocusOut: true
+                }
+              ); 
+              break;
+        default:
+          vscode.window.showErrorMessage(`Items of type '${selectedItem.type}' cannot be moved.`);
+          return;
       }
     }
   );

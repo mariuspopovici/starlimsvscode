@@ -228,6 +228,10 @@
       {
         "command": "STARLIMS.Rename",
         "title": "Rename"
+      },
+      {
+        "command": "STARLIMS.Move",
+        "title": "Move"
       }
     ],
     "keybindings": [
@@ -402,6 +406,11 @@
         },
         {
           "command": "STARLIMS.Rename",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
+          "group": "addRemove"
+        },
+        {
+          "command": "STARLIMS.Move",
           "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
           "group": "addRemove"
         }
