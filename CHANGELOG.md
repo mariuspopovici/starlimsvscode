@@ -143,3 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.72] - 2023-09-13
 
 - Added rename command for all applicable item types
+
+## [1.2.74] - 2023-09-18
+
+- Added move command

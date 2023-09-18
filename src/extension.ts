@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the setPassword command
   vscode.commands.registerCommand('STARLIMS.setPassword', async () => {
     const passwordInput: string = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (2/4)",
       placeHolder: "STARLIMS Password",
       prompt: `Please enter the password for the STARLIMS User '${user}'.`,
       password: true,
@@ -61,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure Starlims user name is defined and prompt for it if not
   if (!user) {
     user = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (3/4)",
       placeHolder: "STARLIMS Username",
       prompt: "Please enter your STARLIMS Username.",
       ignoreFocusOut: true
@@ -87,7 +87,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // ensure base path is defined and prompt for value if not
   if (!rootPath) {
     let newRootPath = await vscode.window.showInputBox({
-      title: "Configure STARLIMS",
+      title: "Configure STARLIMS (4/4)",
       placeHolder: "STARLIMS VS Code Root Path (e. g. C:\\STARLIMS\\VSCode)",
       prompt: "Please enter a root path for the STARLIMS VS Code extension.",
       ignoreFocusOut: true
@@ -568,7 +568,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // remove text in brackets from item name to get the real item name
       let sItemName = item.label.toString();
-      sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      if (sItemName.indexOf("[") > 0) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      } else if (sItemName.indexOf('(Checked out')) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("(Checked out") - 1);
+      }
 
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
@@ -1025,7 +1029,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // remove text in brackets from item name to get the real item name
       let sItemName = selectedItem.label.toString();
-      sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      if (sItemName.indexOf("[") > 0) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      } else if (sItemName.indexOf('(Checked out')) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("(Checked out") - 1);
+      }
 
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
@@ -1455,7 +1463,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
       
       if (selectedItem.type === EnterpriseItemType.ServerLog) {
-        vscode.window.showErrorMessage("Server Logs cannot be deleted.");
+        vscode.window.showErrorMessage("Server Logs cannot be renamed.");
         return;
       }
 
@@ -1481,9 +1489,147 @@ export async function activate(context: vscode.ExtensionContext) {
           for (const td of filteredTextDocuments) {
             await vscode.window.showTextDocument(td, { preview: true, preserveFocus: false });
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            await vscode.workspace.fs.delete(td.uri);
+            try {
+              await vscode.workspace.fs.delete(td.uri);
+            }
+            catch (e) {
+              // ignore
+            }
           }
         }
+      }
+    }
+  );
+
+  vscode.commands.registerCommand(
+    "STARLIMS.Move",
+    async () => {
+      if (selectedItem === undefined) {
+        vscode.window.showErrorMessage("Please select an item to move.");
+        return;
+      }
+      
+      if (selectedItem.type === EnterpriseItemType.ServerLog) {
+        vscode.window.showErrorMessage("Server Logs cannot be renamed.");
+        return;
+      }
+
+      let aUri = selectedItem.uri.split("/");
+      const itemName = aUri.pop() || "";
+
+      const refreshTreeAndCloseEditors = async (itemName: string) => {
+        enterpriseTreeProvider.refresh();
+        // close and delete (local copies) open documents with the old name
+        const filteredTextDocuments = vscode.workspace.textDocuments.filter(td => td.fileName.indexOf(itemName) > 0);
+        for (const td of filteredTextDocuments) {
+          await vscode.window.showTextDocument(td, { preview: true, preserveFocus: false });
+          await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+          try {
+            await vscode.workspace.fs.delete(td.uri);
+          }
+          catch (e) {
+            // ignore
+          }
+        }
+      };
+
+      switch (selectedItem.type) {
+        case EnterpriseItemType.AppClientScript:
+        case EnterpriseItemType.AppDataSource:
+        case EnterpriseItemType.AppServerScript:  
+        case EnterpriseItemType.HTMLFormCode:
+        case EnterpriseItemType.HTMLFormGuide:  
+        case EnterpriseItemType.HTMLFormResources:  
+        case EnterpriseItemType.HTMLFormXML:  
+        case EnterpriseItemType.XFDFormCode:
+        case EnterpriseItemType.XFDFormResources:  
+        case EnterpriseItemType.XFDFormXML:
+          const appItems = await enterpriseService.getEnterpriseItems("/Applications/*");
+          const applications = appItems.map(({name}: any) => ({ label: name, description: name }));
+          const application : any = await vscode.window.showQuickPick(
+            applications,
+            {
+              title: `Moving '${itemName}' - Select Application`,
+              placeHolder: "Select the application where to move the selected item...",
+              canPickMany: false,
+              ignoreFocusOut: true
+            }
+          );
+          
+          if (application) {
+            const bSuccess = await enterpriseService.moveItem(selectedItem.uri, application.label);
+            if (bSuccess) {
+              await refreshTreeAndCloseEditors(itemName);
+            }
+          }
+
+          break;
+        case EnterpriseItemType.ServerScript:
+          const ssCategoryItems = await enterpriseService.getEnterpriseItems("/ServerScripts");
+          const ssCategories = ssCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+          const ssCategory: any = await vscode.window.showQuickPick(
+            ssCategories,
+            {
+              title: `Moving '${itemName}' - Select Server Script Category`,
+              placeHolder: "Select the server scripts category where to move the selected item...",
+              canPickMany: false,
+              ignoreFocusOut: true
+            }
+          ); 
+          
+          if (ssCategory) {
+            const bSuccess = await enterpriseService.moveItem(selectedItem.uri, ssCategory.label);
+            if (bSuccess) {
+              await refreshTreeAndCloseEditors(itemName);
+            }
+          }
+
+          break;
+        case EnterpriseItemType.DataSource:
+            const dsCategoryItems = await enterpriseService.getEnterpriseItems("/DataSources");
+            const dsCategories = dsCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+            const dsCategory: any = await vscode.window.showQuickPick(
+              dsCategories,
+              {
+                title: `Moving '${itemName}' - Select Data Source Category`,
+                placeHolder: "Select the data sources category where to move the selected item...",
+                canPickMany: false,
+                ignoreFocusOut: true
+              }
+            ); 
+
+            if (dsCategory) {
+              const bSuccess = await enterpriseService.moveItem(selectedItem.uri, dsCategory.label);
+              if (bSuccess) {
+                await refreshTreeAndCloseEditors(itemName);
+              }
+            }
+
+            break;
+        case EnterpriseItemType.ClientScript:
+            const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
+            const csCategories = csCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+            const csCategory: any = await vscode.window.showQuickPick(
+              csCategories,
+              {
+                title: `Moving '${itemName}' - Select Client Script Category`,
+                placeHolder: "Select the client scripts category where to move the selected item...",
+                canPickMany: false,
+                ignoreFocusOut: true
+              }
+            ); 
+
+            if (csCategory) {
+              const bSuccess = await enterpriseService.moveItem(selectedItem.uri, csCategory.label);
+              if (bSuccess) {
+                await refreshTreeAndCloseEditors(itemName);
+              }
+            }
+
+            break;
+        default:
+          vscode.window.showErrorMessage(`Items of type '${selectedItem.type}' cannot be moved.`);
+          return;
       }
     }
   );

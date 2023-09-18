@@ -187,6 +187,18 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>71853E78-8F67-4BE4-9F9C-9FE712D5FAA5</ItemID>
+          <ItemName>Move</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>4F5154F8-1858-454C-A1B0-F7CD4BAE6B03</ItemID>
           <ItemName>Rename</ItemName>
           <LayerId>300</LayerId>

@@ -27,7 +27,7 @@ oEnterpriseItem := oUtils:ParseURI(sURI);
 sItemName := oEnterpriseItem:Name;
 sItemType := oEnterpriseItem:Type;
 sAppName  := oEnterpriseItem:AppName;
-sCategory := oEnterpriseItem:Category;
+sCategory := oEnterpriseItem:CategoryName;
 
 /*usrmes({sItemName, sItemType, sAppName, sCategory});
 
