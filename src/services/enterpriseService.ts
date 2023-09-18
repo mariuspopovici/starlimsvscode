@@ -30,6 +30,31 @@ export class EnterpriseService implements IEnterpriseService {
     this.config = config;
     this.baseUrl = cleanUrl(config.url);
   }
+  async moveItem(uri: string, destination: string) {
+    const url = `${this.baseUrl}/SCM_API.Move.lims?URI=${uri}&Destination=${destination}`;
+    const headers = new Headers(this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        vscode.window.showInformationMessage("Item moved successfully.");
+        return true;
+      } else {
+        vscode.window.showErrorMessage(data);
+        console.error(data);
+        return false;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not move item.");
+      console.error(e);
+      return false;
+    }
+  }
 
   /**
    * Renames the item specified via uri
@@ -324,7 +349,10 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns an object with Language: string and Code: string
    */
   public async getEnterpriseItemCode(uri: string, language: string | undefined) {
-    const params = new URLSearchParams([["URI", uri], ["UserLang", language ?? ""]]);
+    const params = new URLSearchParams([
+      ["URI", uri],
+      ["UserLang", language ?? ""]
+    ]);
     const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -359,7 +387,10 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns  true if the item was checked out successfully, false otherwise.
    */
   public async checkOutItem(uri: string, language: string | undefined) {
-    const params = new URLSearchParams([["URI", uri], ["UserLang", language ?? ""]]);
+    const params = new URLSearchParams([
+      ["URI", uri],
+      ["UserLang", language ?? ""]
+    ]);
     const url = `${this.baseUrl}/SCM_API.CheckOut.lims?${params}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -881,7 +912,7 @@ export class EnterpriseService implements IEnterpriseService {
    * Check in all checked out items
    * @returns true if all items were checked in successfully, false otherwise
    */
-  public async checkInAllItems(reason : string | undefined) {
+  public async checkInAllItems(reason: string | undefined) {
     const url = `${this.baseUrl}/SCM_API.CheckInAll.lims?Reason=${reason}`;
     const headers = new Headers(this.getAPIHeaders());
     const options: any = {
@@ -1004,28 +1035,28 @@ export class EnterpriseService implements IEnterpriseService {
     let resourcesData = await this.getEnterpriseItemCode(uri, language);
 
     if (resourcesData) {
-      const formName = uri.split('/').pop();
+      const formName = uri.split("/").pop();
 
       // Create a new DOMParser
       const parser = new DOMParser();
 
       // Parse the XML string
-      const xmlDoc = parser.parseFromString(resourcesData.code, 'text/xml');
+      const xmlDoc = parser.parseFromString(resourcesData.code, "text/xml");
 
       // Parse all ResourcesTable nodes
-      const resourcesTableNodes = Array.from(xmlDoc.getElementsByTagName('ResourcesTable'));
+      const resourcesTableNodes = Array.from(xmlDoc.getElementsByTagName("ResourcesTable"));
       const resourcesArray: any[][] = [];
 
       for (const resourcesTableNode of resourcesTableNodes) {
-        const guid = resourcesTableNode.getElementsByTagName('Guid')[0].textContent;
-        const resourceId = resourcesTableNode.getElementsByTagName('ResourceId')[0].textContent;
-        const resourceValue = resourcesTableNode.getElementsByTagName('ResourceValue')[0].textContent;
+        const guid = resourcesTableNode.getElementsByTagName("Guid")[0].textContent;
+        const resourceId = resourcesTableNode.getElementsByTagName("ResourceId")[0].textContent;
+        const resourceValue = resourcesTableNode.getElementsByTagName("ResourceValue")[0].textContent;
 
         resourcesArray.push([guid?.trim(), resourceId?.trim(), resourceValue?.trim()]);
       }
 
       // Create a 2D array with header and data
-      const header = ['Guid', 'ResourceId', 'ResourceValue'];
+      const header = ["Guid", "ResourceId", "ResourceValue"];
       const tableData = [header, ...resourcesArray];
       const filePath = this.getLocalFilePath(uri, this.rootPath!, "xml");
       const oParams = {

@@ -26,4 +26,5 @@ export interface IEnterpriseService {
   setCheckedOut(uri: string, username: string | null): any;
   renameItem(uri: string, newName: string): any;
   deleteItem(uri: string): any;
+  moveItem(uri: string, destination: string): any;
 }

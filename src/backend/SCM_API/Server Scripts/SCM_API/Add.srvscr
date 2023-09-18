@@ -88,7 +88,6 @@ oResponse := CreateUDObject({
 :ENDIF;
 
 sFormLang := GetSetting("DEFAULTLANGUAGE");
-usrmes({sAppName, sCategory, sScriptLang, sItemType});
 
 :DECLARE oUtils, sCategoryID, sAppID;
 oUtils := CreateUDObject("SCM_API.Utils", {});

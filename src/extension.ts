@@ -568,7 +568,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // remove text in brackets from item name to get the real item name
       let sItemName = item.label.toString();
-      sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      if (sItemName.indexOf("[") > 0) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      } else if (sItemName.indexOf('(Checked out')) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("(Checked out") - 1);
+      }
 
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
@@ -1025,7 +1029,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // remove text in brackets from item name to get the real item name
       let sItemName = selectedItem.label.toString();
-      sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      if (sItemName.indexOf("[") > 0) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
+      } else if (sItemName.indexOf('(Checked out')) {
+        sItemName = sItemName.substring(0, sItemName.indexOf("(Checked out") - 1);
+      }
 
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
@@ -1481,7 +1489,12 @@ export async function activate(context: vscode.ExtensionContext) {
           for (const td of filteredTextDocuments) {
             await vscode.window.showTextDocument(td, { preview: true, preserveFocus: false });
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            await vscode.workspace.fs.delete(td.uri);
+            try {
+              await vscode.workspace.fs.delete(td.uri);
+            }
+            catch (e) {
+              // ignore
+            }
           }
         }
       }
@@ -1501,6 +1514,25 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      let aUri = selectedItem.uri.split("/");
+      const itemName = aUri.pop() || "";
+
+      const refreshTreeAndCloseEditors = async (itemName: string) => {
+        enterpriseTreeProvider.refresh();
+        // close and delete (local copies) open documents with the old name
+        const filteredTextDocuments = vscode.workspace.textDocuments.filter(td => td.fileName.indexOf(itemName) > 0);
+        for (const td of filteredTextDocuments) {
+          await vscode.window.showTextDocument(td, { preview: true, preserveFocus: false });
+          await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+          try {
+            await vscode.workspace.fs.delete(td.uri);
+          }
+          catch (e) {
+            // ignore
+          }
+        }
+      }
+
       switch (selectedItem.type) {
         case EnterpriseItemType.AppClientScript:
         case EnterpriseItemType.AppDataSource:
@@ -1512,9 +1544,9 @@ export async function activate(context: vscode.ExtensionContext) {
         case EnterpriseItemType.XFDFormCode:
         case EnterpriseItemType.XFDFormResources:  
         case EnterpriseItemType.XFDFormXML:
-          const appItems = await enterpriseService.getEnterpriseItems("/Applications");
+          const appItems = await enterpriseService.getEnterpriseItems("/Applications/*");
           const applications = appItems.map(({name}: any) => ({ label: name, description: name }));
-          const application = await vscode.window.showQuickPick(
+          const application : any = await vscode.window.showQuickPick(
             applications,
             {
               title: "Select Application",
@@ -1523,46 +1555,78 @@ export async function activate(context: vscode.ExtensionContext) {
               ignoreFocusOut: true
             }
           );
+          
+          if (application) {
+            const bSuccess = await enterpriseService.moveItem(selectedItem.uri, application.label);
+            if (bSuccess) {
+              await refreshTreeAndCloseEditors(itemName);
+            }
+          }
+
           break;
-          case EnterpriseItemType.ServerScript:
-            const ssCategoryItems = await enterpriseService.getEnterpriseItems("/ServerScripts");
-            const ssCategories = ssCategoryItems.map(({name}: any) => ({ label: name, description: name }));
-            const ssCategory = await vscode.window.showQuickPick(
-              ssCategories,
+        case EnterpriseItemType.ServerScript:
+          const ssCategoryItems = await enterpriseService.getEnterpriseItems("/ServerScripts");
+          const ssCategories = ssCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+          const ssCategory: any = await vscode.window.showQuickPick(
+            ssCategories,
+            {
+              title: "Select Server Script Category",
+              placeHolder: "Select the server scripts category where to move the selected item...",
+              canPickMany: false,
+              ignoreFocusOut: true
+            }
+          ); 
+          
+          if (ssCategory) {
+            const bSuccess = await enterpriseService.moveItem(selectedItem.uri, ssCategory.label);
+            if (bSuccess) {
+              await refreshTreeAndCloseEditors(itemName);
+            }
+          }
+
+          break;
+        case EnterpriseItemType.DataSource:
+            const dsCategoryItems = await enterpriseService.getEnterpriseItems("/DataSources");
+            const dsCategories = dsCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+            const dsCategory: any = await vscode.window.showQuickPick(
+              dsCategories,
               {
-                title: "Select Server Script Category",
-                placeHolder: "Select the server scripts category where to move the selected item...",
+                title: "Select Data Source Category",
+                placeHolder: "Select the data sources category where to move the selected item...",
                 canPickMany: false,
                 ignoreFocusOut: true
               }
             ); 
+
+            if (dsCategory) {
+              const bSuccess = await enterpriseService.moveItem(selectedItem.uri, dsCategory.label);
+              if (bSuccess) {
+                await refreshTreeAndCloseEditors(itemName);
+              }
+            }
+
             break;
-          case EnterpriseItemType.DataSource:
-              const dsCategoryItems = await enterpriseService.getEnterpriseItems("/DataSources");
-              const dsCategories = dsCategoryItems.map(({name}: any) => ({ label: name, description: name }));
-              const dsCategory = await vscode.window.showQuickPick(
-                dsCategories,
-                {
-                  title: "Select Data Source Category",
-                  placeHolder: "Select the data sources category where to move the selected item...",
-                  canPickMany: false,
-                  ignoreFocusOut: true
-                }
-              ); 
-              break;
-          case EnterpriseItemType.DataSource:
-              const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
-              const csCategories = csCategoryItems.map(({name}: any) => ({ label: name, description: name }));
-              const csCategory = await vscode.window.showQuickPick(
-                csCategories,
-                {
-                  title: "Select Client Script Category",
-                  placeHolder: "Select the client scripts category where to move the selected item...",
-                  canPickMany: false,
-                  ignoreFocusOut: true
-                }
-              ); 
-              break;
+        case EnterpriseItemType.DataSource:
+            const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
+            const csCategories = csCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+            const csCategory: any = await vscode.window.showQuickPick(
+              csCategories,
+              {
+                title: "Select Client Script Category",
+                placeHolder: "Select the client scripts category where to move the selected item...",
+                canPickMany: false,
+                ignoreFocusOut: true
+              }
+            ); 
+
+            if (csCategory) {
+              const bSuccess = await enterpriseService.moveItem(selectedItem.uri, csCategory.label);
+              if (bSuccess) {
+                await refreshTreeAndCloseEditors(itemName);
+              }
+            }
+
+            break;
         default:
           vscode.window.showErrorMessage(`Items of type '${selectedItem.type}' cannot be moved.`);
           return;
