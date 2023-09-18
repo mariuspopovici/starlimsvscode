@@ -78,7 +78,7 @@ Date......... : 2018-11-02
 	/* initialize AppName and Category with default values;
 	oEnterpriseItem:AppName := "N/A";
 	oEnterpriseItem:CategoryName := "N/A";
-	oEnterpriseItem:Type = "";
+	oEnterpriseItem:Type = "N/A";
 	
 	aComponents := Me:GetURIComponents(sURI);
 	nCount := Len(aComponents);
@@ -92,7 +92,6 @@ Date......... : 2018-11-02
 	
 	:IF !(AScanExact({"Applications", "ServerScripts", "ClientScripts", 
 		"DataSources", "Tables", "ServerLogs"}, sEnterpriseCategory) > 0);
-		oEnterpriseItem:Type := "ROOT";
 		:RETURN oEnterpriseItem;
 	:ENDIF;
 

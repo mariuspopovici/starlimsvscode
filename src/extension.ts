@@ -1531,7 +1531,7 @@ export async function activate(context: vscode.ExtensionContext) {
             // ignore
           }
         }
-      }
+      };
 
       switch (selectedItem.type) {
         case EnterpriseItemType.AppClientScript:
@@ -1549,7 +1549,7 @@ export async function activate(context: vscode.ExtensionContext) {
           const application : any = await vscode.window.showQuickPick(
             applications,
             {
-              title: "Select Application",
+              title: `Moving '${itemName}' - Select Application`,
               placeHolder: "Select the application where to move the selected item...",
               canPickMany: false,
               ignoreFocusOut: true
@@ -1570,7 +1570,7 @@ export async function activate(context: vscode.ExtensionContext) {
           const ssCategory: any = await vscode.window.showQuickPick(
             ssCategories,
             {
-              title: "Select Server Script Category",
+              title: `Moving '${itemName}' - Select Server Script Category`,
               placeHolder: "Select the server scripts category where to move the selected item...",
               canPickMany: false,
               ignoreFocusOut: true
@@ -1591,7 +1591,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const dsCategory: any = await vscode.window.showQuickPick(
               dsCategories,
               {
-                title: "Select Data Source Category",
+                title: `Moving '${itemName}' - Select Data Source Category`,
                 placeHolder: "Select the data sources category where to move the selected item...",
                 canPickMany: false,
                 ignoreFocusOut: true
@@ -1606,13 +1606,13 @@ export async function activate(context: vscode.ExtensionContext) {
             }
 
             break;
-        case EnterpriseItemType.DataSource:
+        case EnterpriseItemType.ClientScript:
             const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
             const csCategories = csCategoryItems.map(({name}: any) => ({ label: name, description: name }));
             const csCategory: any = await vscode.window.showQuickPick(
               csCategories,
               {
-                title: "Select Client Script Category",
+                title: `Moving '${itemName}' - Select Client Script Category`,
                 placeHolder: "Select the client scripts category where to move the selected item...",
                 canPickMany: false,
                 ignoreFocusOut: true

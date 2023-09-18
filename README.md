@@ -51,7 +51,6 @@ Features:
 
 To Do:
 
-- Move forms and scripts
 - Create a HTML form designer
 - Implement table support including a schema and ERD generator / viewer
 
@@ -117,4 +116,5 @@ New features:
 - Global search / full text search in code items
 - View and edit form resources
 - Rename items and categories
+- Move items
 - Misc. bug fixes

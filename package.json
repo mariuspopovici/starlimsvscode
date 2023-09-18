@@ -366,7 +366,7 @@
         },
         {
           "command": "STARLIMS.Delete",
-          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && viewItem != APPLICATION && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY && viewItem != TABLE",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && viewItem != APPLICATION && !(viewItem =~ /category/i)",
           "group": "addRemove"
         },
         {
@@ -411,7 +411,7 @@
         },
         {
           "command": "STARLIMS.Move",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
+          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY && !(viewItem =~ /cat/i)",
           "group": "addRemove"
         }
       ],

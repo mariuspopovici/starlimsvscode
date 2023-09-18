@@ -93,7 +93,6 @@ bFolder := .T.;
 		sOutType := "APP";
 		:DECLARE sCategoryID, aCategories, sCategoryName, j, sFilter;
 		sCategoryName := Upper(oEnterpriseItem:Name);
-		/* allow wildcard to obtain the entire list of applications without filtering by category;
 		:IF sCategoryName != "*";
 			sFilter := "CATNAME=?sCategoryName?";
 		:ELSE;
