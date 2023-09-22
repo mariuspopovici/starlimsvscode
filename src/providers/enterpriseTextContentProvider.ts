@@ -1,9 +1,8 @@
 "use strict";
 import * as vscode from "vscode";
 import { IEnterpriseService } from "../services/iEnterpriseService";
-import { EnterpriseTreeDataProvider } from "../providers/enterpriseTreeDataProvider";
-export class EnterpriseTextDocumentContentProvider
-  implements vscode.TextDocumentContentProvider {
+import { EnterpriseItemType, EnterpriseTreeDataProvider } from "../providers/enterpriseTreeDataProvider";
+export class EnterpriseTextDocumentContentProvider implements vscode.TextDocumentContentProvider {
   // emitter and its event
   onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
   onDidChange = this.onDidChangeEmitter.event;
@@ -34,7 +33,7 @@ export class EnterpriseTextDocumentContentProvider
 
     // Check if the document has already been checked out in this session
     const uri = await this.service.getUriFromLocalPath(document.fileName);
-    if (await this.service.isCheckedOut(uri) === true) {
+    if ((await this.service.isCheckedOut(uri)) === true) {
       return;
     }
 
@@ -45,27 +44,26 @@ export class EnterpriseTextDocumentContentProvider
     }
 
     // Check if the document is checked out (is null or empty string)
-    if (item.checkedOutBy === '') {
+    if (item.checkedOutBy === "") {
       // Revert the changes made by the user
-      await vscode.commands.executeCommand('workbench.action.files.revert', document.uri);
+      await vscode.commands.executeCommand("workbench.action.files.revert", document.uri);
 
-      if (!this.promptOpen) {
+      if (!this.promptOpen && item.type !== EnterpriseItemType.ServerLog) {
         // Prompt the user to check out the item
         this.promptOpen = true;
         const result = await vscode.window.showInformationMessage(
-          'This item cannot be edited because it is not checked out. Would you like to check it out?',
-          'Yes',
-          'No'
+          "This item cannot be edited because it is not checked out. Would you like to check it out?",
+          "Yes",
+          "No"
         );
 
         this.promptOpen = false;
 
-        if (result === 'Yes') {
-          vscode.commands.executeCommand('STARLIMS.CheckOut', item);
+        if (result === "Yes") {
+          vscode.commands.executeCommand("STARLIMS.CheckOut", item);
         }
       }
-    }
-    else {
+    } else {
       this.service.setCheckedOut(uri, null);
     }
     this.promptOpen = false;

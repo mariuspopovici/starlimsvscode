@@ -1,0 +1,158 @@
+/********************************************************************************
+Description.. :	Rename an enterprise item.
+Author....... :	MARIUS
+Date......... : 2023-09-11
+********************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI, sNewName;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+:IF Request:QueryString:IsProperty("NewName");
+	sNewName := Request:QueryString:NewName;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "NewName");
+	:RETURN oResponse;
+:ENDIF;
+
+:IF Empty(sNewName);
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Parameter: {0} is empty", "NewName");
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oUtils;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+
+:DECLARE oEnterpriseItem;
+oEnterpriseItem := oUtils:ParseURI(sURI);
+
+:DECLARE oDataSet, sDataSet, sItemName, sItemType, sUserLang, sItemID, sItemGUID;
+:DECLARE sDescription, sScriptLanguage, oRow, sVersionString;
+sItemName := BuildArray(oEnterpriseItem:Name,, ".")[1]; 
+sItemType := oEnterpriseItem:Type;
+sUserLang := GetSetting("DEFAULTLANGUAGE");
+
+
+:BEGINCASE;	
+	:CASE sItemType == "APPCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
+		DoProc("Enterprise_Data_Providers.AppCategProvider.Modify", {sItemGUID, sNewName});
+	:EXITCASE;
+	:CASE sItemType == "SSCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
+		DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Modify", {sItemGUID, sNewName});
+	:EXITCASE;
+	:CASE sItemType == "DSCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
+		DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Modify", {sItemGUID, sNewName});
+	:EXITCASE;
+	:CASE sItemType == "CSCATEGORY";
+		sItemGUID := oUtils:GetItemGUID(sItemName, sItemType);
+		DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Modify", {sItemGUID, sNewName});
+	:EXITCASE;
+	:CASE sItemType == "SS";
+		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.ServerScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
+		DoProc("Enterprise_Data_Providers.ServerScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
+	:EXITCASE;
+	:CASE sItemType == "APPSS";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.AppServerScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+		
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
+		DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
+	:EXITCASE;
+	:CASE sItemType == "CS";
+		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.ClientScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
+		DoProc("Enterprise_Data_Providers.ClientScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
+	:EXITCASE;
+	:CASE sItemType == "APPCS";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.AppClientScriptProvider.GetById", {sItemID});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["SCRIPTDESCRIPTION"];
+		sItemGUID := oRow["SCRIPTID"];
+		DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Modify", {sItemGUID, sNewName, sDescription});
+	:EXITCASE;
+	:CASE sItemType == "DS";
+		sItemID := oEnterpriseItem:CategoryName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.DataSourceProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["DSDESCRIPTION"];
+		sItemGUID := oRow["DATASOURCEID"];
+		sScriptLanguage := oRow["SCRIPTLANGUAGE"];
+		DoProc("Enterprise_Data_Providers.DataSourceProvider.Modify", {sItemGUID, sNewName, sDescription, sScriptLanguage});
+	:EXITCASE;
+	:CASE sItemType == "APPDS";
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.AppDataSourceProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["DSDESCRIPTION"];
+		sScriptLanguage := oRow["SCRIPTLANGUAGE"];
+		sItemGUID := oRow["DATASOURCEID"];
+		DoProc("Enterprise_Data_Providers.AppDataSourceProvider.Modify", {sItemGUID, sNewName, sDescription, sScriptLanguage});
+	:EXITCASE;
+	:CASE AScanExact({"HTMLFORMXML", "XFDFORMXML", "HTMLFORMCODE", "XFDFORMCODE", 
+		"HTMLFORMGUIDE", "XFDFORMCODE", "HTMLFORMRESOURCES", "XFDFORMRESOURCES"}, sItemType) > 0; 
+		sItemID := oEnterpriseItem:AppName + "." + sItemName;
+		sDataSet := DoProc("Enterprise_Data_Providers.FormProvider.GetById", {sItemID, .F.});
+		oDataSet := DoProc("Enterprise_Server.DataSetSupport.DsFromString", {sDataSet});
+
+		oRow := oDataSet:Tables[0]:Rows[0];
+		sDescription := oRow["FORMDESCRIPTION"];
+		sItemGUID := oRow["FORMID"];
+		sIsOffline := oRow["ISOFFLINE"];
+		sVersionString := "";
+		DoProc("Enterprise_Data_Providers.FormProvider.Modify", {sItemGUID, sNewName, sDescription, sVersionString, sIsOffline});
+	:EXITCASE;
+	:OTHERWISE;
+		Response:StatusCode := 400;
+		oResponse:success := .F.;
+		oResponse:data := String:Format("Unsupported item type: {0}", sItemType);
+		:RETURN oResponse;
+	:EXITCASE;
+:ENDCASE;
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+:RETURN oResponse;

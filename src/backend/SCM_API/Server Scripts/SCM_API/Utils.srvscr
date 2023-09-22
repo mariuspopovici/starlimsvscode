@@ -77,8 +77,8 @@ Date......... : 2018-11-02
 	
 	/* initialize AppName and Category with default values;
 	oEnterpriseItem:AppName := "N/A";
-	oEnterpriseItem:Category := "N/A";
-	oEnterpriseItem:Type = "";
+	oEnterpriseItem:CategoryName := "N/A";
+	oEnterpriseItem:Type = "N/A";
 	
 	aComponents := Me:GetURIComponents(sURI);
 	nCount := Len(aComponents);
@@ -90,6 +90,11 @@ Date......... : 2018-11-02
 	:DECLARE sEnterpriseCategory;
 	sEnterpriseCategory := aComponents[1];
 	
+	:IF !(AScanExact({"Applications", "ServerScripts", "ClientScripts", 
+		"DataSources", "Tables", "ServerLogs"}, sEnterpriseCategory) > 0);
+		:RETURN oEnterpriseItem;
+	:ENDIF;
+
 	:BEGINCASE;
 		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 1;
 			oEnterpriseItem:Type := "ENT_CAT_APPS";
@@ -100,18 +105,19 @@ Date......... : 2018-11-02
 		:EXITCASE;
 		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 3;
 			oEnterpriseItem:Type := "APP";
-			oEnterpriseItem:Category := aComponents[2];
+			oEnterpriseItem:CategoryName := aComponents[2];
 			oEnterpriseItem:Name := aComponents[3];
 		:EXITCASE;
 		:CASE sEnterpriseCategory == "Applications" .AND. nCount == 4;
 			oEnterpriseItem:Type := "APPSUBCATEGORY";
-			oEnterpriseItem:Category := aComponents[2];
+			oEnterpriseItem:CategoryName := aComponents[2];
 			oEnterpriseItem:AppName := aComponents[3];
 			oEnterpriseItem:Name := aComponents[4];
 		:EXITCASE;
 		:CASE sEnterpriseCategory == "Applications" .AND. nCount >= 5;
 			:DECLARE sSubCategory, sFormCodeType;
 			sSubCategory := aComponents[4];
+			oEnterpriseItem:CategoryName := aComponents[2];
 			oEnterpriseItem:AppName := aComponents[3];
 			:BEGINCASE;
 				:CASE sSubCategory == "ServerScripts";
@@ -250,16 +256,16 @@ Returns the GUID of an item
 		:CASE sItemType == "APP";
 			sGUID := Me:GetAppId(aItemName[1], aItemName[2]);
 		:EXITCASE;
-		:CASE sItemType == "APPCAT";
+		:CASE sItemType == "APPCATEGORY";
 			sGUID := Me:GetAppCatId(aItemName[1]);
 		:EXITCASE;
-		:CASE sItemType == "SSCAT";
+		:CASE sItemType == "SSCATEGORY";
 			sGUID := Me:GetSSCatId(aItemName[1]);
 		:EXITCASE;
-		:CASE sItemType == "CSCAT";
+		:CASE sItemType == "CSCATEGORY";
 			sGUID := Me:GetCSCatId(aItemName[1]);
 		:EXITCASE;
-		:CASE sItemType == "DSCAT";
+		:CASE sItemType == "DSCATEGORY";
 			sGUID := Me:GetDSCatId(aItemName[1]);
 		:EXITCASE;
 		:CASE sItemType == "SS".OR. sItemType == "APPSS";
@@ -290,22 +296,30 @@ Returns the application GUID for application and category name
 ----------------------------------------------------------------------;
 :PROCEDURE GetAppId;
 :PARAMETERS sCategoryName, sAppName;
-	:DECLARE sSQL, aReturn, sSysLayerId;
+:DEFAULT sCategoryName, "";
+	:DECLARE sSQL, aReturn, sSysLayerId, sCategoryFilter;
 	sSysLayerId := GetSystemLayerId();
 	sAppName := Upper(sAppName);
-	sCategoryName := Upper(sCategoryName);
+	
+	:IF Empty(sCategoryName);
+		sCategoryFilter := "";
+	:ELSE;
+		sCategoryName := Upper(sCategoryName);
+		sCategoryFilter := " AND c.CATNAME = ?sCategoryName? ";
+	:ENDIF;
+
 	sSQL :=
 	"SELECT APPID 
 	FROM LIMSAPPLICATIONS a
 	JOIN LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
 	WHERE a.APPNAME = ?sAppName?
-	AND c.CATNAME = ?sCategoryName?
+	" + sCategoryFilter + "
 	order by
 	case
 		when a.LAYERID <= ?sSysLayerId? then ?sSysLayerId? - a.LAYERID
 		else a.LAYERID
 	end";
-	
+
 	aReturn := SqlExecute(sSQL, "DICTIONARY");
 	:IF Len(aReturn) = 0;
 		:RETURN "";
@@ -584,4 +598,44 @@ Returns the table ID for the table identified by TableName
 	:ENDIF;
 
 	:RETURN aReturn[1, 1];
+:ENDPROC;
+
+
+/* -----------------------------------------------------------------------------------
+Return the name of the enterprise data provider responsible for handling the specified
+item type.
+-------------------------------------------------------------------------------------;
+:PROCEDURE GetProviderScript;
+:PARAMETERS sItemType;
+
+  :DECLARE oProviderConfig;
+  oProviderConfig := CreateUDObject({
+    {"APPSS", "Enterprise_Data_Providers.AppServerScriptProvider"},
+    {"APPDS", "Enterprise_Data_Providers.AppDataSourceScriptProvider"},
+    {"APPCS", "Enterprise_Data_Providers.AppClientScriptProvider"},
+    {"SS", "Enterprise_Data_Providers.ServerScriptProvider"},
+    {"DS", "Enterprise_Data_Providers.DataSourceProvider"},
+    {"CS", "Enterprise_Data_Providers.ClientScriptProvider"},
+    {"HTMLFORMXML", "Enterprise_Data_Providers.FormProvider"},
+    {"HTMLFORMCODE", "Enterprise_Data_Providers.FormProvider"},
+    {"HTMLFORMGUIDE", "Enterprise_Data_Providers.FormProvider"},
+    {"XFDFORMRESOURCES", "Enterprise_Data_Providers.FormProvider"},
+    {"XFDFORMXML", "Enterprise_Data_Providers.FormProvider"},
+    {"XFDFORMCODE", "Enterprise_Data_Providers.FormProvider"},
+    {"APPCATEGORY", "Enterprise_Data_Providers.AppCategProvider"},
+    {"SSCATEGORY", "Enterprise_Data_Providers.ServerScriptCategProvider"},
+    {"CSCATEGORY", "Enterprise_Data_Providers.ClientScriptCategProvider"},
+    {"DSCATEGORY", "Enterprise_Data_Providers.DataSourceCategProvider"},
+		{"APPCATEGORY", "Enterprise_Data_Providers.AppCategProvider"},
+		{"SSCATEGORY", "Enterprise_Data_Providers.ServerScriptCategProvider"},
+		{"DSCATEGORY", "Enterprise_Data_Providers.DataSourceCategProvider"},
+		{"CSCATEGORY", "Enterprise_Data_Providers.ClientScriptCategProvider"},
+		{"TABLE", "Enterprise_Data_Providers.TableProvider"}
+  });
+
+  :IF oProviderConfig:IsProperty(sItemType);
+		:RETURN oProviderConfig:GetProperty(sItemType);
+	:ENDIF;
+
+	:RETURN NIL;
 :ENDPROC;

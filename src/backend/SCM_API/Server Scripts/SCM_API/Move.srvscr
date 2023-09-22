@@ -1,0 +1,82 @@
+/********************************************************************************
+Description.. :	Move enterprise item.
+Author....... :	MARIUS
+Date......... : 2023-09-17
+********************************************************************************/;
+:DECLARE String;
+String := "";
+
+:DECLARE oResponse, oResult;
+oResult := CreateUDObject();
+oResponse := CreateUDObject({
+	{"success", .T.},
+	{"data", NIL}
+});
+
+:DECLARE sURI, sDestination;
+
+:IF Request:QueryString:IsProperty("URI");
+	sURI := Request:QueryString:URI;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "URI");
+	:RETURN oResponse;
+:ENDIF;
+
+:IF Request:QueryString:IsProperty("Destination");
+	sDestination := Request:QueryString:Destination;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "Destination");
+	:RETURN oResponse;
+:ENDIF;
+
+:DECLARE oEnterpriseItem, sAppId, sItemName, sItemType, aItemComponents, oUtils, sProviderScript, sItemGUID, sCategoryName;
+:DECLARE sCategoryID;
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oEnterpriseItem := oUtils:ParseURI(sURI);
+aItemComponents := BuildArray(oEnterpriseItem:Name,, ".");
+sItemType := oEnterpriseItem:Type;
+sProviderScript := oUtils:GetProviderScript(sItemType);
+
+:BEGINCASE;	
+	:CASE AScanExact({"APPSS", "APPCS", "APPDS", "HTMLFORMCODE", 
+    	"HTMLFORMXML", "HTMLFORMGUIDE", "HTMLFORMRESOURCES", 
+    	"XFDFORMCODE", "XFDFORMXML", "XFDFORMRESOURCES"}, sItemType) > 0;
+    	sCategoryName := oEnterpriseItem:Category;
+    	sItemName := oEnterpriseItem:Name;
+    	sAppId := oUtils:GetAppID(NIL, sDestination);
+		sItemGUID := oUtils:GetItemGUID(sCategoryName + "." + sItemName, sItemType);
+		DoProc(sProviderScript + ".MoveTo", {sItemGUID, sAppId});
+	:EXITCASE;
+  	:CASE AScanExact({"SS", "CS", "DS"}, sItemType) > 0;
+		sItemName := oEnterpriseItem:Name;
+		sCategoryName := oEnterpriseItem:Category;
+		sItemGUID := oUtils:GetItemGUID(sCategoryName + "." + sItemName, sItemType);   
+		:BEGINCASE;
+		:CASE sItemType == "SS";
+			sCategoryID := oUtils:GetSSCatId(sDestination);
+		:EXITCASE;
+		:CASE sItemType == "CS";
+			sCategoryID := oUtils:GetCSCatId(sDestination);
+		:EXITCASE;
+		:CASE sItemType == "DS";
+			sCategoryID := oUtils:GetDSCatId(sDestination);
+		:EXITCASE;
+		:ENDCASE;
+		
+		DoProc(sProviderScript + ".MoveTo", {sItemGUID, sCategoryID});
+	:EXITCASE;
+  :OTHERWISE;
+		Response:StatusCode := 400;
+		oResponse:success := .F.;
+		oResponse:data := String:Format("Unsupported item type: {0}", sItemType);
+		:RETURN oResponse;
+	:EXITCASE;
+:ENDCASE;
+
+Response:StatusCode := 200;
+oResponse:success := .T.;
+:RETURN oResponse;

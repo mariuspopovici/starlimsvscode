@@ -51,10 +51,8 @@ Features:
 
 To Do:
 
-- Move forms and scripts
 - Create a HTML form designer
 - Implement table support including a schema and ERD generator / viewer
-- Rename items
 
 ## Extension Settings
 
@@ -117,4 +115,6 @@ New features:
 - View checked out items, check in pending, undo check out, view checked out items from all uses, refresh checked out items tree
 - Global search / full text search in code items
 - View and edit form resources
+- Rename items and categories
+- Move items
 - Misc. bug fixes

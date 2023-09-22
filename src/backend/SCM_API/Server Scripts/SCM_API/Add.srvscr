@@ -88,18 +88,17 @@ oResponse := CreateUDObject({
 :ENDIF;
 
 sFormLang := GetSetting("DEFAULTLANGUAGE");
-usrmes({sAppName, sCategory, sScriptLang, sItemType});
 
 :DECLARE oUtils, sCategoryID, sAppID;
 oUtils := CreateUDObject("SCM_API.Utils", {});
 :TRY;
 	:BEGINCASE;
-		:CASE sItemType == "APPCAT";
+		:CASE sItemType == "APPCATEGORY";
 			DoProc("Enterprise_Data_Providers.AppCategProvider.Add", {sItemName});
 		:EXITCASE;
 
 		:CASE sItemType == "APP";
-			sCategoryID := oUtils:GetItemGUID(sCategory, "APPCAT");
+			sCategoryID := oUtils:GetItemGUID(sCategory, "APPCATEGORY");
 			DoProc("Enterprise_Data_Providers.AppProvider.Add", {sCategoryID, sItemName, ""});
 		:EXITCASE;
 
@@ -135,31 +134,31 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 			DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Add", {sAppID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
-		:CASE sItemType == "SSCAT";
+		:CASE sItemType == "SSCATEGORY";
 			DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Add", {sItemName});
 		:EXITCASE;
 
 		:CASE sItemType == "SS";
-			sCategoryID := oUtils:GetItemGUID(sCategory, "SSCAT");
+			sCategoryID := oUtils:GetItemGUID(sCategory, "SSCATEGORY");
 			sScriptLang := "STARLIMS";
 			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
-		:CASE sItemType == "DSCAT";
+		:CASE sItemType == "DSCATEGORY";
 			DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Add", {sItemName});
 		:EXITCASE;
 
 		:CASE sItemType == "DS";
-			sCategoryID := oUtils:GetItemGUID(sCategory, "DSCAT");
+			sCategoryID := oUtils:GetItemGUID(sCategory, "DSCATEGORY");
 			DoProc("Enterprise_Data_Providers.DataSourceProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
-		:CASE sItemType == "CSCAT";
+		:CASE sItemType == "CSCATEGORY";
 			DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Add", {sItemName});
 		:EXITCASE;
 
 		:CASE sItemType == "CS";
-			sCategoryID := oUtils:GetItemGUID(sCategory, "CSCAT");
+			sCategoryID := oUtils:GetItemGUID(sCategory, "CSCATEGORY");
 			sScriptLang := "JS";			
 			DoProc("Enterprise_Data_Providers.ClientScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
