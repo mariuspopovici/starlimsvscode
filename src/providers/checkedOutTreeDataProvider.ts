@@ -624,7 +624,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
           }
         }
 
-        if (childType === "AppDataSource") {
+        if (childType === "AppDataSourceScript") {
           // create "Data Sources" node
           var appDataSourcesNode: TreeEnterpriseItem | undefined = appNode.children?.find(
             (item: TreeEnterpriseItem) => item.label === "Data Sources" && item.type === EnterpriseItemType.AppDataSourceCategory
