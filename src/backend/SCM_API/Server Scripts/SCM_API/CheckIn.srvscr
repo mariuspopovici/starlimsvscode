@@ -78,7 +78,7 @@ sType := oEnterpriseItem:Type;
 		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "DataSourceScript", NIL, sReason, NIL, .F.});
 	:EXITCASE;
 	:CASE sType == "APPDS";
-		sItemName := sCategory + "." + sItemName;
+		sItemName := sAppNAme + "." + sItemName;
 		sItemID := oUtils:GetItemGUID(sItemName, sType);
 		DoProc("Enterprise_Data_Providers.CheckInProvider.CheckInItem", {sItemID, "AppDataSourceScript", NIL, sReason, NIL, .F.});
 	:EXITCASE;
