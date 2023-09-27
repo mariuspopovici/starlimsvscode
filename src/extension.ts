@@ -112,7 +112,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   // create enterprise service
-  const enterpriseService = new EnterpriseService(config);
+  const enterpriseService = new EnterpriseService(config, secretStorage);
 
   // create output channel for the extension
   const outputChannel = vscode.window.createOutputChannel("STARLIMS");
