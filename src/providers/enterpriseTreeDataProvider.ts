@@ -16,7 +16,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   private dataMode: string = "LOAD";
   private treeItems: TreeEnterpriseItem[] = [];
   private resultItems: TreeEnterpriseItem[] = [];
-  private currentItem: TreeEnterpriseItem | undefined;
   static service: any;
 
   /**
@@ -162,9 +161,6 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
       title: "Select Node",
       arguments: [item]
     };
-
-    // store current item for refresh
-    this.currentItem = item;
 
     return item;
   }
