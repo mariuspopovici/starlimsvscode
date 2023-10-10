@@ -27,8 +27,7 @@ export class EnterpriseService implements IEnterpriseService {
    * Constructor
    * @param config Workspace config object for the STARLIMS VS Code extension.
    */
-  constructor(config: vscode.WorkspaceConfiguration,
-              secretStorage: vscode.SecretStorage) {
+  constructor(config: vscode.WorkspaceConfiguration, secretStorage: vscode.SecretStorage) {
     this.config = config;
     this.secretStorage = secretStorage;
     this.baseUrl = cleanUrl(config.url);
@@ -106,7 +105,7 @@ export class EnterpriseService implements IEnterpriseService {
 
     const headers = new Headers([
       ["STARLIMSUser", this.config.user],
-      ["STARLIMSPass", this.secretStorage.get("userPassword")],
+      ["STARLIMSPass", await this.secretStorage.get("userPassword")],
       ["Accept", "*/*"],
       ["Accept-Encoding", "gzip, deflate, br"],
       ["Content-length", stats.size.toString()]
