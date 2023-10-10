@@ -520,9 +520,7 @@ export async function activate(context: vscode.ExtensionContext) {
       // check out the item
       let bSuccess = await enterpriseService.checkOutItem(item.uri, language);
       if (bSuccess) {
-        item.checkedOutBy = user;
-        item.language = language;
-        enterpriseTreeProvider.refresh();
+        enterpriseTreeProvider.setItemCheckedOutStatus(item, true, language);
         vscode.commands.executeCommand("STARLIMS.GetLocal", item);
 
         // refresh checked out items
@@ -548,9 +546,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       let bSuccess = await enterpriseService.checkInItem(item.uri, checkinReason, item.language);
       if (bSuccess) {
-        item.checkedOutBy = "";
-        item.language = "";
-        enterpriseTreeProvider.refresh();
+        enterpriseTreeProvider.setItemCheckedOutStatus(item, false, item.language);
 
         // refresh checked out items
         vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
@@ -587,8 +583,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       let bSuccess = await enterpriseService.undoCheckOut(item.uri);
       if (bSuccess) {
-        item.checkedOutBy = "";
-        enterpriseTreeProvider.refresh();
+        enterpriseTreeProvider.setItemCheckedOutStatus(item, false, item.language);
 
         // refresh checked out items
         vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
