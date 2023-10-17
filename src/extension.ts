@@ -120,6 +120,29 @@ export async function activate(context: vscode.ExtensionContext) {
   // create output channel for the log
   const logChannel = vscode.window.createOutputChannel("STARLIMS Log");
 
+  // install ESlint to SLVSCODE folder if not already installed
+  // check for .eslintrc.json file
+  const eslintConfigFile = path.join(rootPath!, ".eslintrc.json");
+  if (!await enterpriseService.fileExists(eslintConfigFile)) {
+    executeWithProgress(async () => {
+      // copy .eslintrc and package.json to folder
+      const eslintConfig = context.asAbsolutePath("dist/eslint/.eslintrc.json");
+      const packageJson = context.asAbsolutePath("dist/eslint/package.json");
+      var fs = require('fs');
+      fs.copyFileSync(eslintConfig, eslintConfigFile);
+      fs.copyFileSync(packageJson, path.join(rootPath!, "package.json"));
+
+      // install eslint vscode extension
+      await vscode.commands.executeCommand("workbench.extensions.installExtension", "dbaeumer.vscode-eslint");
+
+      // run the shell command "npm install"
+      const terminal = vscode.window.createTerminal("STARLIMS");
+      terminal.show();
+      terminal.sendText("cd " + rootPath!);
+      terminal.sendText("npm install");
+    }, "Installing ESlint to SLVSCODE folder...");
+  }
+
   // verify API version
   enterpriseService.getVersion()
     .then(async (apiVersion) => {
@@ -154,7 +177,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (log) {
         logChannel.clear();
         logChannel.appendLine(log.code);
-        logChannel.show();
+        logChannel.show(true);
       }
     }
   );
@@ -171,7 +194,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (log) {
         logChannel.clear();
         logChannel.appendLine(log.code);
-        logChannel.show();
+        logChannel.show(true);
       }
     }
   );
@@ -353,8 +376,8 @@ export async function activate(context: vscode.ExtensionContext) {
     let oParams = await enterpriseService.getFormResources(remoteUri, item.language);
 
     // render the data view panel
-    ResourcesDataViewPanel.render(context.extensionUri, oParams, enterpriseService, 
-                         enterpriseTreeProvider);
+    ResourcesDataViewPanel.render(context.extensionUri, oParams, enterpriseService,
+      enterpriseTreeProvider);
   }
 
   /**
@@ -367,7 +390,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const openDocument = vscode.workspace.textDocuments.find(
       (doc) => doc.uri.fsPath.toLowerCase() === item.filePath?.toLowerCase()
     );
-    
+
     if (openDocument) {
       // reload document, if it is a log file
       if (openDocument.uri.toString().endsWith(".log")) {
@@ -459,7 +482,7 @@ export async function activate(context: vscode.ExtensionContext) {
           outputChannel.appendLine("### Script output: ###");
           outputChannel.appendLine(result.data);
 
-          outputChannel.show();
+          outputChannel.show(true);
         }
       }, "Executing script...");
     }
@@ -818,7 +841,7 @@ export async function activate(context: vscode.ExtensionContext) {
       vscode.commands.executeCommand("workbench.debug.action.toggleRepl");
 
       // show the output channel
-      outputChannel.show();
+      //outputChannel.show();
     }
   );
 
@@ -1456,7 +1479,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage("Please select an item to rename.");
         return;
       }
-      
+
       if (selectedItem.type === EnterpriseItemType.ServerLog) {
         vscode.window.showErrorMessage("Server Logs cannot be renamed.");
         return;
@@ -1503,7 +1526,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage("Please select an item to move.");
         return;
       }
-      
+
       if (selectedItem.type === EnterpriseItemType.ServerLog) {
         vscode.window.showErrorMessage("Server Logs cannot be renamed.");
         return;
@@ -1531,17 +1554,17 @@ export async function activate(context: vscode.ExtensionContext) {
       switch (selectedItem.type) {
         case EnterpriseItemType.AppClientScript:
         case EnterpriseItemType.AppDataSource:
-        case EnterpriseItemType.AppServerScript:  
+        case EnterpriseItemType.AppServerScript:
         case EnterpriseItemType.HTMLFormCode:
-        case EnterpriseItemType.HTMLFormGuide:  
-        case EnterpriseItemType.HTMLFormResources:  
-        case EnterpriseItemType.HTMLFormXML:  
+        case EnterpriseItemType.HTMLFormGuide:
+        case EnterpriseItemType.HTMLFormResources:
+        case EnterpriseItemType.HTMLFormXML:
         case EnterpriseItemType.XFDFormCode:
-        case EnterpriseItemType.XFDFormResources:  
+        case EnterpriseItemType.XFDFormResources:
         case EnterpriseItemType.XFDFormXML:
           const appItems = await enterpriseService.getEnterpriseItems("/Applications/*");
-          const applications = appItems.map(({name}: any) => ({ label: name, description: name }));
-          const application : any = await vscode.window.showQuickPick(
+          const applications = appItems.map(({ name }: any) => ({ label: name, description: name }));
+          const application: any = await vscode.window.showQuickPick(
             applications,
             {
               title: `Moving '${itemName}' - Select Application`,
@@ -1550,7 +1573,7 @@ export async function activate(context: vscode.ExtensionContext) {
               ignoreFocusOut: true
             }
           );
-          
+
           if (application) {
             const bSuccess = await enterpriseService.moveItem(selectedItem.uri, application.label);
             if (bSuccess) {
@@ -1561,7 +1584,7 @@ export async function activate(context: vscode.ExtensionContext) {
           break;
         case EnterpriseItemType.ServerScript:
           const ssCategoryItems = await enterpriseService.getEnterpriseItems("/ServerScripts");
-          const ssCategories = ssCategoryItems.map(({name}: any) => ({ label: name, description: name }));
+          const ssCategories = ssCategoryItems.map(({ name }: any) => ({ label: name, description: name }));
           const ssCategory: any = await vscode.window.showQuickPick(
             ssCategories,
             {
@@ -1570,8 +1593,8 @@ export async function activate(context: vscode.ExtensionContext) {
               canPickMany: false,
               ignoreFocusOut: true
             }
-          ); 
-          
+          );
+
           if (ssCategory) {
             const bSuccess = await enterpriseService.moveItem(selectedItem.uri, ssCategory.label);
             if (bSuccess) {
@@ -1581,47 +1604,47 @@ export async function activate(context: vscode.ExtensionContext) {
 
           break;
         case EnterpriseItemType.DataSource:
-            const dsCategoryItems = await enterpriseService.getEnterpriseItems("/DataSources");
-            const dsCategories = dsCategoryItems.map(({name}: any) => ({ label: name, description: name }));
-            const dsCategory: any = await vscode.window.showQuickPick(
-              dsCategories,
-              {
-                title: `Moving '${itemName}' - Select Data Source Category`,
-                placeHolder: "Select the data sources category where to move the selected item...",
-                canPickMany: false,
-                ignoreFocusOut: true
-              }
-            ); 
-
-            if (dsCategory) {
-              const bSuccess = await enterpriseService.moveItem(selectedItem.uri, dsCategory.label);
-              if (bSuccess) {
-                await refreshTreeAndCloseEditors(itemName);
-              }
+          const dsCategoryItems = await enterpriseService.getEnterpriseItems("/DataSources");
+          const dsCategories = dsCategoryItems.map(({ name }: any) => ({ label: name, description: name }));
+          const dsCategory: any = await vscode.window.showQuickPick(
+            dsCategories,
+            {
+              title: `Moving '${itemName}' - Select Data Source Category`,
+              placeHolder: "Select the data sources category where to move the selected item...",
+              canPickMany: false,
+              ignoreFocusOut: true
             }
+          );
 
-            break;
+          if (dsCategory) {
+            const bSuccess = await enterpriseService.moveItem(selectedItem.uri, dsCategory.label);
+            if (bSuccess) {
+              await refreshTreeAndCloseEditors(itemName);
+            }
+          }
+
+          break;
         case EnterpriseItemType.ClientScript:
-            const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
-            const csCategories = csCategoryItems.map(({name}: any) => ({ label: name, description: name }));
-            const csCategory: any = await vscode.window.showQuickPick(
-              csCategories,
-              {
-                title: `Moving '${itemName}' - Select Client Script Category`,
-                placeHolder: "Select the client scripts category where to move the selected item...",
-                canPickMany: false,
-                ignoreFocusOut: true
-              }
-            ); 
-
-            if (csCategory) {
-              const bSuccess = await enterpriseService.moveItem(selectedItem.uri, csCategory.label);
-              if (bSuccess) {
-                await refreshTreeAndCloseEditors(itemName);
-              }
+          const csCategoryItems = await enterpriseService.getEnterpriseItems("/ClientScripts");
+          const csCategories = csCategoryItems.map(({ name }: any) => ({ label: name, description: name }));
+          const csCategory: any = await vscode.window.showQuickPick(
+            csCategories,
+            {
+              title: `Moving '${itemName}' - Select Client Script Category`,
+              placeHolder: "Select the client scripts category where to move the selected item...",
+              canPickMany: false,
+              ignoreFocusOut: true
             }
+          );
 
-            break;
+          if (csCategory) {
+            const bSuccess = await enterpriseService.moveItem(selectedItem.uri, csCategory.label);
+            if (bSuccess) {
+              await refreshTreeAndCloseEditors(itemName);
+            }
+          }
+
+          break;
         default:
           vscode.window.showErrorMessage(`Items of type '${selectedItem.type}' cannot be moved.`);
           return;
@@ -1638,47 +1661,47 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 }
 
-async function highlightGlobalSearchMatches(item : TreeEnterpriseItem, localUri : vscode.Uri) {
-    // mark all occurrences of the global search term 
-    if (item.globalSearchTerm) {
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const text = editor.document.getText();
-        const regex = new RegExp(item.globalSearchTerm, "mig");
-        const matches = text.matchAll(regex);
-        if (matches) {
-          // get positions of matches
-          var positions = new Array<vscode.Range>();
-          for (const match of matches) {
-            if(match.index === undefined) {
-              continue; // skip invalid matches
-            }
-            var start = editor.document.positionAt(match.index);
-            var end = editor.document.positionAt(match.index + match[0].length);
-            positions.push(new vscode.Range(start, end));
+async function highlightGlobalSearchMatches(item: TreeEnterpriseItem, localUri: vscode.Uri) {
+  // mark all occurrences of the global search term 
+  if (item.globalSearchTerm) {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const text = editor.document.getText();
+      const regex = new RegExp(item.globalSearchTerm, "mig");
+      const matches = text.matchAll(regex);
+      if (matches) {
+        // get positions of matches
+        var positions = new Array<vscode.Range>();
+        for (const match of matches) {
+          if (match.index === undefined) {
+            continue; // skip invalid matches
           }
-
-          // highlight matches
-          var decorationType = vscode.window.createTextEditorDecorationType({
-            backgroundColor: new vscode.ThemeColor("editor.findMatchHighlightBackground"),
-            isWholeLine: false
-          });
-          const decorations = positions.map((range) => ({ range, hoverMessage: 'Matched text' }));
-          editor.setDecorations(decorationType, decorations);
-
-          // scroll to first match
-          editor.revealRange(positions[0], vscode.TextEditorRevealType.InCenter);
-
-          // set breakpoints on matches
-          var breakpoints = new Array<vscode.SourceBreakpoint>();
-          positions.forEach((position) => {
-            var location = new vscode.Location(localUri, position);
-            breakpoints.push(new vscode.SourceBreakpoint(location));
-          });
-          vscode.debug.addBreakpoints(breakpoints);
+          var start = editor.document.positionAt(match.index);
+          var end = editor.document.positionAt(match.index + match[0].length);
+          positions.push(new vscode.Range(start, end));
         }
+
+        // highlight matches
+        var decorationType = vscode.window.createTextEditorDecorationType({
+          backgroundColor: new vscode.ThemeColor("editor.findMatchHighlightBackground"),
+          isWholeLine: false
+        });
+        const decorations = positions.map((range) => ({ range, hoverMessage: 'Matched text' }));
+        editor.setDecorations(decorationType, decorations);
+
+        // scroll to first match
+        editor.revealRange(positions[0], vscode.TextEditorRevealType.InCenter);
+
+        // set breakpoints on matches
+        var breakpoints = new Array<vscode.SourceBreakpoint>();
+        positions.forEach((position) => {
+          var location = new vscode.Location(localUri, position);
+          breakpoints.push(new vscode.SourceBreakpoint(location));
+        });
+        vscode.debug.addBreakpoints(breakpoints);
       }
     }
+  }
 }
 
 // this method is called when your extension is deactivated
