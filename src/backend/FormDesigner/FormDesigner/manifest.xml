@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ItemID>954FCB25-2F5A-4989-BB1E-7BFEA293967A</ItemID>
+  <ItemName>FormDesigner</ItemName>
+  <IsMandatory>false</IsMandatory>
+  <ItemBehaviour>merge</ItemBehaviour>
+  <PackageDate>2023-11-17T10:44:51.5315501+01:00</PackageDate>
+  <PathReadMe />
+  <PathEULA />
+  <PathLogo />
+  <OverwriteLayer>false</OverwriteLayer>
+  <ApplicationCategoryCollection>
+    <ApplicationCategory>
+      <ItemID>541997AF-CAD0-47D7-8D06-C11BC73E40AA</ItemID>
+      <ItemName>SCM</ItemName>
+      <LayerId>300</LayerId>
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemIsSystem>N</ItemIsSystem>
+      <ApplicationCollection>
+        <Application>
+          <ItemID>FDDBD4BD-0429-46E0-9545-93F2E4B2BA32</ItemID>
+          <ItemName>FormDesigner</ItemName>
+          <LayerId>300</LayerId>
+          <ItemCategory>SCM</ItemCategory>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>merge</ItemBehaviour>
+          <FormCollection>
+            <Form>
+              <ItemID>1D09BB79-2D28-4594-8B03-26306F5C8AEC</ItemID>
+              <ItemName>FormDesigner</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Forms\HTML\FormDesigner</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ModesOfOperationImportMode>ignore</ModesOfOperationImportMode>
+              <OverwriteTransactionSettings>false</OverwriteTransactionSettings>
+              <FormType>HTML</FormType>
+            </Form>
+          </FormCollection>
+          <DataSourceCollection>
+            <DataSourceScript>
+              <ItemID>A96BA599-FDD5-4E8E-A0E7-42FCE867C1B4</ItemID>
+              <ItemName>dsBool</ItemName>
+              <LayerId>300</LayerId>
+              <ItemDescription>undefined</ItemDescription>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Data Sources\dsBool.ds</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>SQL</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </DataSourceScript>
+            <DataSourceScript>
+              <ItemID>7D020ACB-A27B-43B7-ACCF-C94CAE8A5F62</ItemID>
+              <ItemName>dsCboForms</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Data Sources\dsCboForms.ds</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>SQL</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </DataSourceScript>
+            <DataSourceScript>
+              <ItemID>967727EE-1F31-42E3-B32A-D560E652D61A</ItemID>
+              <ItemName>dsControlProperties</ItemName>
+              <LayerId>300</LayerId>
+              <ItemDescription>undefined</ItemDescription>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Data Sources\dsControlProperties.ds</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>SQL</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </DataSourceScript>
+            <DataSourceScript>
+              <ItemID>92CAE7E8-CF36-47A8-A334-043E2D10FFD8</ItemID>
+              <ItemName>dsForms</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Data Sources\dsForms.ds</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>SSL</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </DataSourceScript>
+          </DataSourceCollection>
+          <ServerScriptCollection>
+            <ServerScript>
+              <ItemID>A082A113-664E-461C-9D7A-FDD1905CCE2B</ItemID>
+              <ItemName>scGetFormCode</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Server Scripts\scGetFormCode.srvscr</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ServerScript>
+            <ServerScript>
+              <ItemID>8C84FC69-3671-45EB-AB4B-4323876C7558</ItemID>
+              <ItemName>scInitFormProperties</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Server Scripts\scInitFormProperties.srvscr</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ServerScript>
+          </ServerScriptCollection>
+          <ClientScriptCollection>
+            <ClientScript>
+              <ItemID>0DF5B87C-F163-413B-8010-ED18BDB85E0F</ItemID>
+              <ItemName>ContextMenu</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Client Scripts\ContextMenu.clientscript</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ClientScript>
+            <ClientScript>
+              <ItemID>2F57C813-B6E7-4425-A73D-96C9115FC20E</ItemID>
+              <ItemName>GUIFunctions</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Client Scripts\GUIFunctions.clientscript</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ClientScript>
+            <ClientScript>
+              <ItemID>34BE2829-428D-400D-9AD3-54AB11A8743A</ItemID>
+              <ItemName>ReadXML</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Client Scripts\ReadXML.clientscript</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ClientScript>
+            <ClientScript>
+              <ItemID>49986D66-2117-42FF-AA41-7326D5329477</ItemID>
+              <ItemName>SaveXML</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Client Scripts\SaveXML.clientscript</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ClientScript>
+            <ClientScript>
+              <ItemID>69071B46-06C9-4E5F-B9E9-8528C6F72BD4</ItemID>
+              <ItemName>TreeView</ItemName>
+              <LayerId>300</LayerId>
+              <ItemCategory>FORMDESIGNER</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Client Scripts\TreeView.clientscript</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ClientScript>
+          </ClientScriptCollection>
+        </Application>
+      </ApplicationCollection>
+    </ApplicationCategory>
+  </ApplicationCategoryCollection>
+  <LanguageCollection>
+    <Language>
+      <ItemID>ENG</ItemID>
+      <ItemName>English</ItemName>
+      <ItemDescription>English</ItemDescription>
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemFlag>
+        <ItemID>FEDE7B57-F733-8340-A311-77F05D153799</ItemID>
+        <ItemName>USA</ItemName>
+        <LayerId>300</LayerId>
+        <ItemDescription>USA.gif</ItemDescription>
+        <ItemCategory>FLAGS16X16</ItemCategory>
+        <ItemContent>Images\FLAGS16X16\USA.img</ItemContent>
+        <IsMandatory>false</IsMandatory>
+        <ItemBehaviour>overwrite</ItemBehaviour>
+        <ImageType />
+        <ColorDepth />
+        <ImageHeight>0</ImageHeight>
+        <ImageWidth>0</ImageWidth>
+        <Size>0</Size>
+      </ItemFlag>
+    </Language>
+  </LanguageCollection>
+  <TableCategoryCollection>
+    <TableCategory>
+      <ItemID>DICTIONARY</ItemID>
+      <ItemName>DICTIONARY</ItemName>
+      <LayerId>200</LayerId>
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemIsSystem>Y</ItemIsSystem>
+      <TableCollection>
+        <Table>
+          <ItemID>CBC76334-376E-4CD9-A806-9447B4BA2AAE</ItemID>
+          <ItemName>CONTROL_PROPERTIES</ItemName>
+          <LayerId>300</LayerId>
+          <ItemCategory>DICTIONARY</ItemCategory>
+          <ItemContent>Tables\DICTIONARY\CONTROL_PROPERTIES.xml</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>merge</ItemBehaviour>
+          <IsSystem>Y</IsSystem>
+        </Table>
+      </TableCollection>
+    </TableCategory>
+  </TableCategoryCollection>
+  <OverwriteCodeBehind>true</OverwriteCodeBehind>
+  <ImportGlobalResources>true</ImportGlobalResources>
+  <CompareTables>false</CompareTables>
+</Package>

@@ -1,0 +1,16 @@
+/********************************************************************************
+Description.. :	Get checked out forms for combobox
+DS Type...... : SQL
+Author....... : DC
+Date......... :	2023-11-03
+********************************************************************************/
+:DSN := DICTIONARY;
+:PARAMETERS sUserID := MYUSERNAME;
+
+select UPPER(ITEMID) as FORM_ID, A.DISPLAYTEXT + '.' + XF.DISPLAYTEXT + ' (' + SC.LANGID + ')' as FORM_NAME
+from LIMSSOURCECONTROL SC
+join LIMSXFDFORMS XF on SC.ITEMID = XF.FORMID
+join LIMSAPPLICATIONS A on XF.APPID = A.APPID
+where SC.ITEMTYPE='Form'
+and SC.DONE = '0'
+and SC.CHECKEDOUTBY = @sUserID

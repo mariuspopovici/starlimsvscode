@@ -126,8 +126,8 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!await enterpriseService.fileExists(eslintConfigFile)) {
     executeWithProgress(async () => {
       // copy .eslintrc and package.json to folder
-      const eslintConfig = context.asAbsolutePath("dist/eslint/.eslintrc.json");
-      const packageJson = context.asAbsolutePath("dist/eslint/package.json");
+      const eslintConfig = context.asAbsolutePath("src/client/eslint/.eslintrc.json");
+      const packageJson = context.asAbsolutePath("src/client/eslint/package.json");
       var fs = require('fs');
       fs.copyFileSync(eslintConfig, eslintConfigFile);
       fs.copyFileSync(packageJson, path.join(rootPath!, "package.json"));
@@ -1025,6 +1025,9 @@ export async function activate(context: vscode.ExtensionContext) {
         if (newItem !== undefined) {
           vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
         }
+        
+        // refresh checkout tree
+        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
       }
     }
   );

@@ -1,0 +1,7 @@
+/********************************************************************************
+Description.. :	Get form document from database and decode it
+Author....... :	DC
+Date......... : 2023-11-03
+*******************************************************************************/;
+:PARAMETERS sFormID, sLang;
+:RETURN MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument", {sFormID, sLang}));
