@@ -92,7 +92,7 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
     // open image picker for Image property
     if (eventArgs["column"].Id === "PROPERTY_VALUE" && sPropertyName.includes("Image"))
     {
-        var sImageID = await csShowForm("FormDesigner.dlgImagePicker");
+        var sImageID = await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgImagePicker"));
 
         // operation canceled
         if (sImageID == null)

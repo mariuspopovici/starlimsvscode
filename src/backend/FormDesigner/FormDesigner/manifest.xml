@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>D36DE88B-1158-4F8C-A707-903CE7AF48F6</ItemID>
+  <ItemID>61D7A2B3-B26D-45D8-86C4-1AB18FBBE383</ItemID>
   <ItemName>FormDesigner</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-11-17T11:53:50.9688817+01:00</PackageDate>
+  <PackageDate>2023-11-17T12:05:09.6080944+01:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -391,6 +391,6 @@
   </TableCategoryCollection>
   <RequiredPackageCollection />
   <OverwriteCodeBehind>true</OverwriteCodeBehind>
-  <ImportGlobalResources>true</ImportGlobalResources>
+  <ImportGlobalResources>false</ImportGlobalResources>
   <CompareTables>false</CompareTables>
 </Package>

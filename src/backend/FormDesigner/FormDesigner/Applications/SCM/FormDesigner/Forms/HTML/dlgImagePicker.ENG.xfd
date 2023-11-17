@@ -19,7 +19,7 @@
       <Id>btnNoImage</Id>
       <Guid>dcd6fd48-d042-49f4-b73a-9c1c3d880d77</Guid>
       <FromDesigner>true</FromDesigner>
-      <Text>Kein Bild</Text>
+      <Text>No Image</Text>
       <Visible>true</Visible>
       <Enabled>true</Enabled>
       <Left>664</Left>
@@ -32,7 +32,6 @@
       <Anchor>RIGHT,BOTTOM</Anchor>
       <TabIndex>0</TabIndex>
       <TabStop>true</TabStop>
-      <Image>htmlruntime/images/EE5AF9D5-8106-42C1-AE61-1CD89C2962FF</Image>
       <ImageAlign>LEFT</ImageAlign>
       <OnClick>btnNoImage_OnClick</OnClick>
       <VisualStyle>FLAT</VisualStyle>
@@ -111,19 +110,21 @@
       <Id>btnCancel</Id>
       <Guid>94ad7401-ffc0-488e-bb94-2534c785341a</Guid>
       <FromDesigner>true</FromDesigner>
-      <Text>Abbrechen</Text>
+      <Text>Cancel</Text>
       <Visible>true</Visible>
       <Enabled>true</Enabled>
       <Left>816</Left>
       <Top>549</Top>
       <Height>32</Height>
       <Width>127</Width>
+      <ForeColor>#804040</ForeColor>
+      <BackColor>#FFE0C0</BackColor>
       <Anchor>RIGHT,BOTTOM</Anchor>
       <TabIndex>0</TabIndex>
       <TabStop>true</TabStop>
       <ImageAlign>LEFT</ImageAlign>
       <OnClick>btnCancel_OnClick</OnClick>
-      <VisualStyle>ORANGE</VisualStyle>
+      <VisualStyle>FLAT</VisualStyle>
     </item>
   </__array__Controls>
   <Padding>0</Padding>
