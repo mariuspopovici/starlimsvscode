@@ -4,7 +4,7 @@
   <Id>Form1</Id>
   <Guid>B7E7FA6A-4680-47DF-A895-D7BA09A9B714</Guid>
   <FromDesigner>true</FromDesigner>
-  <Text>Bild auswählen</Text>
+  <Text>Select Image</Text>
   <Visible>true</Visible>
   <Enabled>true</Enabled>
   <Left>0</Left>
