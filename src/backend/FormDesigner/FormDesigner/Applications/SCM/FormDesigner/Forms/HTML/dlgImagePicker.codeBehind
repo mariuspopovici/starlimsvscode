@@ -1,0 +1,98 @@
+/*
+Description.. :	Image picker
+Author....... :	DC
+Date......... : 2022-09-30
+*/
+
+//BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
+
+var btnNoImage = form.All( "btnNoImage" ); // Button
+var pnlImages = form.All( "pnlImages" ); // Panel
+var cboImageCat = form.All( "cboImageCat" ); // ComboBox
+var btnCancel = form.All( "btnCancel" ); // Button
+
+//END_GLOBAL_DECLARATIONS
+
+const pad = 10;
+const size = 24;
+const xOff = 4 * size;
+const yOff = 3 * size;
+var posX = pad;
+var posY = pad;
+
+async function btnCancel_OnClick( sender, eventArgs )
+{
+	form.Close();
+}
+
+async function cboImageCat_OnSelectionChanged( sender, eventArgs )
+{
+	form.Variables["DS"] = lims.GetDataSet("FormDesigner.dsGetImages", [cboImageCat.SelectedValue]);
+	DrawImages();
+}
+
+async function AddImage(row)
+{
+	var img = new Image();
+	img.ImageSource = row["PREVIEW"];
+	img.ToolTip = row["IMAGENAME"];
+	img.Left = posX + (size - pad);
+	img.Top = posY;
+	img.Width = size;
+	img.Height = size;
+	img.DisplayMode = "STRETCH";
+	img.OnClick = "img_OnClick(sender, eventArgs);";
+	pnlImages.Controls.Add(img);
+	
+	var label = new Label();
+	label.Text = row["IMAGENAME"].substr(0,12);
+	label.Top = posY + size + pad;
+	label.Left = posX;
+	label.Font = "Open Sans, 9";
+	pnlImages.Controls.Add(label);
+
+	// adjust offsets
+	posX += xOff;
+	if(posX > pnlImages.Width - (3*size))
+	{
+		posX = pad;
+		posY += yOff;
+	}
+}
+
+async function DrawImages(bNoReload)
+{
+	pnlImages.Controls.Clear();
+	posX = posY = pad;
+
+	var ds = form.Variables["DS"];
+
+	pnlImages.mask("Loading Images...");
+	await Application.DoEvents();
+	
+	for(var row of ds.Tables[0].Rows)
+		AddImage(row);
+
+	pnlImages.unmask();
+}
+
+async function img_OnClick(sender, eventArgs)
+{
+	form.returnValue = sender.ImageSource;
+	form.Close();
+}
+
+async function Form1_OnLoad( sender, eventArgs )
+{
+}
+
+async function Form1_OnResized( sender, eventArgs )
+{
+	DrawImages();
+}
+
+async function btnNoImage_OnClick( sender, eventArgs )
+{
+    form.returnValue = "NONE";
+    form.Close();
+}

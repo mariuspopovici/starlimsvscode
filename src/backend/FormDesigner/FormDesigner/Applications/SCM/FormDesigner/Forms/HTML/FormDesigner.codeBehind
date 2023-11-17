@@ -3,7 +3,6 @@ Description.. :	HTML Forms Designer
 Author....... :	DC
 Date......... : 2623-07-11
 */
-#include "BMBH.HTML_csDialogs"
 #include "FormDesigner.ContextMenu"
 #include "FormDesigner.GUIFunctions"
 #include "FormDesigner.TreeView"
@@ -93,7 +92,7 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
     // open image picker for Image property
     if (eventArgs["column"].Id === "PROPERTY_VALUE" && sPropertyName.includes("Image"))
     {
-        var sImageID = await csShowForm("GenericDialogs.dlgImagePicker");
+        var sImageID = await csShowForm("FormDesigner.dlgImagePicker");
 
         // operation canceled
         if (sImageID == null)

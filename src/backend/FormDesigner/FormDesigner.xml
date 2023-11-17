@@ -367,6 +367,6 @@
   </TableCategoryCollection>
   <RequiredPackageCollection />
   <OverwriteCodeBehind>true</OverwriteCodeBehind>
-  <ImportGlobalResources>true</ImportGlobalResources>
+  <ImportGlobalResources>false</ImportGlobalResources>
   <CompareTables>false</CompareTables>
 </Package>
