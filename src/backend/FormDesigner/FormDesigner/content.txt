@@ -1,0 +1,35 @@
+Package Name: FormDesigner
+Package Date: 2023-11-17 12:09:14
+
+Exported languages: English.
+
+Application Category: SCM
+	Application: FormDesigner
+		HTML Forms: 
+			- dlgImagePicker
+			- dlgRootTableEditor
+			- FormDesigner
+		Data Sources: 
+			- dsBool
+			- dsCboForms
+			- dsControlProperties
+			- dsForms
+			- dsGetImageCategories
+			- dsGetImages
+		Server Scripts: 
+			- scGetFormCode
+			- scInitFormProperties
+
+
+Client Script Category: FormDesigner
+	- ContextMenu
+	- GUIFunctions
+	- ReadXML
+	- SaveXML
+	- TreeView
+
+
+Table database: DICTIONARY
+	- CONTROL_PROPERTIES
+
+

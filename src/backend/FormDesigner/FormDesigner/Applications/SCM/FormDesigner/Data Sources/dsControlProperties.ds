@@ -1,0 +1,11 @@
+/********************************************************************************
+Description.. :	Get control properties
+DS Type...... : SQL
+Author....... : DC
+Date......... :	2023-07-14
+********************************************************************************/
+:DSN := DICTIONARY;
+:PARAMETERS sControlType := "Button";
+select PROPERTY_NAME, DEFAULT_VALUE as PROPERTY_VALUE, PROPERTY_GROUP as ':'
+from CONTROL_PROPERTIES
+where CONTROL_TYPE = @sControlType

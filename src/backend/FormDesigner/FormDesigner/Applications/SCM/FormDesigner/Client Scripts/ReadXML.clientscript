@@ -1,0 +1,278 @@
+/********************************************************************************
+Description.. :	Read XML from database and create form
+Author....... :	DC
+Date......... : 2023-11-16
+********************************************************************************/
+const controlClasses = {
+    "Button": Button,
+    "ButtonBar": ButtonBar,
+    "CheckBox": CheckBox,
+    "CheckedListBox": CheckedListBox,
+    "ComboBox": ComboBox,
+    "DataGrid": DataGrid,
+    "DateTimePicker": DateTimePicker,
+    "Frame": Frame,
+    "GroupBox": GroupBox,
+    "Image": Image,
+    "Label": Label,
+    "Line": Line,
+    "LinkBar": LinkBar,
+    "LinkButton": LinkButton,
+    "LinkLabel": LinkLabel,
+    "ListBox": ListBox,
+    "ListView": ListView,
+    "MonthCalendar": MonthCalendar,
+    "MultiChoice": MultiChoice,
+    "Panel": Panel,
+    "ProgressBar": ProgressBar,
+    "RadioButton": RadioButton,
+    "ReportViewer": ReportViewer,
+    "RichTextBox": RichTextBox,
+    "Schedule": Schedule,
+    "ScriptEditor": ScriptEditor,
+    "SplitContainerH": StarlimsSplitContainerH,
+    "SplitContainerV": StarlimsSplitContainerV,
+    "SplitterPanel": StarlimsSplitterPanel,
+    "TabControl": TabControl,
+    "TabPage": TabPage,
+    "TextArea": TextArea,
+    "TextBox": TextBox,
+    "TreeNode": TreeNode,
+    "TreeView": TreeView,
+    "TreeListView": TreeListView,
+    "WebBrowser": WebBrowser
+};
+
+// create form with all controls from XML
+async function LoadFormFromXML(sXML)
+{
+    var xmlDoc = new DOMParser().parseFromString(sXML, "text/xml");
+    var formNode = xmlDoc.getElementsByTagName("Form")[0];
+    var newForm = await CreateControlFromXML(formNode);
+    newForm.Left = 240;
+    newForm.Top = 40;
+    await LoadCboControls();
+    return newForm;
+}
+
+// create javascript control from XML
+async function CreateControlFromXML(xmlNode, xmlParentNode)
+{
+    // skip text nodes
+    if (xmlNode.nodeName === "#text")
+        return;
+
+    var nodeElement = xmlNode.getElementsByTagName("xtype");
+    if (!nodeElement[0])
+        return;
+
+    var sType = nodeElement[0].textContent.replace("Starlims", "");
+    var sGuid = xmlNode.getElementsByTagName("Guid")[0].textContent;
+    var control;
+
+    if(sType === "Form")
+    {
+        control = Form1;
+        control.xType = "Form";
+
+        // set form width and height
+        control.Width = Number(xmlNode.getElementsByTagName("Width")[0].textContent);
+        control.Height = Number(xmlNode.getElementsByTagName("Height")[0].textContent);
+    }
+    else
+    {
+        // create new control
+        const controlClass = controlClasses[sType];
+        if (controlClass) {
+            control = new controlClass();
+            control.xType = sType;
+            control.guid = sGuid;
+        }
+        else
+        {
+            await Dialogs.MessageBox("Control " + sType + " not supported", "Error", "ERROR", "OKONLY");
+            return;
+        }
+    }
+
+    // set properties
+    for (let row of xmlNode.childNodes)
+    {
+        // skip text nodes
+        if (row.nodeName === "#text")
+            continue;
+
+        let sPropertyName = row.nodeName;
+        let value = row.textContent;
+
+        if (sPropertyName === "Guid")
+            continue;
+
+        // skip form title
+        if (control.xType === "Form" && sPropertyName === "Text")
+        {
+            control.title = "";
+            continue;
+        }
+
+        if (sPropertyName === "(Id)")
+            sPropertyName = "Id";
+
+        // convert function name to function
+        if (sPropertyName.includes("On") && value.includes("("))
+            value = eval(value);
+
+        // convert numeric string to number
+        if (!isNaN(value))
+            value = Number(value);
+
+        // convert boolean string to boolean
+        if (value === "true")
+            value = true;
+        else if (value === "false")
+            value = false;
+
+        // convert XML RootTable property to StarlimsDataGridTable object
+        if (sPropertyName === "RootTable")
+        {
+            // only one table supported by now
+            let table = new StarlimsDataGridTable();
+            table.xType = "StarlimsDataGridTable";
+
+            // load table properties
+            await LoadDataProperties(table);
+            value = new DOMParser().parseFromString(row.outerHTML, "text/xml");
+            table.Guid = GetProperty(value, "Guid");
+            table.DataMember = GetProperty(value, "DataMember");
+            table.Caption = GetProperty(value, "Caption");
+            table.RowHeight = Number(GetProperty(value, "RowHeight"));
+            table.TotalRow = GetProperty(value, "TotalRow") === "true";
+            table.GroupTotalRow = GetProperty(value, "GroupTotalRow") === "true";
+            table.TranslateAttrColumn = GetProperty(value, "TranslateAttrColumn") === "true";
+
+            // load columns by parsing xml data
+            for (let column of value.getElementsByTagName("__array__Columns")[0].childNodes)
+            {
+                // skip text nodes
+                if (column.nodeName === "#text")
+                    continue;
+
+                let gridColumn = new StarlimsDataGridColumn();
+                gridColumn.xType = "StarlimsDataGridColumn";
+                await LoadDataProperties(gridColumn);
+
+                gridColumn.Guid = GetProperty(column, "Guid");
+                gridColumn.Id = GetProperty(column, "Id");
+                gridColumn.Caption = GetProperty(column, "Caption") ? GetProperty(column, "Caption") : GetProperty(column, "Id");
+                gridColumn.Width = Number(GetProperty(column, "Width"));
+                gridColumn.ReadOnly = GetProperty(column, "ReadOnly") === "true";
+                gridColumn.Visible = GetProperty(column, "Visible") === "true";
+                gridColumn.DataMember = GetProperty(column, "DataMember");
+                gridColumn.Type = GetProperty(column, "Type");
+                gridColumn.TranslateDisplayColumn = GetProperty(column, "TranslateDisplayColumn") === "true";
+                gridColumn.CheckBoxTrueValue = GetProperty(column, "CheckBoxTrueValue");
+                gridColumn.CheckBoxFalseValue = GetProperty(column, "CheckBoxFalseValue");
+                gridColumn.CheckBoxNullValue = GetProperty(column, "CheckBoxNullValue");
+                gridColumn.TranslateDataColumn = GetProperty(column, "TranslateDataColumn") === "true";
+                gridColumn.TranslateAttrColumn = GetProperty(column, "TranslateAttrColumn") === "true";
+                gridColumn.GroupBy = GetProperty(column, "GroupBy") === "true";
+                gridColumn.CardCaption = GetProperty(column, "CardCaption") === "true";
+                gridColumn.CardIcon = GetProperty(column, "CardIcon") === "true";
+                gridColumn.AllowSize = GetProperty(column, "AllowSize") === "true";
+                gridColumn.AllowSort = GetProperty(column, "AllowSort") === "true";
+                gridColumn.AllowDrag = GetProperty(column, "AllowDrag") === "true";
+                gridColumn.CheckBoxTriState = GetProperty(column, "CheckBoxTriState") === "true";
+                gridColumn.WordWrap = GetProperty(column, "WordWrap") === "true";
+                gridColumn.MaxLines = Number(GetProperty(column, "MaxLines"));
+                gridColumn.TrimSpaces = GetProperty(column, "TrimSpaces") === "true";
+                gridColumn.FormatStringsToLocal = GetProperty(column, "FormatStringsToLocal") === "true";
+                table.Columns.Add(gridColumn);
+            }
+
+            control.RootTable = table;
+            continue;
+        }
+        control[sPropertyName] = value;
+    }
+
+    if (sType !== "Form")
+    {
+        LoadDataProperties(control);
+
+        // add control to hashtable
+        htControls.Add(control.Id, control);
+
+        // add control to outline tree
+        let parentNode = await GetNodeFromXML(xmlParentNode);
+        AddControlToOutline(control, parentNode);
+    }
+
+    if (sType === "TabControl")
+        ApplyContextMenu(control);
+
+    // get all child controls (only current level)
+    let allControls = Array.from(xmlNode.getElementsByTagName("__array__Controls"));
+    let aControls = allControls.filter(item => item.parentNode === xmlNode);
+
+    if (aControls && aControls.length > 0)
+    {
+        for (let child of aControls[0].childNodes)
+        {
+            let childControl = await CreateControlFromXML(child, xmlNode);
+
+            if (childControl && control.Controls && childControl.xType !== "TabPage")
+                control.Controls.Add(childControl);
+        }
+    }
+
+    // get all items (only current level)
+    let allItems = Array.from(xmlNode.getElementsByTagName("__array__Items"));
+    let aItems = allItems.filter(item => item.parentNode === xmlNode);
+
+    if (aItems && aItems.length > 0)
+    {
+        for (let item of aItems[0].childNodes)
+        {
+            let childControl = await CreateControlFromXML(item, xmlNode);
+
+            if (childControl && control.TabPages)
+                if (control.TabPages)
+                    control.TabPages.Add(childControl);
+        }
+    }
+    return control;
+}
+
+// get treePanel node from xml node 
+async function GetNodeFromXML(xmlNode)
+{
+    if (xmlNode)
+        return await FindNodeById(xmlNode.getElementsByTagName("Id")[0].textContent);
+    else
+        return treePanel.getRootNode().firstChild;
+}
+
+// get property value from xml node
+function GetProperty(column, name)
+{
+    var element = column.getElementsByTagName(name);
+    if (element.length > 0 && element[0].textContent)
+        return element[0].textContent;
+    else
+        return null;
+}
+
+// load control properties
+async function LoadDataProperties(control)
+{
+    let xmlProperties = await lims.GetData("FormDesigner.dsControlProperties", [control.xType]);
+    if(!xmlProperties)
+    {
+        await Dialogs.MessageBox("Error loading properties for control " + control.xType, "Error", "ERROR", "OKONLY");
+        return;
+    }
+
+    dgdProperties.Data = xmlProperties;
+    control.DataPropertiesXml = xmlProperties;
+    control.DataProperties = dgdProperties.DataSet.Tables[0].Select("PROPERTY_VALUE is not null");
+}

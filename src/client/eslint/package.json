@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "eslint-config-defaults": "^9.0.0",
+    "eslint-plugin-starlims": "^0.0.12"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0"
+  }
+}

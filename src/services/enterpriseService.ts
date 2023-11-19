@@ -1072,4 +1072,18 @@ export class EnterpriseService implements IEnterpriseService {
       return oParams;
     }
   }
+
+  /**
+   * Check if file exists
+   * @param filePath the file path of the enterprise item
+   * @returns true if the file exists, false otherwise
+   */
+  public fileExists(filePath: string): boolean {
+    try {
+      fs.accessSync(filePath, fs.constants.F_OK);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

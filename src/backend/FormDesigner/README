@@ -1,0 +1,10 @@
+FormDesigner
+------------
+
+Installation
+
+1. Import the FormDesigner.sdp package via STARLIMS Designer
+2. Copy the contents of the image folder to your STARLIMS server: [STARLIMS Web Root]/images/designer
+3. Execute the scInitFormProperties server script to populate the CONTROL_PROPERTIES table
+
+(TO DO: Write a SSL script to do all this automatically.)

@@ -1,0 +1,161 @@
+/*
+Description.. :	TreeView with drag n' drop support
+Author....... :	DC
+Date......... : 2023-11-08
+*/
+
+// extend treenode with control property
+Ext.define('ControlNode', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'control', type: 'auto' },
+        { name: 'properties', type: 'auto' }
+    ]
+});
+
+Ext.data.NodeInterface.decorate('ControlNode');
+
+const store = Ext.create('Ext.data.TreeStore', {
+    model: 'ControlNode',
+    root: {
+        text: 'Root',
+        expanded: true
+    }
+});
+
+// add custom extjs tree to tpOutline
+const treePanel = Ext.create('Ext.tree.Panel', {
+    title: 'Outline',
+    width: 200,
+    height: 300,
+    store: store,
+    rootVisible: false,
+    autoLoad: true,
+    viewConfig: {
+        plugins: {
+            ptype: 'treeviewdragdrop'
+        },
+        listeners: {
+            drop: function (node, data, overModel, dropPosition)
+            {
+                SetZIndex();
+
+                // reset control's position to new parent control position
+                data.records[0].data.control.getEl().setXY(overModel.data.control.getEl().getXY());
+            },
+            select: function (node, record)
+            {               
+                // set selected control
+                selectedControl = record.data.control;
+                UpdateSelectionFrame(selectedControl);
+            }
+        }
+    }
+});
+
+// use ext.componentquery to add tree to tpOutline
+Ext.ComponentQuery.query('tabpanel')[0].add(treePanel);
+
+// add control to outline tree
+async function AddControlToOutline(control, parentNode)
+{
+    if (!control)
+        return;
+
+    var isLeafNode = true;
+
+    // set parent node to root node if not set or not of valid type
+    if (!parentNode)
+        parentNode = treePanel.getRootNode().firstChild;
+
+    // check if control is leaf node
+    if (control.xType === "TabControl" || control.xType === "TabPage" || control.xType === "SplitterPanel" ||
+        control.xType === "Panel" || control.xType === "GroupBox" || control.xType === "TreeView" ||
+        control.xType === "DataGrid" || control.xType === "StarlimsDataGridTable")
+        isLeafNode = false;
+
+    // set icon
+    let icon;
+    if (control.xType === "TabPage")
+        icon = "images/designer/tabcontrol.png";
+    else
+    {
+        // get image from lbrControls
+        for (let item of lbrControls.Groups[0].Items)
+            if (item.Text === control.xType)
+            {
+                icon = item.Image;
+                break;
+            }
+    }
+
+    parentNode.set('leaf', false);
+    parentNode.set('expandable', true);
+
+    const newNode = Ext.create("ControlNode", {
+        text: control.Id,
+        icon: icon,
+        leaf: isLeafNode,
+        expandable: !isLeafNode,
+        control: control,
+        properties: control.DataProperties
+    });
+
+    // add node to tree
+    parentNode.appendChild(newNode);
+}
+
+// find tree node by id, starting from parentNode
+async function FindNodeById(id, parentNode)
+{
+    if (!parentNode)
+        parentNode = treePanel.getRootNode().firstChild;
+
+    if (parentNode.data.control.Id === id)
+        return parentNode;
+
+    for (let child of parentNode.childNodes)
+    {
+        if (child.data.control.Id === id)
+            return child;
+        else
+        {
+            let node = await FindNodeById(id, child);
+            if (node)
+                return node;
+        }
+    }
+}
+
+// calculate z-index of control according to position in treePanel
+async function SetZIndex(parentNode, level)
+{
+    // start from root node
+    if (!parentNode)
+        parentNode = treePanel.getRootNode().firstChild;
+
+    // start from level 0
+    if (!level)
+        level = 0;
+
+    let control = parentNode.data.control;
+
+    if (control.xType === "TabControl" || control.xType === "TabPage" || control.xType === "SplitterPanel" ||
+        control.xType === "Panel" || control.xType === "GroupBox" || control.xType === "TreeView" ||
+        control.xType === "DataGrid" || control.xType === "StarlimsDataGridTable")
+        ++level;
+
+    // set z-index as level
+    if(control.getEl === undefined)
+        return;
+
+    var element = control.getEl();
+    if(element)
+        element.setStyle('z-index', level);
+
+    // iterate through all nodes recursively
+    for (let child of parentNode.childNodes)
+    {
+        SetZIndex(child, level + 1);
+    }
+}

@@ -5,7 +5,10 @@ node_modules
 *.http
 apitest/*
 packages/*
-dist/*
+dist/*.js
+dist/*.js.map
+dist/*.css
+dist/*.sdp
 .vscode/*
 .DS_Store
 .vs/*
