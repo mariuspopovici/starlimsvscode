@@ -1,7 +1,34 @@
 Package Name: SCM_API
-Package Date: 2023-09-12 14:19:03
+Package Date: 2023-11-29 11:03:06
 
 Exported languages: English.
+
+Application Category: SCM
+	Application: FormDesigner
+		HTML Forms: 
+			- dlgImagePicker
+			- dlgRootTableEditor
+			- FormDesigner
+		Data Sources: 
+			- dsBool
+			- dsCboForms
+			- dsControlProperties
+			- dsForms
+			- dsGetImageCategories
+			- dsGetImages
+		Server Scripts: 
+			- scGetFormCode
+			- scInitFormProperties
+			- scInstall
+
+
+Client Script Category: FormDesigner
+	- ContextMenu
+	- GUIFunctions
+	- ReadXML
+	- SaveXML
+	- TreeView
+
 
 Server Script Category: SCM_API
 	- Add
@@ -18,6 +45,8 @@ Server Script Category: SCM_API
 	- GetSessions
 	- GlobalSearch
 	- ImportPackage
+	- Move
+	- Rename
 	- RunScript
 	- SaveCode
 	- Search
@@ -26,5 +55,9 @@ Server Script Category: SCM_API
 	- UndoCheckOut
 	- Utils
 	- Version
+
+
+Table database: DICTIONARY
+	- CONTROL_PROPERTIES
 
 

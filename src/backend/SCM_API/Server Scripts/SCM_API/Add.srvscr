@@ -89,10 +89,6 @@ oResponse := CreateUDObject({
 
 sFormLang := GetSetting("DEFAULTLANGUAGE");
 
-:IF sScriptLang == "SSL";
-	sScriptLang := "STARLIMS";
-:ENDIF;
-
 :DECLARE oUtils, sCategoryID, sAppID;
 oUtils := CreateUDObject("SCM_API.Utils", {});
 :TRY;
@@ -121,6 +117,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 		:CASE sItemType == "APPSS";
 			sAppName := sCategory + "." + sAppName;
 			sAppID := oUtils:GetItemGUID(sAppName, "APP");
+			sScriptLang := "STARLIMS";
 			DoProc("Enterprise_Data_Providers.AppServerScriptProvider.Add", {sAppID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
@@ -143,6 +140,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 
 		:CASE sItemType == "SS";
 			sCategoryID := oUtils:GetItemGUID(sCategory, "SSCATEGORY");
+			sScriptLang := "STARLIMS";
 			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 

@@ -1,0 +1,66 @@
+/********************************************************************************
+Description.. :	Performs installation tasks after package import
+Author....... :	MARIUS
+Date......... : 2023-11-28
+********************************************************************************/;
+:PARAMETERS sImportId, importer;
+:DEFAULT sImportId, "";
+:DECLARE sImportPath, sNewImagesPath, sDesignerImagesPath;
+
+sImportPath := GlbImpExpPath + sImportId;
+sNewImagesPath := sImportPath + "\SCM Images\";
+
+/* 
+ GetWebFolder() will return the correct path (e.g. c:\Inetpub\wwwroot\...)
+ when the package is deployed via the SCM import API. If this is imported from
+ the designer, because the importer runs inside a SubmitToBatch the folder will
+ not point to the webroot but rather the path of the worker process .exe
+; 
+sDesignerImagesPath := GetWebFolder() + "images\designer\";
+
+/* check if the designer images are included in this package and deploy them;
+:IF DosSupport("ISDIR", sNewImagesPath);
+	InfoMes("Deploying images to: " + sDesignerImagesPath);
+	DoProc("CopyContents", {sNewImagesPath, sDesignerImagesPath});
+:ENDIF;
+
+/* initialize control properties objects;
+InfoMes("Initializing form controls properties for the VSCode extension form designer");
+ExecFunction("FormDesigner.scInitFormProperties", {});
+
+:RETURN .T.;
+
+:PROCEDURE CopyContents;
+:PARAMETERS sSourcePath, sDestinationPath;
+	:DECLARE aFiles, i;
+	:IF !DOSSupport("ISDIR", sDestinationPath);
+		DosSupport("MD", sDestinationPath);
+	:ENDIF;
+	aFiles := DosSupport("DIR", sSourcePath);
+	:FOR i:=1 :TO Len(aFiles);
+		:DECLARE sFilePath, sDestinationFilePath;
+		sFilePath := sSourcePath + aFiles[i][1];
+		sDestinationFilePath := sDestinationPath + aFiles[i][1];
+		bOK := FileSupport(sFilePath, "COPY", sDestinationFilePath);
+	:NEXT;
+
+:ENDPROC;
+
+:PROCEDURE Move;
+:PARAMETERS sSourcePath, sDestinationPath;
+	:DECLARE Directory;
+	Directory := LimsNetConnect(,"System.IO.Directory");
+	:IF !DOSSupport("ISDIR", sDestinationPath);
+		Directory:Move(sSourcePath, sDestinationPath);
+	:ENDIF;
+:ENDPROC;
+
+:PROCEDURE GetSiteFolder;
+	:DECLARE appConfig, sFolder;
+	appConfig := LimsNetConnect(, "System.Configuration.ConfigurationManager");
+	sFolder := appConfig:AppSettings:Get("SiteFolder");
+	:IF Empty(sFolder);
+		RaiseError("The SiteFolder configuration is missing from the web.config file");
+	:ENDIF;
+	:RETURN sFolder + "\";
+:ENDPROC;

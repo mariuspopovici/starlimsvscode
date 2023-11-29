@@ -118,3 +118,4 @@ New features:
 - Rename items and categories
 - Move items
 - Misc. bug fixes
+- Support for ESLint in Javascript client scripts and form code behind with specific rules for STARLIMS objects and data types
