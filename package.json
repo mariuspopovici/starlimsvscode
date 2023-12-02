@@ -576,6 +576,11 @@
             ],
             "default": "chrome",
             "description": "Browser to use for debugging STARLIMS forms. Possible values: chrome, msedge"
+          },
+          "STARLIMS.urlSuffix": {
+            "type": "string",
+            "default": "lims",
+            "description": "The web service request url suffix"
           }
         }
       }

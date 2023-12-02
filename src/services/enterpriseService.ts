@@ -21,7 +21,12 @@ export class EnterpriseService implements IEnterpriseService {
   private SLVSCODE_FOLDER: string = "SLVSCODE";
   private checkedOutDocuments: Map<string, string> = new Map<string, string>();
   private secretStorage: vscode.SecretStorage;
+  /**
+   * STARLIMS web service request url suffix
+   */
+  private urlSuffix: string = "lims";
   public languages: string[] = [];
+  
 
   /**
    * Constructor
@@ -31,9 +36,12 @@ export class EnterpriseService implements IEnterpriseService {
     this.config = config;
     this.secretStorage = secretStorage;
     this.baseUrl = cleanUrl(config.url);
+    if (config.urlSuffix) {
+      this.urlSuffix = config.urlSuffix;
+    }
   }
   async moveItem(uri: string, destination: string) {
-    const url = `${this.baseUrl}/SCM_API.Move.lims?URI=${uri}&Destination=${destination}`;
+    const url = `${this.baseUrl}/SCM_API.Move.${this.urlSuffix}?URI=${uri}&Destination=${destination}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -64,7 +72,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @param newName the new name
    */
   async renameItem(uri: string, newName: string) {
-    const url = `${this.baseUrl}/SCM_API.Rename.lims?URI=${uri}&NewName=${newName}`;
+    const url = `${this.baseUrl}/SCM_API.Rename.${this.urlSuffix}?URI=${uri}&NewName=${newName}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -93,7 +101,7 @@ export class EnterpriseService implements IEnterpriseService {
    * Deploys the current version of the SCM_API.sdp on the STARLIMS server.
    */
   async upgradeBackend(sdpPackage: string) {
-    const url = `${this.baseUrl}/SCM_API.ImportPackage.lims`;
+    const url = `${this.baseUrl}/SCM_API.ImportPackage.${this.urlSuffix}`;
     let stats: fs.Stats;
     try {
       stats = fs.statSync(sdpPackage);
@@ -140,7 +148,7 @@ export class EnterpriseService implements IEnterpriseService {
    * Gets the extension backend API version.
    */
   async getVersion(): Promise<any> {
-    const url = `${this.baseUrl}/SCM_API.Version.lims`;
+    const url = `${this.baseUrl}/SCM_API.Version.${this.urlSuffix}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -170,7 +178,7 @@ export class EnterpriseService implements IEnterpriseService {
    */
   async getTableDefinition(uri: string) {
     const params = new URLSearchParams([["URI", uri]]);
-    const url = `${this.baseUrl}/SCM_API.TableDefinition.lims?${params}`;
+    const url = `${this.baseUrl}/SCM_API.TableDefinition.${this.urlSuffix}?${params}`;
     const headers = new Headers(await this.getAPIHeaders());
 
     const options: any = {
@@ -208,7 +216,7 @@ export class EnterpriseService implements IEnterpriseService {
       ["URI", uri],
       ["CommandType", type]
     ]);
-    const url = `${this.baseUrl}/SCM_API.TableCommand.lims?${params}`;
+    const url = `${this.baseUrl}/SCM_API.TableCommand.${this.urlSuffix}?${params}`;
     const headers = new Headers(await this.getAPIHeaders());
 
     const options: any = {
@@ -240,7 +248,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @param language the language of the new item
    */
   async addItem(itemName: string, itemType: string, language: string, categoryName: string, appName: string) {
-    const url = `${this.baseUrl}/SCM_API.Add.lims`;
+    const url = `${this.baseUrl}/SCM_API.Add.${this.urlSuffix}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "POST",
@@ -275,7 +283,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @param uri the URI of the remote script.
    */
   async runScript(uri: string) {
-    const url = `${this.baseUrl}/SCM_API.RunScript.lims`;
+    const url = `${this.baseUrl}/SCM_API.RunScript.${this.urlSuffix}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "POST",
@@ -316,7 +324,7 @@ export class EnterpriseService implements IEnterpriseService {
    */
   public async getEnterpriseItems(uri: string, bSilent: boolean = false) {
     const params = new URLSearchParams([["URI", uri]]);
-    const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.lims?${params}`;
+    const url = `${this.baseUrl}/SCM_API.GetEnterpriseItems.${this.urlSuffix}?${params}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -355,7 +363,7 @@ export class EnterpriseService implements IEnterpriseService {
       ["URI", uri],
       ["UserLang", language ?? ""]
     ]);
-    const url = `${this.baseUrl}/SCM_API.GetCode.lims?${params}`;
+    const url = `${this.baseUrl}/SCM_API.GetCode.${this.urlSuffix}?${params}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -393,7 +401,7 @@ export class EnterpriseService implements IEnterpriseService {
       ["URI", uri],
       ["UserLang", language ?? ""]
     ]);
-    const url = `${this.baseUrl}/SCM_API.CheckOut.lims?${params}`;
+    const url = `${this.baseUrl}/SCM_API.CheckOut.${this.urlSuffix}?${params}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -435,7 +443,7 @@ export class EnterpriseService implements IEnterpriseService {
       ["UserLang", language ?? ""],
       ["Reason", reason]
     ]);
-    const url = `${this.baseUrl}/SCM_API.CheckIn.lims?${params}`;
+    const url = `${this.baseUrl}/SCM_API.CheckIn.${this.urlSuffix}?${params}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -516,7 +524,7 @@ export class EnterpriseService implements IEnterpriseService {
   public async saveEnterpriseItemCode(uri: string, code: string, language: string) {
     // uncomment all occurences of '#include'
     code = code.replace(/^\/\/#include/gm, "#include");
-    const url = `${this.baseUrl}/SCM_API.SaveCode.lims`;
+    const url = `${this.baseUrl}/SCM_API.SaveCode.${this.urlSuffix}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "POST",
@@ -564,7 +572,7 @@ export class EnterpriseService implements IEnterpriseService {
    */
   public async clearLog(uri: string) {
     const user = uri.split("/")[2];
-    const url = `${this.baseUrl}/SCM_API.ClearLog.lims?User=${user}`;
+    const url = `${this.baseUrl}/SCM_API.ClearLog.${this.urlSuffix}?User=${user}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -642,7 +650,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the enterprise item found
    */
   public async searchForItems(itemName: string, itemType: string, isExactMatch: boolean = false): Promise<any> {
-    let url = `${this.baseUrl}/SCM_API.Search.lims?itemName=${itemName}&exactMatch=${isExactMatch}`;
+    let url = `${this.baseUrl}/SCM_API.Search.${this.urlSuffix}?itemName=${itemName}&exactMatch=${isExactMatch}`;
     if (itemType !== "") {
       url += `&itemType=${itemType}`;
     }
@@ -675,7 +683,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the enterprise items found
    */
   public async globalSearch(searchString: string, itemTypes: string): Promise<any> {
-    const url = `${this.baseUrl}/SCM_API.GlobalSearch.lims?searchString=${searchString}&itemTypes=${itemTypes}`;
+    const url = `${this.baseUrl}/SCM_API.GlobalSearch.${this.urlSuffix}?searchString=${searchString}&itemTypes=${itemTypes}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -705,7 +713,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns true if the item was deleted successfully, false otherwise
    */
   public async deleteItem(uri: string) {
-    const url = `${this.baseUrl}/SCM_API.Delete.lims?URI=${uri}`;
+    const url = `${this.baseUrl}/SCM_API.Delete.${this.urlSuffix}?URI=${uri}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -789,7 +797,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns object with ```aspnetsessionid``` and ```starlimssessionid```
    */
   private async getServerSessions() {
-    const url = `${this.baseUrl}/SCM_API.GetSessions.lims`;
+    const url = `${this.baseUrl}/SCM_API.GetSessions.${this.urlSuffix}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -843,7 +851,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the GUID of the enterprise item
    */
   public async getGUID(uri: string): Promise<string | null> {
-    const url = `${this.baseUrl}/SCM_API.GetItemGUID.lims?URI=${uri}`;
+    const url = `${this.baseUrl}/SCM_API.GetItemGUID.${this.urlSuffix}?URI=${uri}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -886,7 +894,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the checked out items
    */
   public async getCheckedOutItems(bAllUsers: boolean = false) {
-    const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.lims${bAllUsers ? "?allUsers=true" : ""}`;
+    const url = `${this.baseUrl}/SCM_API.GetCheckedOutItems.${this.urlSuffix}${bAllUsers ? "?allUsers=true" : ""}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -915,7 +923,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns true if all items were checked in successfully, false otherwise
    */
   public async checkInAllItems(reason: string | undefined) {
-    const url = `${this.baseUrl}/SCM_API.CheckInAll.lims?Reason=${reason}`;
+    const url = `${this.baseUrl}/SCM_API.CheckInAll.${this.urlSuffix}?Reason=${reason}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -947,7 +955,7 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns true if the item was checked in successfully, false otherwise
    */
   public async undoCheckOut(uri: string) {
-    const url = `${this.baseUrl}/SCM_API.UndoCheckOut.lims?URI=${uri}`;
+    const url = `${this.baseUrl}/SCM_API.UndoCheckOut.${this.urlSuffix}?URI=${uri}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
@@ -1002,7 +1010,7 @@ export class EnterpriseService implements IEnterpriseService {
    * Get available languages and store them in config
    */
   public async getLanguages() {
-    const url = `${this.baseUrl}/SCM_API.GetLanguages.lims`;
+    const url = `${this.baseUrl}/SCM_API.GetLanguages.${this.urlSuffix}`;
     const headers = new Headers(await this.getAPIHeaders());
     const options: any = {
       method: "GET",
