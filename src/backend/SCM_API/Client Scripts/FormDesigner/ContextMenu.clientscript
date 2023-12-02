@@ -1,0 +1,153 @@
+/*
+Description.. :	
+Author....... :	DC
+Date......... : 2023-10-27
+*/
+const DEFAULT = "";
+const ADD_TAB_PAGE = "Add Tab Page|htmlruntime/images/0D66B508-7742-DE45-A2B8-C53380801516";
+
+// extends a context menu with base functionality
+function ApplyContextMenu(control)
+{
+	if(control instanceof TabControl)
+	{
+        control.EnableContextMenu = true;
+        var oMenu = control.ContextMenu;
+        if(!oMenu)
+        {
+            oMenu = new Menu();
+            control.ContextMenu = oMenu;
+            __addItem(oMenu, form.Resources[ADD_TAB_PAGE], "__add_tab_page");
+        }
+    }
+	
+	// handle events
+	if(control.OnContextMenuClick)
+	{
+		if(!control.OnContextMenuClick.name !== "_newOnContextMenuClick")
+		{
+			let aux = control.OnContextMenuClick;
+			control.OnContextMenuClick = function _newOnContextMenuClick(sender, eventArgs) {
+				if (!__base_menu_OnContextMenuClick(sender, eventArgs))
+					aux(sender, eventArgs);
+			};
+		}
+	}
+	else
+		control.OnContextMenuClick = __base_menu_OnContextMenuClick;
+	
+	if (control.OnContextMenuPopup)
+	{
+		if (!control.OnContextMenuPopup.name !== "_newContextMenuPopup")
+		{
+			let aux = control.OnContextMenuPopup;
+			control.OnContextMenuPopup = function _newContextMenuPopup(sender, eventArgs) {
+				aux(sender, eventArgs);
+				__base_menu_OnContextMenuPopup(sender, eventArgs);
+			};
+		}
+	}
+	else
+		control.OnContextMenuPopup = "__base_menu_OnContextMenuPopup(sender, eventArgs)";
+}
+
+function __findByText(oMenu, sText, aAlternateTexts)
+{
+	var aTexts = aAlternateTexts;
+	if(!aTexts)
+		aTexts = [];
+
+	aTexts.push(sText);
+	for(let i of oMenu.Items)
+		for(let j of aTexts)
+			if(i.Text == aTexts[j])
+				return i;
+
+	return null;
+}
+
+function __addItem(oMenu, sText, sFunction, bAllowDuplicates, aAlternateTexts, sGroup, enabled = true)
+{
+	var sImage;
+	if(sText.includes("|"))
+	{
+		var aText = sText.split('|');
+		sText = aText[0];
+		sImage = aText[1];
+	}
+	else
+		sImage = form.Resources[DEFAULT];
+
+	if(!bAllowDuplicates && __findByText(oMenu, sText, aAlternateTexts))
+		return null;
+
+	var oParent = oMenu;
+	if(sGroup)
+	{
+		oParent = __findByText(oMenu, sGroup, []);
+		if(!oParent)
+		{
+			oParent = new MenuItem();	
+			oParent.Id = sGroup;
+			oParent.Text = sGroup;
+			oMenu.Items.Add(oParent);
+		}
+		if(!bAllowDuplicates && __findByText(oParent, sText, aAlternateTexts))
+			return null;
+	}
+	
+	if(!oParent)
+		oParent = oMenu;
+
+	var oItem = new MenuItem();	
+	oItem.Id = sText;
+	oItem.Text = sText;
+	oItem.Tag = {sFunction: sFunction};
+	oItem.Enabled = enabled;
+	oItem.icon = sImage;
+	oParent.Items.Add(oItem); 
+	return oItem;
+}
+
+function __add_separator(oMenu)
+{
+	var oItem = new MenuSeparator();
+	oMenu.Items.Add(oItem); 
+	return oItem;
+}
+
+function __add_header(oMenu, sText)
+{
+	var oItem = new MenuHeader();
+	oItem.Text = sText;
+	oMenu.Items.Add(oItem);
+	return oItem;
+}
+
+function __base_menu_OnContextMenuClick(sender, eventArgs)
+{
+	event.preventDefault();
+	var bHandled = false;
+	var oMenuItem = eventArgs["Menu"];
+
+    // differentiate from menu items from CreateAuditContextMenuEx
+	if(oMenuItem.Tag && oMenuItem.Tag.sFunction && !oMenuItem.Tag.IsBase) 
+	{
+		try
+		{
+			form.DisplayWaitMessage(true, "Loading...");
+			form.ExecFunction(oMenuItem.Tag.sFunction, [sender, eventArgs]);
+		}
+		finally
+		{
+			form.DisplayWaitMessage(false);
+		}
+		return true;
+	}
+	return bHandled;
+}
+
+function __base_menu_OnContextMenuPopup(sender, eventArgs)
+{
+    event.preventDefault();
+}

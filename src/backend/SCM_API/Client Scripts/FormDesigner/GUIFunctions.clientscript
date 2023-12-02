@@ -1,0 +1,759 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+/*
+Description.. :	GUI helper functions for FormDesigner
+Author....... :	DC
+Date......... : 2023-11-03
+*/
+var pnlSelected = new Panel();
+pnlSelected.Id = "pnlSelected";
+pnlSelected.Type = "Panel";
+pnlSelected.Visible = false;
+pnlSelected.BackColor = "Transparent";
+pnlSelected.setStyle("border", "1px dotted #f00");
+
+// create new form
+async function CreateEmptyForm()
+{
+    // create form panel
+    Form1.Id = "Form1";
+    Form1.Type = "Form";
+    Form1.Guid = System.Guid.NewGuid().ToString();
+    Form1.setStyle('border', '1px dotted black');
+    Form1.CloseOnEscape = false;
+    Form1.ValidateOnClose = false;
+    Form1.title = "";
+    htControls.Add(Form1.Id, Form1);
+    Form1.Controls.Add(pnlSelected);
+    selectedControl = Form1;
+
+    // load properties into grid
+    LoadDataProperties(Form1);
+
+    // clear extjs tree store
+    await treePanel.store.getRootNode().removeAll();
+  
+    var node = Ext.create("ControlNode", {
+        text: "Form1",
+        icon: 'htmlruntime/images/10B98BB5-80D7-B54B-A9BF-F87A586A5675',
+        leaf: true,
+        expandable: false,
+        control: Form1,
+        properties: Form1.DataPropertiesXml
+    });
+    
+    // add form to outline
+    treePanel.getRootNode().appendChild(node);
+    treePanel.getRootNode().expand(true);
+
+    // bind click event
+    $('[automation-id="Form1"]').click(function (event)
+    {
+        __control_OnClick(Form1, event);
+    });
+
+    selectedControl = Form1;
+}
+
+// add new control to form
+async function AddControl(controlType)
+{
+    var control;
+    switch (controlType)
+    {
+        case "Button":
+            control = new Button();
+            control.xType = "Button";
+            control.Width = 100;
+            control.Height = 26;
+            control.BackColor = "White";
+            control.ForeColor = "Black";
+            control.Image = "htmlruntime/images/3FCCF003-E470-428F-8AAF-8B96D4A43643";
+            control.ImageAlign = "LEFT";
+            control.VisualStyle = "FLAT";
+            break;
+        case "ButtonBar":
+            control = new ButtonBar();
+            control.xType = "ButtonBar";
+            control.Width = 200;
+            control.Height = 250;
+            control.BorderStyle = "SINGLE";
+            break;
+        case "CheckBox":
+            control = new CheckBox();
+            control.Width = 100;
+            control.Height = 26;
+            control.xType = "CheckBox";
+            break;
+        case "CheckedListBox":
+            control = new CheckedListBox();
+            control.Width = 300;
+            control.Height = 400;
+            control.xType = "CheckedListBox";
+            break;
+        case "ComboBox":
+            control = new ComboBox();
+            control.Width = 100;
+            control.Height = 26;
+            control.xType = "ComboBox";
+            break;
+        case "DataGrid":
+            control = new DataGrid();
+            control.xType = "DataGrid";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "DateTimePicker":
+            control = new DateTimePicker();
+            control.Width = 100;
+            control.Height = 26;
+            control.xType = "DateTimePicker";
+            break;
+        case "Frame":
+            control = new Frame();
+            control.Width = 500;
+            control.Height = 300;
+            control.xType = "Frame";
+            break;
+        case "GroupBox":
+            control = new GroupBox();
+            control.xType = "GroupBox";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "Image":
+            control = new Image();
+            control.xType = "Image";
+            control.Width = 32;
+            control.Height = 32;
+            break;
+        case "Label":
+            control = new Label();
+            control.Width = 100;
+            control.Height = 26;
+            control.xType = "Label";
+            break;
+        case "LinkBar":
+            control = new LinkBar();
+            control.xType = "LinkBar";
+            control.Width = 200;
+            control.Height = 250;
+            control.BorderStyle = "SINGLE";
+            break;
+        case "LinkButton":
+            control = new LinkButton();
+            control.xType = "LinkButton";
+            control.Width = 100;
+            control.Height = 26;
+            control.BackColor = "Transparent";
+            control.ForeColor = "Blue";
+            control.Image = "htmlruntime/images/3FCCF003-E470-428F-8AAF-8B96D4A43643";
+            control.ImageAlign = "LEFT";
+            control.VisualStyle = "FLAT";
+            break;
+        case "LinkLabel":
+            control = new LinkLabel();
+            control.xType = "LinkLabel";
+            control.Width = 100;
+            control.Height = 26;
+            control.BackColor = "Transparent";
+            control.ForeColor = "Blue";
+            control.VisualStyle = "FLAT";
+            break;
+        case "ListBox":
+            control = new ListBox();
+            control.xType = "ListBox";
+            control.Width = 300;
+            control.Height = 400;
+            break;
+        case "ListView":
+            control = new ListView();
+            control.xType = "ListView";
+            control.Width = 300;
+            control.Height = 400;
+            break;
+        case "MonthCalendar":
+            control = new MonthCalendar();
+            control.xType = "MonthCalendar";
+            control.Width = 200;
+            control.Height = 200;
+            break;
+        case "MultiChoice":
+            control = new MultiChoice();
+            control.xType = "MultiChoice";
+            control.Width = 300;
+            control.Height = 400;
+            break;
+        case "Panel":
+            control = new Panel();
+            control.xType = "Panel";
+            control.Width = 500;
+            control.Height = 300;
+            control.BorderStyle = "FIXEDSINGLE";
+            break;
+        case "ProgressBar":
+            control = new ProgressBar();
+            control.xType = "ProgressBar";
+            control.Width = 100;
+            control.Height = 26;
+            break;
+        case "RadioButton":
+            control = new RadioButton();
+            control.xType = "RadioButton";
+            control.Text = "RadioButton";
+            control.Width = 100;
+            control.Height = 26;
+            break;
+        case "ReportViewer":
+            control = new ReportViewer();
+            control.xType = "ReportViewer";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "RichTextBox":
+            control = new RichTextBox();
+            control.xType = "RichTextBox";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "Schedule":
+            control = new Schedule();
+            control.xType = "Schedule";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "ScriptEditor":
+            control = new ScriptEditor();
+            control.xType = "ScriptEditor";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "SplitContainerH":
+            control = new StarlimsSplitContainerH();
+            control.xType = "SplitContainerH";
+            control.FixedPanel = "PANEL1";
+            control.SplitterWidth = 3;
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "SplitContainerV":
+            control = new StarlimsSplitContainerV();
+            control.xType = "SplitContainerV";
+            control.FixedPanel = "PANEL1";
+            control.SplitterWidth = 3;
+            control.Width = 500;
+            control.Height = 300;
+            break;
+        case "TabControl":
+            control = new TabControl();
+            control.Id = controlType + (controlCounter++).toString();
+            control.xType = "TabControl";
+            control.Width = 500;
+            control.Height = 300;
+            control.Alignment = "TOP";
+            control.ShowCloseButton = false;
+            ApplyContextMenu(control);
+            break;
+        case "TextArea":
+            control = new TextArea();
+            control.xType = "TextArea";
+            control.Width = 200;
+            control.Height = 26;
+            break;
+        case "TextBox":
+            control = new TextBox();
+            control.xType = "TextBox";
+            control.Width = 100;
+            control.Height = 26;
+            break;
+        case "TreeListView":
+            control = new TreeListView();
+            control.xType = "TreeListView";
+            control.Width = 300;
+            control.Height = 400;
+            break;
+        case "TreeView":
+            control = new TreeView();
+            control.xType = "TreeView";
+            control.Width = 300;
+            control.Height = 400;
+            break;
+        case "WebBrowser":
+            control = new WebBrowser();
+            control.xType = "WebBrowser";
+            control.Width = 500;
+            control.Height = 300;
+            break;
+    }
+
+    // set initial properties
+    if (!control.Id)
+    {
+        let id = controlType + (controlCounter++).toString();
+        // check if id already exists
+        while (htControls.ContainsKey(id))
+            id = controlType + (controlCounter++).toString();
+        control.Id = id;
+    }
+    control.Text = control.Id;
+    control.Top = 20;
+    control.Left = 20;
+
+    LoadDataProperties(control);
+
+    // add control to form or as child of selected control
+    if (selectedControl.xType === "TabPage" ||
+        selectedControl.xType === "SplitContainerH" ||
+        selectedControl.xType === "SplitContainerV" ||
+        selectedControl.xType === "Panel" ||
+        selectedControl.xType === "GroupBox")
+        selectedControl.Controls.Add(control);
+    else
+        Form1.Controls.Add(control);
+
+    // add control to hashtable
+    htControls.Add(control.Id, control);
+    __control_OnClick(control, null);
+    LoadCboControls();
+
+    // add control to outline
+    let selectedNode = await FindNodeById(selectedControl.Id);
+    AddControlToOutline(control, selectedNode);
+    treePanel.getRootNode().expand(true);
+
+    // use jquery to bind click event
+    $('[automation-id="' + control.Id + '"]').click(function (event)
+    {
+        __control_OnClick(control, event);
+    });
+
+    // make control draggable
+    $('[automation-id="' + control.Id + '"]').mousedown(__control_OnDrag);
+}
+
+async function BindControlEvents(control)
+{
+    // bind click event
+    $('[automation-id="' + control.Id + '"]').click(function (event)
+    {
+        __control_OnClick(control, event);
+    });
+
+    if (control.Id !== "Form1")
+    {
+        // bind mouse drag event
+        $('[automation-id="' + control.Id + '"]').mousedown(__control_OnDrag);
+    }
+
+    // recursively bind events to child controls
+    if (control.Controls)
+    {
+        for (let i = 0; i < control.Controls.Count; ++i)
+            BindControlEvents(control.Controls[i]);
+    }
+}
+
+// load controls from hashtable to combobox
+async function LoadCboControls()
+{
+    cboControl.Items.Clear();
+
+    let keys = htControls.Keys;
+    for (let i = 0; i < keys.length; ++i)
+        cboControl.Items.Add(keys[i], keys[i] + " (" + htControls[keys[i]].xType + ")");
+
+    cboControl.SelectedValue = selectedControl.Id;
+}
+
+// loads control's properties on click
+async function __control_OnClick(sender, event)
+{
+    if (form.Variables["PreventClickEvents"] === true)
+        return;
+
+    // prevent other events from firing
+    form.Variables["PreventInputEvents"] = true;
+
+    var control = await sender;
+    if (control === undefined)
+        return;
+
+    // prevent parent form's click event
+    if (event != null)
+        event.stopPropagation();
+
+    // set new selected control
+    let controlId = control.Id;
+    selectedControl = form.All(controlId);
+    cboControl.SelectedValue = controlId;
+
+    // select node in outline treePanel
+    selectedNode = await FindNodeById(controlId);
+    treePanel.getSelectionModel().select(selectedNode);
+
+    // update selection frame
+    pnlSelected.Visible = true;
+    UpdateSelectionFrame(control);
+
+    // update properties grid
+    dgdProperties.Data = control.DataPropertiesXml;
+
+    // loop over data rows and set values
+    for (let i = 0; i < dgdProperties.RowCount; ++i)
+    {
+        let row = dgdProperties.DataSet.Tables[0].Rows[i];
+        let sPropertyName = row["PROPERTY_NAME"];
+        
+        // skip resources
+        if(sPropertyName === "Resources")
+            continue;
+
+        let value = control[sPropertyName];
+
+        if (value == null)
+            value = "";
+
+        // convert function to string and get only function name
+        if (sPropertyName.includes("On") && typeof value === "function")
+        {
+            value = value.toString().split("(")[0].replace("async ", "").replace("function ", "").Trim();
+            if (value == "__control_OnClick")
+                continue;
+        }
+
+        if (value.toString() === "true")
+            value = "True";
+        else if (value.toString() === "false")
+            value = "False";
+
+        if (sPropertyName === "(Id)")
+            value = control.Id;
+        
+        row["PROPERTY_VALUE"] = value;
+    }
+
+    dgdProperties.DataSet.AcceptChanges();
+    form.Variables["PreventInputEvents"] = false;
+}
+
+// make control draggable
+function __control_OnDrag(e)
+{
+    // prevent to drag parent elements
+    e.stopPropagation();
+
+    // get extjs control from currentTarget
+    let control = Ext.getCmp(this.id);
+
+    // move control when shift key is pressed
+    if (e.shiftKey)
+    {
+        pnlSelected.Visible = false;
+
+        var my_dragging = {};
+        my_dragging.pageX0 = e.pageX;
+        my_dragging.pageY0 = e.pageY;
+        my_dragging.elem = this;
+        my_dragging.offset0 = $(this).offset();
+
+        function handle_dragging(e)
+        {
+            pnlSelected.Visible = false;
+
+            var left = my_dragging.offset0.left + (e.pageX - my_dragging.pageX0);
+            var top = my_dragging.offset0.top + (e.pageY - my_dragging.pageY0);
+            $(my_dragging.elem).offset({ top: top, left: left });
+        }
+
+        function handle_mouseup()
+        {
+            pnlSelected.Visible = true;
+
+            // stop listening for movement and mouseup
+            $('body').off('mousemove', handle_dragging).off('mouseup', handle_mouseup);
+        }
+
+        $('body').on('mouseup', handle_mouseup).on('mousemove', handle_dragging);
+        return;
+    }
+
+    // resize control when ctrl key is pressed
+    if (e.ctrlKey)
+    {
+        var my_resizing = {};
+        my_resizing.pageX0 = e.pageX;
+        my_resizing.pageY0 = e.pageY;
+        my_resizing.elem = this;
+        my_resizing.offset0 = $(this).offset();
+        my_resizing.width0 = $(this).width();
+        my_resizing.height0 = $(this).height();
+
+        // resize handler
+        function handle_resizing(e)
+        {
+            var width = my_resizing.width0 + (e.pageX - my_resizing.pageX0);
+            var height = my_resizing.height0 + (e.pageY - my_resizing.pageY0);
+            $(my_resizing.elem).width(width).height(height);
+        }
+
+        function handle_mouseup(e)
+        {
+            control.Width = $(my_resizing.elem).width();
+            control.Height = $(my_resizing.elem).height();
+
+            // stop listening for movement and mouseup
+            $('body').off('mousemove', handle_resizing).off('mouseup', handle_mouseup);
+
+            UpdateSelectionFrame(control);
+        }
+
+        $('body').on('mouseup', handle_mouseup).on('mousemove', handle_resizing);
+    }
+}
+
+// delete selected control
+async function __control_OnDelete(control)
+{
+    // delete children first
+    if (control.Controls)
+    {
+        for (let i = control.Controls.Count - 1; i >= 0; --i)
+            __control_OnDelete(control.Controls[i]);
+    }
+
+    // delete control
+    control.Dispose();
+
+    // delete control from treeview
+    var node = await FindNodeById(control.Id);
+    node.remove();
+
+    // delete control from hashtable
+    htControls.Remove(control.Id);
+
+    // select form in cboControl
+    cboControl.SelectedValue = Form1.Id;
+    UpdateSelectionFrame(Form1);
+}
+
+// draw a selection frame around the selected control
+async function UpdateSelectionFrame(sender)
+{
+    $('[automation-id="pnlSelected"]').css("z-index", 9999);
+    $('[automation-id="pnlSelected"]').css("pointer-events", "none");
+
+    pnlSelected.Width = selectedControl.Width + 4;
+    pnlSelected.Height = selectedControl.Height + 4;
+
+    // iterate over all parents and add positions to get absolute position
+    let top = sender.Top? sender.Top : 0;
+    let left = sender.Left? sender.Left : 0;
+    let parent = sender.Parent;
+
+    while (parent && parent.Id !== "Form1")
+    {
+        top += parent.Top;
+        left += parent.Left;
+        parent = parent.Parent;
+    }
+    pnlSelected.Top = top - 2;
+    pnlSelected.Left = left - 2;
+}
+
+// add tab page to tab control
+async function __add_tab_page(sender, eventArgs)
+{
+    var tabControl = sender;
+    var tabPage = new TabPage();
+    tabPage.Id = tabControl.Id + "_tabPage_" + tabControl.TabPages.Count;
+    tabPage.Text = "New Tab";
+    tabPage.xType = "TabPage";
+    tabPage.Selected = false;
+    LoadDataProperties(tabPage);
+    tabControl.TabPages.Add(tabPage);
+    tabControl.SelectedPage = tabControl.TabPages.Count;
+
+    // bind click event
+    $('[automation-id="' + tabPage.Id + '"]').click(function (event)
+    {
+        __control_OnClick(tabPage, event);
+    });
+
+    htControls.Add(tabPage.Id, tabPage);
+    __control_OnClick(tabPage, null);
+    LoadCboControls();
+
+    // add tab page to outline
+    let selectedNode = await FindNodeById(tabControl.Id);
+    AddControlToOutline(tabPage, selectedNode);
+
+    selectedControl = tabPage;
+}
+
+function SetProperties(sPropertyName, sPropertyValue)
+{
+    // switch type of PROPERTY_VALUE column depending on PROPERTY_TYPE
+    var sColumn = dgdProperties.RootTable.Columns.FindById("PROPERTY_VALUE");
+
+    if (sPropertyValue === "True" || sPropertyValue === "False")
+    {
+        sColumn.Type = "ComboBox";
+        sColumn.DataArray = [["True", "True"], ["False", "False"]];
+        return;
+    }
+
+    switch (sPropertyName)
+    {
+        case "Anchor":
+            sColumn.Type = "UD";
+            break;
+        case "Align":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["BEGIN", "BEGIN"], ["MIDDLE", "MIDDLE"], ["END", "END"], ["STRETCH", "STRETCH"], ["STRETCHMAX", "STRETCHMAX"]];
+            break;
+        case "Alignment":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"]];
+            break;
+        case "CheckBehavior":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["MULTIPLE", "MULTIPLE"], ["MULTIPLEEXTENDED", "MULTIPLEEXTENDED"], ["SINGLE", "SINGLE"]];
+            break;
+        case "ContentOverflow":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["SCROLL", "SCROLL"], ["RESIZE", "RESIZE"], ["HIDE", "HIDE"], ["ANCHOR", "ANCHOR"]];
+            break;
+        case "DisplayMode":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["AUTO", "AUTO"], ["CENTER", "CENTER"], ["NORMAL", "NORMAL"], ["STRETCH", "STRETCH"]];
+            break;
+        case "FirstDayOfWeek":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["DEFAULT", "DEFAULT"], ["SUNDAY", "SUNDAY"], ["MONDAY", "MONDAY"], ["TUESDAY", "TUESDAY"], ["WEDNESDAY", "WEDNESDAY"], ["THURSDAY", "THURSDAY"], ["FRIDAY", "FRIDAY"], ["SATURDAY", "SATURDAY"]];
+            break;
+        case "Layout":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["ABSOLUTE", "ABSOLUTE"], ["HBOX", "HBOX"], ["VBOX", "VBOX"]];
+            break;
+        case "Pack":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["START", "START"], ["CENTER", "CENTER"], ["END", "END"]];
+            break;
+        case "BackgroundImage":
+        case "Image":
+            sColumn.Type = "UD";
+            break;
+        case "ImageAlign":
+            sColumn.Type = "ComboBox";
+            if (selectedcontrol.xType === "Button")
+                sColumn.DataArray = [["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["CENTER", "CENTER"]];
+            if (selectedcontrol.xType === "LinkButton")
+                sColumn.DataArray = [["LEFT", "LEFT"], ["MIDDLELEFT", "MIDDLELEFT"], ["RIGHT", "RIGHT"], ["MIDDLERIGHT", "MIDDLERIGHT"], ["TOP", "TOP"], ["TOPCENTER", "TOPCENTER"], ["BOTTOM", "BOTTOM"], ["BOTTOMCENTER", "BOTTOMCENTER"]];
+            break;
+        case "DataBindingBehavior":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["APPEND", "APPEND"], ["REPLACE", "REPLACE"], ["REPLACEUNSELECTED", "REPLACEUNSELECTED"]];
+            break;
+        case "DataLoadingBehavior":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["AUTOLOAD", "AUTOLOAD"], ["ONDEMAND", "ONDEMAND"], ["RESETDATA", "RESETDATA"]];
+        case "BackColor":
+        case "ForeColor":
+            sColumn.Type = "TEXTBOX";
+            break;
+        case "FixedPanel":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["PANEL1", "PANEL1"], ["PANEL2", "PANEL2"]];
+            break;
+        case "Font":
+            sColumn.Type = "UD";
+            break;
+        case "Format":
+            if (selectedcontrol.xType === "DateTimePicker")
+            {
+                sColumn.Type = "ComboBox";
+                sColumn.DataArray = [["SHORT", "SHORT"], ["LONG", "LONG"], ["TIME", "TIME"], ["CUSTOM", "CUSTOM"]];
+            }
+            else
+                sColumn.Type = "TextBox";
+            break;
+        case "FrameStyle":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["FRAME", "FRAME"], ["TOP", "TOP"], ["NONE", "NONE"]];
+            break;
+        case "ScriptLanguage":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["STARLIMS", "STARLIMS"], ["JSCRIPT", "JSCRIPT"], ["SQL", "SQL"], ["XML", "XML"]];
+            break;
+        case "TextAlign":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["Left", "Left"], ["Center", "Center"], ["Right", "Right"]];
+            break;
+        case "TextPosition":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["AFTER", "AFTER"], ["BEFORE", "BEFORE"]];
+            break;
+        case "BorderStyle":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["NONE", "NONE"], ["FIXEDSINGLE", "FIXEDSINGLE"], ["FIXED3D", "FIXED3D"]];
+            break;
+        case "RightToLeft":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["NONE", "NONE"], ["YES", "YES"], ["INHERIT", "INHERIT"]];
+            break;
+        case "Dock":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["NONE", "NONE"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["FILL", "FILL"]];
+            break;
+        case "Anchor":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["NONE", "NONE"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["TOPLEFT", "TOPLEFT"], ["TOPRIGHT", "TOPRIGHT"], ["BOTTOMLEFT", "BOTTOMLEFT"], ["BOTTOMRIGHT", "BOTTOMRIGHT"]];
+            break;
+        case "Cursor":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["Default", "Default"], ["Arrow", "Arrow"], ["Cross", "Cross"], ["Hand", "Hand"], ["Help", "Help"], ["IBeam", "IBeam"], ["No", "No"], ["SizeAll", "SizeAll"], ["SizeNESW", "SizeNESW"], ["SizeNS", "SizeNS"], ["SizeNWSE", "SizeNWSE"], ["SizeWE", "SizeWE"], ["UpArrow", "UpArrow"], ["Wait", "Wait"]];
+            break;
+        case "SelectionMode":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["NONE", "NONE"], ["ONE", "ONE"], ["MULTIPLE", "MULTIPLE"]];
+            break;
+        case "VisualStyle":
+            sColumn.Type = "ComboBox";
+            switch (selectedcontrol.xType)
+            {
+                case "Button":
+                    // BMBH custom styles
+                    sColumn.DataArray = [["FLAT", "FLAT"], ["RAISED", "RAISED"], ["GREEN", "GREEN"], ["ORANGE", "ORANGE"]];
+                    // STARLIMS standard styles
+                    //sColumn.DataArray = [["FLAT", "FLAT"], ["RAISED", "RAISED"]];
+                    break;
+                case "ButtonBar":
+                    sColumn.DataArray = [["CLASSIC", "CLASSIC"], ["OFFICE2003", "OFFICE2003"]];
+                    break;
+                case "LinkBar":
+                    sColumn.DataArray = [["OFFICE2003", "OFFICE2003"], ["CLASSIC", "CLASSIC"], ["XP", "XP"]];
+                    break;
+                case "DataGrid":
+                    sColumn.DataArray = [["DEFAULT", "DEFAULT"], ["STANDARD", "STANDARD"], ["OFFICE2003", "OFFICE2003"]];
+                    break;
+                case "TabControl":
+                    sColumn.DataArray = [["CLASSIC", "CLASSIC"], ["OFFICE2003", "OFFICE2003"], ["ELEGANT", "ELEGANT"]];
+                    break;
+            }
+            break;
+        case "HeaderStyle":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["CLICKABLE", "CLICKABLE"], ["NONCLICKABLE", "NONCLICKABLE"], ["NONE", "NONE"]];
+            break;
+        case "ViewMode":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["DETAILS", "DETAILS"], ["HLIST", "HLIST"], ["VLIST", "VLIST"]];
+            break;
+        case "Type":
+            sColumn.Type = "ComboBox";
+            sColumn.DataArray = [["Button", "Button"], ["ButtonBar", "ButtonBar"], ["CheckBox", "CheckBox"], ["ComboBox", "ComboBox"], ["DateTimePicker", "DateTimePicker"], ["Label", "Label"], ["ListBox", "ListBox"], ["ListView", "ListView"], ["RadioButton", "RadioButton"], ["TextBox", "TextBox"], ["TreeView", "TreeView"], ["TextArea", "TextArea"], ["Image", "Image"], ["Panel", "Panel"], ["GroupBox", "GroupBox"], ["TabControl", "TabControl"], ["DataGrid", "DataGrid"], ["SplitContainerH", "SplitContainerH"], ["SplitContainerV", "SplitContainerV"]];
+        default:
+            sColumn.Type = "TextBox";
+    }
+    return sColumn;
+}

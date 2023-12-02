@@ -1,0 +1,1 @@
+update limsVERSIONS set MAJOR = 0, MINOR = 0, BUILD = 1, DMAJOR = 0, DMINOR = 0, DBUILD = 0, CMAJOR = 0, CMINOR = 0, CBUILD = 0 where versionID = ?

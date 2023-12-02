@@ -1,0 +1,24 @@
+/********************************************************************************
+Description.. :	Display all images
+DS Type...... : STARLIMS
+Author....... : DC
+Date......... :	2022-09-30
+********************************************************************************/;
+:PARAMETERS sCategoryID := '5A4EBB7C-9C1C-4E1F-A96E-CE9DBE6551EC';
+:RETURN GetDataSetEx(
+"select
+IMAGEID,
+IMAGENAME,
+IMAGEDESCRIPTION,
+DISPLAYTEXT,
+HEIGHT,
+WIDTH,
+IMAGETYPE,
+COLORS,
+IMAGESIZE,
+TAG,
+LAYERID,
+'htmlruntime/images/' + IMAGEID as PREVIEW
+from LIMSIMAGES
+where CATEGORYID = '" + sCategoryID + "'
+order by IMAGENAME","DICTIONARY");

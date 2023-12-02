@@ -1,0 +1,12 @@
+/********************************************************************************
+Description.. :	Get image categories
+DS Type...... : SQL
+Author....... : DC
+Date......... :	2022-09-30
+********************************************************************************/
+:DSN := DICTIONARY;
+select 
+DISPLAYTEXT, 
+CATEGORYID as VALUETEXT
+from LIMSIMAGECATEGORIES
+order by DISPLAYTEXT
