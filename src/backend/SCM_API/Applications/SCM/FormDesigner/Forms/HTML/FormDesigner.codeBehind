@@ -160,6 +160,13 @@ async function dgdProperties_OnRowChange(sender, eventArgs)
 
 async function frmFormDesigner_OnLoad(sender, eventArgs)
 {
+    if(form.formArguments)
+    {
+        var sFormID = form.formArguments;
+        cboForm.SelectedValue = sFormID;
+        return;
+    }
+
     await CreateEmptyForm();
 
     // populate controls combobox

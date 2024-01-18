@@ -705,8 +705,38 @@ export async function activate(context: vscode.ExtensionContext) {
       // get the form GUID
       const formGuid = await enterpriseService.getGUID(remoteUri);
 
+      // get the language from the checked out item
+      const sLangId = item.language;
+
       // open form in default browser
-      const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`;
+      const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&LangId=${sLangId}&Debug=true`;
+      vscode.env.openExternal(vscode.Uri.parse(formUrl));
+    }
+  );
+
+  // register the edit HTML form command
+  vscode.commands.registerCommand("STARLIMS.DesignHTMLForm",
+    async (item: TreeEnterpriseItem | any) => {
+      // get item from editor if no item is defined (shortcut key pressed)
+      if (item === undefined) {
+        let editor = vscode.window.activeTextEditor;
+        item = editor?.document.uri;
+      }
+
+      // get remote path from local path if opened from editor context menu
+      let remoteUri;
+      if (item.uri === undefined) {
+        remoteUri = enterpriseService.getUriFromLocalPath(item.path);
+      }
+      else {
+        remoteUri = item.uri;
+      }
+
+      // get the form GUID
+      const formGuid = await enterpriseService.getGUID(remoteUri);
+
+      // open form in default browser
+      const formUrl = `${cleanUrl(config.url)}/starthtml.lims?FormId=1D09BB79-2D28-4594-8B03-26306F5C8AEC&LangId=ENG&Debug=true&FormArgs=%22${formGuid}%22`;
       vscode.env.openExternal(vscode.Uri.parse(formUrl));
     }
   );
@@ -738,6 +768,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // check if vscode debugger is already running
       const debuggerRunning = vscode.debug.activeDebugSession !== undefined;
 
+      // get the language from the checked out item
+      const sLangId = item.language;
+
       var debugConfig;
       if (!debuggerRunning) {
         // launch browser in debug mode
@@ -745,7 +778,7 @@ export async function activate(context: vscode.ExtensionContext) {
           type: browserType,
           name: "Launch STARLIMS Debugging",
           request: "launch",
-          url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`,
+          url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&LangId=${sLangId}&Debug=true`,
           webRoot: rootPath,
           userDataDir: path.join(context.globalStorageUri.fsPath, "edge"),
           runtimeArgs: [
@@ -770,7 +803,7 @@ export async function activate(context: vscode.ExtensionContext) {
             type: browserType,
             name: "Attach to STARLIMS Debugging",
             request: "attach",
-            url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&Debug=true`,
+            url: `${cleanUrl(config.url)}/starthtml.lims?FormId=${formGuid}&LangId=${sLangId}&Debug=true`,
             webRoot: rootPath,
             userDataDir: path.join(context.globalStorageUri.fsPath, "edge"),
             port: 9222
