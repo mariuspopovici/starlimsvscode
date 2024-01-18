@@ -1,11 +1,12 @@
 Package Name: SCM_API
-Package Date: 2023-11-29 11:03:06
+Package Date: 2024-01-18 09:58:59
 
 Exported languages: English.
 
 Application Category: SCM
 	Application: FormDesigner
 		HTML Forms: 
+			- dlgAnchor
 			- dlgImagePicker
 			- dlgRootTableEditor
 			- FormDesigner
@@ -28,6 +29,12 @@ Client Script Category: FormDesigner
 	- ReadXML
 	- SaveXML
 	- TreeView
+Client Script Category: FormDesigner
+	- ContextMenu
+	- GUIFunctions
+	- ReadXML
+	- SaveXML
+	- TreeView
 
 
 Server Script Category: SCM_API
@@ -37,6 +44,7 @@ Server Script Category: SCM_API
 	- CheckOut
 	- ClearLog
 	- Delete
+	- GetAllItems
 	- GetCheckedOutItems
 	- GetCode
 	- GetEnterpriseItems

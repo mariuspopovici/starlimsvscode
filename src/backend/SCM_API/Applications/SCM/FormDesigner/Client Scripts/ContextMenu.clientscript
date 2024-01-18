@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 /*
-Description.. :	
+Description.. :	Functions for implementing context menu
 Author....... :	DC
 Date......... : 2023-10-27
 */

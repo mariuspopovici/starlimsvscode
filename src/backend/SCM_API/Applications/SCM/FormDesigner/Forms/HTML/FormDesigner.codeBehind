@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 /*
 Description.. :	HTML Forms Designer
 Author....... :	DC
@@ -51,10 +53,7 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
     }
 
     // convert string to boolean
-    if (value === "True")
-        selectedControl[sPropertyName] = true;
-    else if (value === "False")
-        selectedControl[sPropertyName] = false;
+    value = value === "True" ? true : value === "False" ? false : value;
 
     switch (sPropertyName)
     {
@@ -79,6 +78,37 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
             return;
         case "Image":
             //selectedControl.Image = value;
+            return;
+        case "SelectedPage":
+            selectedControl.SelectedPage = value;
+            selectedControl.TabPages[value].Selected = true;
+            return;
+        case "Dock":
+            if(!value)
+                value = "NONE";
+            selectedControl.Dock = value;
+
+            if(value === "FILL" || value === "TOP" || value === "BOTTOM")
+            {
+                if(value === "TOP" || value === "FILL")
+                    selectedControl.Top = 0;
+                if(value === "BOTTOM")
+                    selectedControl.Top = selectedControl.Parent.Height - selectedControl.Height;
+                
+                selectedControl.Left = 0;
+                selectedControl.Width = selectedControl.Parent.Width;
+            }
+            if(value === "LEFT" || value === "RIGHT" || value === "FILL")
+            {
+                if(value === "LEFT" || value === "FILL")
+                    selectedControl.Left = 0;
+                if(value === "RIGHT")
+                    selectedControl.Left = selectedControl.Parent.Width - selectedControl.Width;
+                
+                selectedControl.Top = 0;
+                selectedControl.Height = selectedControl.Parent.Height;
+            }
+            UpdateSelectionFrame(selectedControl);
             return;
         default:
             selectedControl[sPropertyName] = value;
@@ -142,21 +172,32 @@ async function cboControl_OnSelectionChanged(sender, eventArgs)
 {
     if (form.Variables["PreventInputEvents"])
         return;
-
+    
     // load control properties into grid
     __control_OnClick(htControls[sender.SelectedValue], null);
 }
 
 async function btnSave_OnClick(sender, eventArgs)
 {
+    if(cboForm.SelectedText == "" || cboForm.SelectedText == null)
+        return;
+    
+    Form1.mask("Saving form...");
+    await Application.DoEvents();
+    
     var sAppName = cboForm.SelectedText.split(".")[0];
     var sFormName = cboForm.SelectedText.split(".")[1];
     var sFormLang = cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
     SaveForm(sAppName, sFormName, sFormLang);
+    
+    Form1.unmask();
 }
 
 async function cboForm_OnSelectionChanged(sender, eventArgs)
 {
+    Form1.mask("Loading...");
+    await Application.DoEvents();
+
     var sFormID = sender.SelectedValue;
 
     // use regex to get language from brackets in combobox text
@@ -166,7 +207,10 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
     var sXML = await lims.CallServer("FormDesigner.scGetFormCode", [sFormID, sFormLang]);
 
     if (!sXML)
+    {
+        Form1.unmask();
         return;
+    }
 
     // clear form
     if (Form1.Controls)
@@ -197,6 +241,8 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
 
     form.Variables["PreventInputEvents"] = false;
     form.Variables["PreventClickEvents"] = false;
+
+    Form1.unmask();
 }
 
 async function frmFormDesigner_OnCmdKeyPress( sender, eventArgs )

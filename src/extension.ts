@@ -1012,23 +1012,44 @@ export async function activate(context: vscode.ExtensionContext) {
 
       // create the item
       var sReturn = await enterpriseService.addItem(itemName, itemType, itemLanguage, categoryName, appName);
-
-      if (sReturn.length > 0) {
-        enterpriseTreeProvider.refresh();
-
-        // wait for the tree to refresh
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // open newly created item (works only if section is expanded)
-        var sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
-        var newItem = await enterpriseTreeProvider.getTreeItemByUri(sUri);
-        if (newItem !== undefined) {
-          vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
-        }
-        
-        // refresh checkout tree
-        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+      if (sReturn.length === 0) {
+        return;
       }
+
+      // ask for language for forms only
+      let language;
+      if (itemType === "XFDFORMXML" || itemType === "HTMLFORMXML") {
+        let oReturn = await vscode.window.showQuickPick(
+          languages,
+          {
+            placeHolder: "Select language",
+            ignoreFocusOut: true
+          }
+        );
+        language = oReturn.label;
+      }
+
+      // check out the item
+      let sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
+      let bSuccess = await enterpriseService.checkOutItem(sUri, language);
+      if (bSuccess) {
+        enterpriseTreeProvider.setItemCheckedOutStatus(selectedItem, true, language);
+        vscode.commands.executeCommand("STARLIMS.GetLocal", selectedItem);
+      }
+
+      enterpriseTreeProvider.refresh();
+
+      // wait for the tree to refresh
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // open newly created item (works only if section is expanded)
+      let newItem = await enterpriseTreeProvider.getTreeItemByUri(sUri);
+      if (newItem !== undefined) {
+        vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
+      }
+      
+      // refresh checkout tree
+      vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
     }
   );
 
@@ -1079,7 +1100,10 @@ export async function activate(context: vscode.ExtensionContext) {
           });
         }
         selectedItem = undefined;
+
+        // refresh trees
         enterpriseTreeProvider.refresh();
+        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
       }
     }
   );
@@ -1504,7 +1528,10 @@ export async function activate(context: vscode.ExtensionContext) {
       if (newName) {
         const bSuccess = await enterpriseService.renameItem(selectedItem.uri, newName);
         if (bSuccess) {
+          // refresh trees
           enterpriseTreeProvider.refresh();
+          vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+
           // close and delete (local copies) open documents with the old name
           const filteredTextDocuments = vscode.workspace.textDocuments.filter(td => td.fileName.indexOf(oldName) > 0);
           for (const td of filteredTextDocuments) {
@@ -1539,7 +1566,10 @@ export async function activate(context: vscode.ExtensionContext) {
       const itemName = aUri.pop() || "";
 
       const refreshTreeAndCloseEditors = async (itemName: string) => {
+        // refresh trees
         enterpriseTreeProvider.refresh();
+        vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+        
         // close and delete (local copies) open documents with the old name
         const filteredTextDocuments = vscode.workspace.textDocuments.filter(td => td.fileName.indexOf(itemName) > 0);
         for (const td of filteredTextDocuments) {

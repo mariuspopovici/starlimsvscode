@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 /*
 Description.. :	TreeView with drag n' drop support
 Author....... :	DC
@@ -48,6 +50,7 @@ const treePanel = Ext.create('Ext.tree.Panel', {
                 // set selected control
                 selectedControl = record.data.control;
                 UpdateSelectionFrame(selectedControl);
+                cboControl.SelectedValue = selectedControl.Id;
             }
         }
     }
@@ -103,6 +106,8 @@ async function AddControlToOutline(control, parentNode)
 
     // add node to tree
     parentNode.appendChild(newNode);
+    
+    return newNode;
 }
 
 // find tree node by id, starting from parentNode

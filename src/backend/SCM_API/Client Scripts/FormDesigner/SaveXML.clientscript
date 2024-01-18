@@ -1,5 +1,5 @@
 /********************************************************************************
-Description.. :	
+Description.. :	Save form as XML in database
 Author....... :	DC
 Date......... : 2023-11-16
 *******************************************************************************/
@@ -11,28 +11,26 @@ async function SaveForm(sApplicationName, sFormName, sFormLang)
     var sFormGUID = Form1.Guid;
     var sXML = '<?xml version="1.0"?>\n' +
     '<Form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.starlims.com/html">\n' +
-    '\t<Top>0</Top>\n' +
-    '\t<Left>0</Left>\n';
-
-    sXML += await GetXMLControl(formNode, "\t");
-    sXML += "\t<RecordId>ORIGREC</RecordId>\n";
-    sXML += "\t<FormType>" + sApplicationName + "." + sFormName + "</FormType>\n";
-    sXML += "\t<IsExtJS6Plus>true</IsExtJS6Plus>\n";
-    sXML += "\t<UseNewEventsOrder>true</UseNewEventsOrder>\n";
-    sXML += "\t<__array__Scripts>\n";
-    sXML += "\t\t<item>\n";
-    sXML += "\t\t\t<Id>__CodeBehind__</Id>\n";
-    sXML += "\t\t\t<Src>RUNTIME_SUPPORT.GetXFDFormCodeBehind.lims?FormId=" + sFormGUID + "</Src>\n";
-    sXML += "\t\t\t<ScriptLanguage>javascript</ScriptLanguage>\n";
-    sXML += "\t\t</item>\n";
-    sXML += "\t</__array__Scripts>\n";
-    sXML += "\t<Resources>\n";
-    sXML += "\t\t<Data>RUNTIME_SUPPORT.GetFormResources.lims?formID=" + sFormGUID + "&amp;languageID=" + sFormLang + "&amp;isProgramatic=Y</Data>\n";
-    sXML += "\t\t<KeyItem>ResourceId</KeyItem>\n";
-    sXML += "\t\t<TextItem>ResourceValue</TextItem>\n";
-    sXML += "\t\t<ResolveEscapeChars>true</ResolveEscapeChars>\n";
-    sXML += "\t</Resources>\n";
-    sXML += "</Form>\n";
+    await GetXMLControl(formNode, "\t") +
+    "\t<RecordId>ORIGREC</RecordId>\n" +
+    "\t<FormType>" + sApplicationName + "." + sFormName + "</FormType>\n" +
+    "\t<IsExtJS6Plus>true</IsExtJS6Plus>\n" +
+    "\t<UseNewEventsOrder>true</UseNewEventsOrder>\n" +
+    "\t<__array__Scripts>\n" +
+    "\t\t<item>\n" +
+    "\t\t\t<Id>__CodeBehind__</Id>\n" +
+    "\t\t\t<Src>RUNTIME_SUPPORT.GetXFDFormCodeBehind.lims?FormId=" + sFormGUID + "</Src>\n" +
+    "\t\t\t<ScriptLanguage>javascript</ScriptLanguage>\n" +
+    "\t\t</item>\n" +
+    "\t</__array__Scripts>\n" +
+    "\t<Resources>\n" +
+    "\t\t<Data>RUNTIME_SUPPORT.GetFormResources.lims?formID=" + sFormGUID + "&amp;languageID=" + sFormLang + "&amp;isProgramatic=Y</Data>\n" +
+    "\t\t<KeyItem>ResourceId</KeyItem>\n" +
+    "\t\t<TextItem>ResourceValue</TextItem>\n" +
+    "\t\t<ResolveEscapeChars>true</ResolveEscapeChars>\n" +
+    "\t</Resources>\n" +
+    "</Form>\n";
+    //console.log(sXML);
     lims.CallServer("Enterprise_Data_Providers.FormProvider.SaveXFDDocument", [sFormGUID, sFormLang, sXML]);
 }
 
@@ -47,11 +45,10 @@ async function GetXMLProperties(control, sIndentation = "")
 {
     var sXML = "";
     var aProperties = control.DataProperties;
-
-    if (!control.xType.includes("Starlims"))
-        sXML += sIndentation + "<xtype>Starlims" + control.xType + "</xtype>\n";
-    else
-        sXML += sIndentation + "<xtype>" + control.xType + "</xtype>\n";
+    
+    // add "Starlims" to control type
+    var sType = control.xType.includes("Starlims") ? control.xType : "Starlims" + control.xType;
+    sXML += sIndentation + "<xtype>" + sType + "</xtype>\n";
 
     // add guid and id
     if (!control.Guid)
@@ -78,7 +75,7 @@ async function GetXMLProperties(control, sIndentation = "")
         if (value === undefined || value === null || value === "" || value === "default")
             continue;
 
-        if (control.xType === "TabPage")
+        if (control.xType === "TabPage" || control.xType === "Form")
         {
             if (sPropertyName === "Top")
                 value = 0;
@@ -93,6 +90,12 @@ async function GetXMLProperties(control, sIndentation = "")
             if (value == "__control_OnClick")
                 continue;
         }
+        if(control.xType === "SplitterPanel")
+        {
+            if(sPropertyName === "FixedPanel")
+                value = value.toUpperCase();
+        }
+
         sXML += sIndentation + "<" + sPropertyName + ">" + value + "</" + sPropertyName + ">\n";
     }
     return sXML;
@@ -103,6 +106,7 @@ async function GetXMLControl(node, sIndentation = "")
 {
     var control = node.data.control;
     var sXML = "";
+
     if (!control.xType)
     {
         await Dialogs.MessageBox("Control " + control.Id + " not supported", "Error", "ERROR", "OKONLY");
@@ -113,7 +117,7 @@ async function GetXMLControl(node, sIndentation = "")
          // add xsi item tag for regular controls only
         if (isExtendedControl(control.xType))
             sXML += sIndentation + "<item>\n";
-        else
+        else if (control.xType !== "SplitterPanel")
             sXML += sIndentation + "<item xsi:type=\"" + control.xType + "\">\n";
 
         sIndentation += "\t";
@@ -123,9 +127,10 @@ async function GetXMLControl(node, sIndentation = "")
     sXML += await GetXMLProperties(control, sIndentation);
 
     // iterate over child controls
-    if (node.childNodes.length > 0 && control.xType != "TabControl")
+    if (node.childNodes.length > 0 && control.xType != "TabControl" &&
+        !control.xType.includes("SplitContainer"))
     {
-        sXML += sIndentation + "\t<__array__Controls>\n";
+        sXML += sIndentation + "<__array__Controls>\n";
 
         for (let childNode of node.childNodes)
         {
@@ -134,8 +139,11 @@ async function GetXMLControl(node, sIndentation = "")
             else
                 sXML += await GetXMLControl(childNode, sIndentation + "\t");
         }
-        sXML += sIndentation + "\t</__array__Controls>\n";
+        sXML += sIndentation + "</__array__Controls>\n";
     }
+
+    if(control.xType.includes("SplitContainer"))
+        sXML += sIndentation + "<__array__Controls/>\n";
 
     // iterate over tab pages
     if (control.xType == "TabControl" && control.TabPages.Count > 0)
@@ -148,6 +156,17 @@ async function GetXMLControl(node, sIndentation = "")
             sXML += await GetXMLControl(tabPageNode, sIndentation + "\t");
         }
         sXML += sIndentation + "</__array__Items>\n";
+    }
+
+    // generate splitter panels
+    if (control.xType.includes("SplitContainer"))
+    {
+        sXML += sIndentation + "<Panel1>\n";
+        sXML += await GetXMLControl(node.childNodes[0], sIndentation);
+        sXML += sIndentation + "</Panel1>\n";
+        sXML += sIndentation + "<Panel2>\n";
+        sXML += await GetXMLControl(node.childNodes[1], sIndentation);
+        sXML += sIndentation + "</Panel2>\n";
     }
 
     // add root table definition to DataGrid
@@ -169,10 +188,12 @@ async function GetXMLControl(node, sIndentation = "")
         sXML += sIndentation + "\t<__array__ChildTables />\n";
         sXML += sIndentation + "</RootTable>\n";
     }
-
+    
     // add item tag for controls only
-    if (control.xType !== "Form")
+    if (control.xType !== "Form" && control.xType !== "SplitterPanel")
+    {
+        sIndentation = sIndentation.slice(0, -1);
         sXML += sIndentation + "</item>\n";
-
+    }
     return sXML;
 }

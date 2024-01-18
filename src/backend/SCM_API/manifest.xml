@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>A5725F8E-2F1A-44F3-83C2-A888B17461BA</ItemID>
+  <ItemID>56BB65B3-81FD-4E36-A6FA-2FDF736C1505</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2023-11-29T11:03:06.4780611-05:00</PackageDate>
+  <PackageDate>2024-01-18T09:58:59.8797461+01:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
   <OverwriteLayer>false</OverwriteLayer>
   <ApplicationCategoryCollection>
     <ApplicationCategory>
-      <ItemID>CA9FF855-5AD6-4A96-B227-4C53D2E54CEE</ItemID>
+      <ItemID>541997AF-CAD0-47D7-8D06-C11BC73E40AA</ItemID>
       <ItemName>SCM</ItemName>
       <LayerId>300</LayerId>
       <ItemDescription />
@@ -20,7 +20,7 @@
       <ItemIsSystem>N</ItemIsSystem>
       <ApplicationCollection>
         <Application>
-          <ItemID>EABA43B9-35B8-4B92-A745-9E7494034E5B</ItemID>
+          <ItemID>FDDBD4BD-0429-46E0-9545-93F2E4B2BA32</ItemID>
           <ItemName>FormDesigner</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -28,6 +28,21 @@
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>merge</ItemBehaviour>
           <FormCollection>
+            <Form>
+              <ItemID>920AC6E3-7D79-4C55-AF50-A6FF75C4EDFE</ItemID>
+              <ItemName>dlgAnchor</ItemName>
+              <LayerId>300</LayerId>
+              <ItemDescription />
+              <ItemCategory>FormDesigner</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Forms\HTML\dlgAnchor</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ClientScripts />
+              <ModesOfOperationImportMode>ignore</ModesOfOperationImportMode>
+              <OverwriteTransactionSettings>false</OverwriteTransactionSettings>
+              <FormType>HTML</FormType>
+              <IsOffline>N</IsOffline>
+            </Form>
             <Form>
               <ItemID>8CD67603-2A55-447C-8F39-FF6425FF2378</ItemID>
               <ItemName>dlgImagePicker</ItemName>
@@ -275,9 +290,9 @@
   </ApplicationCategoryCollection>
   <ServerScriptCategoryCollection>
     <ServerScriptCategory>
-      <ItemID>069AD641-5BC8-4D98-84CD-8B1B1D3E6C95</ItemID>
+      <ItemID>7C117241-417D-442D-80B6-BAD7797E8EF2</ItemID>
       <ItemName>SCM_API</ItemName>
-      <LayerId>300</LayerId>
+      <LayerId>200</LayerId>
       <ItemDescription />
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
@@ -323,7 +338,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>55796A78-5B64-4CF4-A11D-662C95991EDC</ItemID>
+          <ItemID>FFC413EC-2528-49EB-861A-AA0582F5E87C</ItemID>
           <ItemName>CheckOut</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -362,6 +377,19 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>78452D93-5054-4EAB-93FC-F040AC922458</ItemID>
+          <ItemName>GetAllItems</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\GetAllItems.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>313EF809-5DDC-4DB7-9802-4E75A977F60F</ItemID>
           <ItemName>GetCheckedOutItems</ItemName>
           <LayerId>300</LayerId>
@@ -375,7 +403,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>2125F634-42D7-4E95-B40D-B376A7F2F87F</ItemID>
+          <ItemID>7ECC5228-ED06-43BF-B627-03BB7175C7EE</ItemID>
           <ItemName>GetCode</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -388,7 +416,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>C70E01EB-5FBA-46E6-912B-A04C6127A0C8</ItemID>
+          <ItemID>043FFF7C-4B7D-4635-88C0-5FD0D63BC283</ItemID>
           <ItemName>GetEnterpriseItems</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -440,7 +468,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>E3AF9503-008A-4D3B-AB38-D56B91ADA572</ItemID>
+          <ItemID>5A682FAB-C29C-4E87-9831-8A4F7361A817</ItemID>
           <ItemName>GlobalSearch</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -492,7 +520,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>93E4A929-6C67-447E-93F8-AC10BCBC8389</ItemID>
+          <ItemID>13E60EDB-1664-4520-9D30-347F58C2E64E</ItemID>
           <ItemName>RunScript</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -570,7 +598,7 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
-          <ItemID>1FA459E1-CB06-4C9E-9A59-10B2FF946C43</ItemID>
+          <ItemID>9A8D0E66-A2B3-4B18-8C6A-83C66BF7F9BE</ItemID>
           <ItemName>Utils</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />
@@ -600,7 +628,84 @@
   </ServerScriptCategoryCollection>
   <ClientScriptCategoryCollection>
     <ClientScriptCategory>
-      <ItemID>AB6AE797-5900-45C5-897A-53F2472BF24A</ItemID>
+      <ItemID>63E1CB3B-3C01-4AEF-83E2-E2B7F1CD633F</ItemID>
+      <ItemName>FormDesigner</ItemName>
+      <LayerId>300</LayerId>
+      <ItemDescription />
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemIsSystem>N</ItemIsSystem>
+      <ClientScriptCollection>
+        <ClientScript>
+          <ItemID>0DF5B87C-F163-413B-8010-ED18BDB85E0F</ItemID>
+          <ItemName>ContextMenu</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\ContextMenu.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>2F57C813-B6E7-4425-A73D-96C9115FC20E</ItemID>
+          <ItemName>GUIFunctions</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\GUIFunctions.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>34BE2829-428D-400D-9AD3-54AB11A8743A</ItemID>
+          <ItemName>ReadXML</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\ReadXML.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>49986D66-2117-42FF-AA41-7326D5329477</ItemID>
+          <ItemName>SaveXML</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\SaveXML.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>69071B46-06C9-4E5F-B9E9-8528C6F72BD4</ItemID>
+          <ItemName>TreeView</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\TreeView.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+      </ClientScriptCollection>
+      <Hidden>true</Hidden>
+    </ClientScriptCategory>
+    <ClientScriptCategory>
+      <ItemID>FDDBD4BD-0429-46E0-9545-93F2E4B2BA32</ItemID>
       <ItemName>FormDesigner</ItemName>
       <LayerId>300</LayerId>
       <ItemDescription />
@@ -677,6 +782,7 @@
       <Hidden>true</Hidden>
     </ClientScriptCategory>
   </ClientScriptCategoryCollection>
+  <DataSourceCategoryCollection />
   <LanguageCollection>
     <Language>
       <ItemID>ENG</ItemID>
@@ -705,14 +811,14 @@
     <TableCategory>
       <ItemID>DICTIONARY</ItemID>
       <ItemName>DICTIONARY</ItemName>
-      <LayerId>300</LayerId>
+      <LayerId>200</LayerId>
       <ItemDescription>Connection to DICTIONARY</ItemDescription>
       <IsMandatory>false</IsMandatory>
       <ItemBehaviour>merge</ItemBehaviour>
       <ItemIsSystem>Y</ItemIsSystem>
       <TableCollection>
         <Table>
-          <ItemID>15A3F8CB-2F7B-4C98-BA59-8FA367542412</ItemID>
+          <ItemID>CBC76334-376E-4CD9-A806-9447B4BA2AAE</ItemID>
           <ItemName>CONTROL_PROPERTIES</ItemName>
           <LayerId>300</LayerId>
           <ItemDescription />

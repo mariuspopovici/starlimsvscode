@@ -295,7 +295,10 @@ async function AddControl(controlType)
             id = controlType + (controlCounter++).toString();
         control.Id = id;
     }
-    control.Text = control.Id;
+
+    if(control.xType != "TabControl")
+        control.Text = control.Id;
+
     control.Top = 20;
     control.Left = 20;
 
@@ -303,13 +306,15 @@ async function AddControl(controlType)
 
     // add control to form or as child of selected control
     if (selectedControl.xType === "TabPage" ||
-        selectedControl.xType === "SplitContainerH" ||
-        selectedControl.xType === "SplitContainerV" ||
+        selectedControl.xType === "SplitterPanel" ||
         selectedControl.xType === "Panel" ||
         selectedControl.xType === "GroupBox")
         selectedControl.Controls.Add(control);
     else
+    {
+        selectedControl = Form1;
         Form1.Controls.Add(control);
+    }
 
     // add control to hashtable
     htControls.Add(control.Id, control);
@@ -333,6 +338,9 @@ async function AddControl(controlType)
 
 async function BindControlEvents(control)
 {
+    // remove existing click event
+    $('[automation-id="' + control.Id + '"]').off("click");
+
     // bind click event
     $('[automation-id="' + control.Id + '"]').click(function (event)
     {
@@ -351,6 +359,12 @@ async function BindControlEvents(control)
         for (let i = 0; i < control.Controls.Count; ++i)
             BindControlEvents(control.Controls[i]);
     }
+
+    // recursively bind events to child panels
+    if(control.Panel1)
+        BindControlEvents(control.Panel1);
+    if(control.Panel2)
+        BindControlEvents(control.Panel2);
 }
 
 // load controls from hashtable to combobox
@@ -378,7 +392,7 @@ async function __control_OnClick(sender, event)
     if (control === undefined)
         return;
 
-    // prevent parent form's click event
+    // prevent parent control click event
     if (event != null)
         event.stopPropagation();
 
@@ -539,16 +553,18 @@ async function __control_OnDelete(control)
 // draw a selection frame around the selected control
 async function UpdateSelectionFrame(sender)
 {
-    $('[automation-id="pnlSelected"]').css("z-index", 9999);
-    $('[automation-id="pnlSelected"]').css("pointer-events", "none");
-
-    pnlSelected.Width = selectedControl.Width + 4;
-    pnlSelected.Height = selectedControl.Height + 4;
+    $('[automation-id="pnlSelected"]').css("cssText", "border: 1px dotted rgb(255, 0, 0); z-index: 99999; pointer-events: none; position: sticky !important;");
 
     // iterate over all parents and add positions to get absolute position
     let top = sender.Top? sender.Top : 0;
     let left = sender.Left? sender.Left : 0;
+    let width = sender.Width? sender.Width + 2 : 0;
+    let height = sender.Height? sender.Height + 2 : 0;
     let parent = sender.Parent;
+
+    // don't set width and height above form width
+    width = Math.min(width, Form1.Width-5);
+    height = Math.min(height, Form1.Height-5);
 
     while (parent && parent.Id !== "Form1")
     {
@@ -556,8 +572,13 @@ async function UpdateSelectionFrame(sender)
         left += parent.Left;
         parent = parent.Parent;
     }
+
     pnlSelected.Top = top - 2;
     pnlSelected.Left = left - 2;
+
+    // use jquery to set width and height to avoid automatic resizing for sticky elements
+    $('[automation-id="pnlSelected"]').width(width);
+    $('[automation-id="pnlSelected"]').height(height);
 }
 
 // add tab page to tab control
@@ -645,9 +666,9 @@ function SetProperties(sPropertyName, sPropertyValue)
             break;
         case "ImageAlign":
             sColumn.Type = "ComboBox";
-            if (selectedcontrol.xType === "Button")
+            if (selectedControl.xType === "Button")
                 sColumn.DataArray = [["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["CENTER", "CENTER"]];
-            if (selectedcontrol.xType === "LinkButton")
+            if (selectedControl.xType === "LinkButton")
                 sColumn.DataArray = [["LEFT", "LEFT"], ["MIDDLELEFT", "MIDDLELEFT"], ["RIGHT", "RIGHT"], ["MIDDLERIGHT", "MIDDLERIGHT"], ["TOP", "TOP"], ["TOPCENTER", "TOPCENTER"], ["BOTTOM", "BOTTOM"], ["BOTTOMCENTER", "BOTTOMCENTER"]];
             break;
         case "DataBindingBehavior":
@@ -669,7 +690,7 @@ function SetProperties(sPropertyName, sPropertyValue)
             sColumn.Type = "UD";
             break;
         case "Format":
-            if (selectedcontrol.xType === "DateTimePicker")
+            if (selectedControl.xType === "DateTimePicker")
             {
                 sColumn.Type = "ComboBox";
                 sColumn.DataArray = [["SHORT", "SHORT"], ["LONG", "LONG"], ["TIME", "TIME"], ["CUSTOM", "CUSTOM"]];
@@ -680,6 +701,15 @@ function SetProperties(sPropertyName, sPropertyValue)
         case "FrameStyle":
             sColumn.Type = "ComboBox";
             sColumn.DataArray = [["FRAME", "FRAME"], ["TOP", "TOP"], ["NONE", "NONE"]];
+            break;
+        case "SelectedPage":
+            sColumn.Type = "ComboBox";
+            var aValues = [["0", "0"]];
+
+            for (let i = 1; i <= selectedControl.TabPages.Count; ++i)
+                aValues.push([i.toString(), i.toString()]);
+
+            sColumn.DataArray = aValues;
             break;
         case "ScriptLanguage":
             sColumn.Type = "ComboBox";
