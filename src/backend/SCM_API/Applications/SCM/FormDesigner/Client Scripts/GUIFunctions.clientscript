@@ -623,6 +623,22 @@ function SetProperties(sPropertyName, sPropertyValue)
         return;
     }
 
+    // get event handler functions
+    if(sPropertyName.includes("On"))
+    {
+        sColumn.Type = "ComboBox";
+        
+        // convert functionNames array to DataArray
+        let functionNames = form.Variables["FunctionNames"];
+        let aValues = new Array(functionNames.length);
+
+        for (let i = 0; i < functionNames.length; ++i)
+            aValues[i] = [functionNames[i], functionNames[i]];
+
+        sColumn.DataArray = aValues;
+        return;
+    }
+
     switch (sPropertyName)
     {
         case "Anchor":
@@ -735,10 +751,6 @@ function SetProperties(sPropertyName, sPropertyValue)
             sColumn.Type = "ComboBox";
             sColumn.DataArray = [["NONE", "NONE"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["FILL", "FILL"]];
             break;
-        case "Anchor":
-            sColumn.Type = "ComboBox";
-            sColumn.DataArray = [["NONE", "NONE"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["TOPLEFT", "TOPLEFT"], ["TOPRIGHT", "TOPRIGHT"], ["BOTTOMLEFT", "BOTTOMLEFT"], ["BOTTOMRIGHT", "BOTTOMRIGHT"]];
-            break;
         case "Cursor":
             sColumn.Type = "ComboBox";
             sColumn.DataArray = [["Default", "Default"], ["Arrow", "Arrow"], ["Cross", "Cross"], ["Hand", "Hand"], ["Help", "Help"], ["IBeam", "IBeam"], ["No", "No"], ["SizeAll", "SizeAll"], ["SizeNESW", "SizeNESW"], ["SizeNS", "SizeNS"], ["SizeNWSE", "SizeNWSE"], ["SizeWE", "SizeWE"], ["UpArrow", "UpArrow"], ["Wait", "Wait"]];
@@ -786,4 +798,21 @@ function SetProperties(sPropertyName, sPropertyValue)
             sColumn.Type = "TextBox";
     }
     return sColumn;
+}
+
+async function handleAnchorSelect( sAnchors, pos )
+{
+    if(form.Variables["AnchorWindow"])
+        return;
+	
+    var formArgs = [sAnchors];
+
+	var windowConfig = {
+        resizable: false,
+        x: pos.x,
+        y: pos.y,
+        header: false
+    };
+
+    return await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgAnchor"), formArgs, null, windowConfig);
 }

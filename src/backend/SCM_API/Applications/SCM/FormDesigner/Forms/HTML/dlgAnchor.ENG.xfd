@@ -1,17 +1,145 @@
 <?xml version="1.0"?>
 <Form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.starlims.com/html">
-  <Id>Form1</Id>
-  <Guid>C00DEFDA-A681-4EB8-ACAB-B2FD56368B76</Guid>
   <xtype>StarlimsForm</xtype>
+  <Id>Form1</Id>
+  <Guid>753CB962-A1CB-49E6-9F9B-2404EA0F1836</Guid>
+  <FromDesigner>true</FromDesigner>
+  <Visible>true</Visible>
+  <Enabled>true</Enabled>
+  <Left>0</Left>
+  <Top>0</Top>
+  <Height>140</Height>
+  <Width>96</Width>
+  <TabIndex>0</TabIndex>
+  <TabStop>true</TabStop>
+  <__array__Controls>
+    <item xsi:type="Label">
+      <xtype>StarlimsLabel</xtype>
+      <Id>label1</Id>
+      <Guid>8f86c224-c29d-4aff-8814-eae197214477</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Text>Select Anchors:</Text>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>0</Left>
+      <Top>0</Top>
+      <Height>19</Height>
+      <Width>94</Width>
+      <Font>Open Sans, 12, Bold</Font>
+      <TabIndex>0</TabIndex>
+      <TabStop>false</TabStop>
+      <AutoSize>true</AutoSize>
+    </item>
+    <item xsi:type="Button">
+      <xtype>StarlimsButton</xtype>
+      <Id>btnApply</Id>
+      <Guid>c44c0d59-b5d9-448f-ad49-4c5947c59552</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Text>Apply</Text>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>4</Left>
+      <Top>106</Top>
+      <Height>23</Height>
+      <Width>80</Width>
+      <ForeColor>#004000</ForeColor>
+      <BackColor>Honeydew</BackColor>
+      <TabIndex>0</TabIndex>
+      <TabStop>true</TabStop>
+      <ImageAlign>LEFT</ImageAlign>
+      <OnClick>btnApply_OnClick</OnClick>
+      <VisualStyle>FLAT</VisualStyle>
+    </item>
+    <item xsi:type="Button">
+      <xtype>StarlimsButton</xtype>
+      <Id>btnLeft</Id>
+      <Guid>2e8d4752-0dda-4795-ac42-73a99654795e</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>0</Left>
+      <Top>53</Top>
+      <Height>16</Height>
+      <Width>32</Width>
+      <BackColor>White</BackColor>
+      <TabIndex>0</TabIndex>
+      <TabStop>true</TabStop>
+      <ImageAlign>LEFT</ImageAlign>
+      <OnClick>btn_OnClick</OnClick>
+      <VisualStyle>FLAT</VisualStyle>
+    </item>
+    <item xsi:type="Button">
+      <xtype>StarlimsButton</xtype>
+      <Id>btnBottom</Id>
+      <Guid>b908731d-f8d1-4d9d-836a-9311f82e16d6</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>37</Left>
+      <Top>69</Top>
+      <Height>32</Height>
+      <Width>16</Width>
+      <BackColor>White</BackColor>
+      <TabIndex>0</TabIndex>
+      <TabStop>true</TabStop>
+      <ImageAlign>LEFT</ImageAlign>
+      <OnClick>btn_OnClick</OnClick>
+      <VisualStyle>FLAT</VisualStyle>
+    </item>
+    <item xsi:type="Button">
+      <xtype>StarlimsButton</xtype>
+      <Id>btnRight</Id>
+      <Guid>df014f78-77ef-42fe-b8a0-85d563c082be</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>56</Left>
+      <Top>53</Top>
+      <Height>15</Height>
+      <Width>32</Width>
+      <BackColor>White</BackColor>
+      <TabIndex>0</TabIndex>
+      <TabStop>true</TabStop>
+      <ImageAlign>LEFT</ImageAlign>
+      <OnClick>btn_OnClick</OnClick>
+      <VisualStyle>FLAT</VisualStyle>
+    </item>
+    <item xsi:type="Button">
+      <xtype>StarlimsButton</xtype>
+      <Id>btnTop</Id>
+      <Guid>456e44af-9ce5-4f63-a778-ff368e1d1f9a</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>37</Left>
+      <Top>21</Top>
+      <Height>32</Height>
+      <Width>16</Width>
+      <BackColor>White</BackColor>
+      <TabIndex>0</TabIndex>
+      <TabStop>true</TabStop>
+      <ImageAlign>LEFT</ImageAlign>
+      <OnClick>btn_OnClick</OnClick>
+      <VisualStyle>FLAT</VisualStyle>
+    </item>
+  </__array__Controls>
+  <Padding>0</Padding>
+  <Stretch>false</Stretch>
+  <AutoScroll>false</AutoScroll>
+  <DataOverridesValidatingType>false</DataOverridesValidatingType>
+  <RecordId>ORIGREC</RecordId>
   <FormType>FormDesigner.dlgAnchor</FormType>
-  <Width>640</Width>
-  <Height>480</Height>
-  <__array__Controls />
+  <UseNewEventsOrder>false</UseNewEventsOrder>
   <__array__Scripts>
-    <item xsi:type="Script">
+    <item>
       <Id>__CodeBehind__</Id>
+      <FromDesigner>true</FromDesigner>
+      <Src>RUNTIME_SUPPORT.GetXFDFormCodeBehind.lims?FormId=B33C9A5D-98FF-4F82-9892-6E65E89F7AAF</Src>
       <ScriptLanguage>javascript</ScriptLanguage>
-      <Src>RUNTIME_SUPPORT.GetXFDFormCodeBehind.lims?FormId=920AC6E3-7D79-4C55-AF50-A6FF75C4EDFE</Src>
     </item>
   </__array__Scripts>
+  <OnLoad>Form1_OnLoad</OnLoad>
+  <OnShow>Form1_OnShow</OnShow>
+  <CloseOnEscape>false</CloseOnEscape>
+  <ValidateOnClose>false</ValidateOnClose>
 </Form>

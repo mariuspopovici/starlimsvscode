@@ -75,8 +75,10 @@ async function SetBaseProperties(xmlNode, control)
             continue;
 
         // convert function name to function
-        if (sPropertyName.includes("On") && value.includes("("))
+        if (sPropertyName.includes("On"))
+        {
             value = eval(value);
+        }
 
         // convert numeric string to number
         if (!isNaN(value))

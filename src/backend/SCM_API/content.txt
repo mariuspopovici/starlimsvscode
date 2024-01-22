@@ -1,5 +1,5 @@
 Package Name: SCM_API
-Package Date: 2024-01-18 09:58:59
+Package Date: 2024-01-22 09:22:39
 
 Exported languages: English.
 
@@ -19,10 +19,17 @@ Application Category: SCM
 			- dsGetImages
 		Server Scripts: 
 			- scGetFormCode
+			- scGetFormCodeBehind
 			- scInitFormProperties
 			- scInstall
 
 
+Client Script Category: FormDesigner
+	- ContextMenu
+	- GUIFunctions
+	- ReadXML
+	- SaveXML
+	- TreeView
 Client Script Category: FormDesigner
 	- ContextMenu
 	- GUIFunctions

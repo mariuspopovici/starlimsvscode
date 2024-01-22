@@ -13,7 +13,7 @@ Date......... : 2623-07-11
 
 //BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
 
-var cboForm = form.All("cboForm"); // ComboBox 
+var _cboForm = form.All("cboForm"); // ComboBox 
 var pnlTop = form.All("pnlTop"); // Panel
 //var tpProperties = form.All( "tpProperties" ); // TabPage
 var tpOutline = form.All("tpOutline"); // TabPage
@@ -31,6 +31,7 @@ var dgdProperties = form.All("dgdProperties"); // DataGrid
 var controlCounter = 0;
 var selectedControl;
 var htControls = new Hashtable();
+var functionNames = [];
 
 async function lbrControls_OnItemClick(sender, eventArgs)
 {
@@ -47,8 +48,7 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
     // convert event handler string to function
     if (sPropertyName.includes("On"))
     {
-        value = eval(value);
-        selectedControl[sPropertyName] = value;
+        selectedControl[sPropertyName] = eval(value);
         return;
     }
 
@@ -120,30 +120,43 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
     var sPropertyName = dgdProperties.GetCurrentRowData("PROPERTY_NAME");
 
     // open image picker for Image property
-    if (eventArgs["column"].Id === "PROPERTY_VALUE" && sPropertyName.includes("Image"))
+    if (eventArgs["column"].Id === "PROPERTY_VALUE")
     {
-        var sImageID = await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgImagePicker"));
-
-        // operation canceled
-        if (sImageID == null)
-            return;
-
-        // "no image" button clicked
-        if (sImageID === "NONE")
-            sImageID = "";
-
-        if (sPropertyName === "BackgroundImage")
+        if(sPropertyName.includes("Image"))
         {
-            //selectedControl.BackgroundImage = sImageID;
-            if (sImageID === "NONE")
-                selectedControl.body.setStyle("background-image", "");
-            else
-                selectedControl.body.setStyle("background-image", "url('" + sImageID + "')");
-        }
-        else
-            selectedControl.Image = sImageID;
+            var sImageID = await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgImagePicker"));
 
-        eventArgs.Set("Value", sImageID);
+            // operation canceled
+            if (sImageID == null)
+                return;
+
+            // "no image" button clicked
+            if (sImageID === "NONE")
+                sImageID = "";
+
+            if (sPropertyName === "BackgroundImage")
+            {
+                //selectedControl.BackgroundImage = sImageID;
+                if (sImageID === "NONE")
+                    selectedControl.body.setStyle("background-image", "");
+                else
+                    selectedControl.body.setStyle("background-image", "url('" + sImageID + "')");
+            }
+            else
+                selectedControl.Image = sImageID;
+
+            eventArgs.Set("Value", sImageID);
+        }
+        if(sPropertyName === "Anchor")
+        {
+            // get mouse position from event
+            var mousePos = { x: event.pageX-100, y: event.pageY };
+
+            // open anchor window
+            var sAnchors = await handleAnchorSelect(eventArgs["Value"], mousePos);
+
+            eventArgs.Set("Value", sAnchors);
+        }
     }
 }
 
@@ -163,7 +176,7 @@ async function frmFormDesigner_OnLoad(sender, eventArgs)
     if(form.formArguments)
     {
         var sFormID = form.formArguments;
-        cboForm.SelectedValue = sFormID;
+        _cboForm.SelectedValue = sFormID;
         return;
     }
 
@@ -186,15 +199,15 @@ async function cboControl_OnSelectionChanged(sender, eventArgs)
 
 async function btnSave_OnClick(sender, eventArgs)
 {
-    if(cboForm.SelectedText == "" || cboForm.SelectedText == null)
+    if(_cboForm.SelectedText == "" || _cboForm.SelectedText == null)
         return;
     
     Form1.mask("Saving form...");
     await Application.DoEvents();
     
-    var sAppName = cboForm.SelectedText.split(".")[0];
-    var sFormName = cboForm.SelectedText.split(".")[1];
-    var sFormLang = cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
+    var sAppName = _cboForm.SelectedText.split(".")[0];
+    var sFormName = _cboForm.SelectedText.split(".")[1];
+    var sFormLang = _cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
     SaveForm(sAppName, sFormName, sFormLang);
     
     Form1.unmask();
@@ -230,11 +243,30 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
     form.Variables["PreventClickEvents"] = true;
 
     await CreateEmptyForm();
+    
+    // get function names afrom code behind
+    let sCode = await lims.CallServer("FormDesigner.scGetFormCodeBehind", [sFormID]);
+    let scriptEl = document.createElement('script');
+
+    let aFunctions = sCode.match(/function\s+([^\s\(]+)\(\s*sender,\s*eventArgs\s*\)/g);
+    var aFunctionDeclarations = aFunctions.map(function(declaration) {
+        return declaration + '{}';
+    });
+    var aFunctionNames = aFunctions.map(function(declaration) {
+        var sReturn = declaration.replace('function ', '');
+        return sReturn.substring(0, sReturn.indexOf('(')).trim();
+    });
+
+    scriptEl.textContent = aFunctionDeclarations.join('\n');
+    document.head.appendChild(scriptEl);
+
+    form.Variables["FunctionNames"] = aFunctionNames;
+
     await Application.DoEvents();
 
     // load form from xml
     Form1 = await LoadFormFromXML(sXML);
-    Form1.Guid = cboForm.SelectedValue;
+    Form1.Guid = _cboForm.SelectedValue;
     Form1.Controls.Add(pnlSelected);
     selectedControl = Form1;
     treePanel.getRootNode().expand(true);

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>56BB65B3-81FD-4E36-A6FA-2FDF736C1505</ItemID>
+  <ItemID>66125F15-2F4A-4280-8978-80CE2ED6BBBE</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2024-01-18T09:58:59.8797461+01:00</PackageDate>
+  <PackageDate>2024-01-22T09:22:39.7303137+01:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -29,7 +29,7 @@
           <ItemBehaviour>merge</ItemBehaviour>
           <FormCollection>
             <Form>
-              <ItemID>920AC6E3-7D79-4C55-AF50-A6FF75C4EDFE</ItemID>
+              <ItemID>B33C9A5D-98FF-4F82-9892-6E65E89F7AAF</ItemID>
               <ItemName>dlgAnchor</ItemName>
               <LayerId>300</LayerId>
               <ItemDescription />
@@ -184,6 +184,19 @@
               <ItemDescription />
               <ItemCategory>FormDesigner</ItemCategory>
               <ItemContent>Applications\SCM\FormDesigner\Server Scripts\scGetFormCode.srvscr</ItemContent>
+              <IsMandatory>false</IsMandatory>
+              <ItemBehaviour>overwrite</ItemBehaviour>
+              <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+              <ItemIsOwned>Y</ItemIsOwned>
+              <IsReferred>false</IsReferred>
+            </ServerScript>
+            <ServerScript>
+              <ItemID>86AE94B9-8B36-4848-B274-5DB32B7F3584</ItemID>
+              <ItemName>scGetFormCodeBehind</ItemName>
+              <LayerId>300</LayerId>
+              <ItemDescription />
+              <ItemCategory>FormDesigner</ItemCategory>
+              <ItemContent>Applications\SCM\FormDesigner\Server Scripts\scGetFormCodeBehind.srvscr</ItemContent>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
               <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
@@ -627,6 +640,83 @@
     </ServerScriptCategory>
   </ServerScriptCategoryCollection>
   <ClientScriptCategoryCollection>
+    <ClientScriptCategory>
+      <ItemID>63E1CB3B-3C01-4AEF-83E2-E2B7F1CD633F</ItemID>
+      <ItemName>FormDesigner</ItemName>
+      <LayerId>300</LayerId>
+      <ItemDescription />
+      <IsMandatory>false</IsMandatory>
+      <ItemBehaviour>merge</ItemBehaviour>
+      <ItemIsSystem>N</ItemIsSystem>
+      <ClientScriptCollection>
+        <ClientScript>
+          <ItemID>0DF5B87C-F163-413B-8010-ED18BDB85E0F</ItemID>
+          <ItemName>ContextMenu</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\ContextMenu.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>2F57C813-B6E7-4425-A73D-96C9115FC20E</ItemID>
+          <ItemName>GUIFunctions</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\GUIFunctions.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>34BE2829-428D-400D-9AD3-54AB11A8743A</ItemID>
+          <ItemName>ReadXML</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\ReadXML.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>49986D66-2117-42FF-AA41-7326D5329477</ItemID>
+          <ItemName>SaveXML</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\SaveXML.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+        <ClientScript>
+          <ItemID>69071B46-06C9-4E5F-B9E9-8528C6F72BD4</ItemID>
+          <ItemName>TreeView</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>FormDesigner</ItemCategory>
+          <ItemContent>Client Scripts\FormDesigner\TreeView.clientscript</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ClientScript>
+      </ClientScriptCollection>
+      <Hidden>true</Hidden>
+    </ClientScriptCategory>
     <ClientScriptCategory>
       <ItemID>63E1CB3B-3C01-4AEF-83E2-E2B7F1CD633F</ItemID>
       <ItemName>FormDesigner</ItemName>
