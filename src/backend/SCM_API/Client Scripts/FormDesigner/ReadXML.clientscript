@@ -113,7 +113,7 @@ async function CreateControlFromXML(xmlNode, xmlParentNode, control)
 
     if (sType === "Form")
     {
-        control = Form1;
+        control = _Form1;
         control.xType = "Form";
 
         // set form width and height
@@ -342,7 +342,7 @@ async function GetNodeFromXML(xmlNode, xmlParentNode)
         return await FindNodeById(sNodeId, parentNode);
     }
     else
-        return treePanel.getRootNode().firstChild;
+        return _treePanel.getRootNode().firstChild;
 }
 
 // get property value from xml node
@@ -365,7 +365,7 @@ async function LoadDataProperties(control)
         return;
     }
 
-    dgdProperties.Data = xmlProperties;
+    _dgdProperties.Data = xmlProperties;
     control.DataPropertiesXml = xmlProperties;
-    control.DataProperties = dgdProperties.DataSet.Tables[0].Select("PROPERTY_VALUE is not null");
+    control.DataProperties = _dgdProperties.DataSet.Tables[0].Select("PROPERTY_VALUE is not null");
 }

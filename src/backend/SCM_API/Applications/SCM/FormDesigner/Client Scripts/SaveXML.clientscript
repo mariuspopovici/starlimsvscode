@@ -7,8 +7,8 @@ Date......... : 2023-11-16
 // generate XML from form and save it to database
 async function SaveForm(sApplicationName, sFormName, sFormLang)
 {
-    var formNode = treePanel.getRootNode().firstChild;
-    var sFormGUID = Form1.Guid;
+    var formNode = _treePanel.getRootNode().firstChild;
+    var sFormGUID = _Form1.Guid;
     var sXML = '<?xml version="1.0"?>\n' +
     '<Form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.starlims.com/html">\n' +
     await GetXMLControl(formNode, "\t") +

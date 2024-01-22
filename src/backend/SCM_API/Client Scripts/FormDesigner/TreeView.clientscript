@@ -17,7 +17,7 @@ Ext.define('ControlNode', {
 
 Ext.data.NodeInterface.decorate('ControlNode');
 
-const store = Ext.create('Ext.data.TreeStore', {
+const _store = Ext.create('Ext.data.TreeStore', {
     model: 'ControlNode',
     root: {
         text: 'Root',
@@ -26,11 +26,11 @@ const store = Ext.create('Ext.data.TreeStore', {
 });
 
 // add custom extjs tree to tpOutline
-const treePanel = Ext.create('Ext.tree.Panel', {
+const _treePanel = Ext.create('Ext.tree.Panel', {
     title: 'Outline',
     width: 200,
     height: 300,
-    store: store,
+    store: _store,
     rootVisible: false,
     autoLoad: true,
     viewConfig: {
@@ -50,14 +50,14 @@ const treePanel = Ext.create('Ext.tree.Panel', {
                 // set selected control
                 selectedControl = record.data.control;
                 UpdateSelectionFrame(selectedControl);
-                cboControl.SelectedValue = selectedControl.Id;
+                _cboControl.SelectedValue = selectedControl.Id;
             }
         }
     }
 });
 
 // use ext.componentquery to add tree to tpOutline
-Ext.ComponentQuery.query('tabpanel')[0].add(treePanel);
+Ext.ComponentQuery.query('tabpanel')[0].add(_treePanel);
 
 // add control to outline tree
 async function AddControlToOutline(control, parentNode)
@@ -69,7 +69,7 @@ async function AddControlToOutline(control, parentNode)
 
     // set parent node to root node if not set or not of valid type
     if (!parentNode)
-        parentNode = treePanel.getRootNode().firstChild;
+        parentNode = _treePanel.getRootNode().firstChild;
 
     // check if control is leaf node
     if (control.xType === "TabControl" || control.xType === "TabPage" || control.xType === "SplitterPanel" ||
@@ -84,7 +84,7 @@ async function AddControlToOutline(control, parentNode)
     else
     {
         // get image from lbrControls
-        for (let item of lbrControls.Groups[0].Items)
+        for (let item of _lbrControls.Groups[0].Items)
             if (item.Text === control.xType)
             {
                 icon = item.Image;
@@ -114,7 +114,7 @@ async function AddControlToOutline(control, parentNode)
 async function FindNodeById(id, parentNode)
 {
     if (!parentNode)
-        parentNode = treePanel.getRootNode().firstChild;
+        parentNode = _treePanel.getRootNode().firstChild;
 
     if (parentNode.data.control.Id === id)
         return parentNode;
@@ -137,7 +137,7 @@ async function SetZIndex(parentNode, level)
 {
     // start from root node
     if (!parentNode)
-        parentNode = treePanel.getRootNode().firstChild;
+        parentNode = _treePanel.getRootNode().firstChild;
 
     // start from level 0
     if (!level)

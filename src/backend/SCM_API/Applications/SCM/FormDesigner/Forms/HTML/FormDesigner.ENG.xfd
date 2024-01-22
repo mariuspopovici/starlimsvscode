@@ -15,7 +15,7 @@
   <__array__Controls>
     <item xsi:type="Panel">
       <xtype>StarlimsPanel</xtype>
-      <Id>pnlTop</Id>
+      <Id>_pnlTop</Id>
       <Guid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</Guid>
       <FromDesigner>true</FromDesigner>
       <Visible>true</Visible>
@@ -31,27 +31,50 @@
       <__array__Controls>
         <item xsi:type="Button">
           <xtype>StarlimsButton</xtype>
-          <Id>btnSave</Id>
+          <Id>_btnRefresh</Id>
+          <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+          <FromDesigner>true</FromDesigner>
+          <Text>Refresh Form</Text>
+          <Visible>true</Visible>
+          <Enabled>true</Enabled>
+          <Left>560</Left>
+          <Top>8</Top>
+          <Height>26</Height>
+          <Width>112</Width>
+          <ForeColor>#004040</ForeColor>
+          <BackColor>Azure</BackColor>
+          <Anchor>RIGHT,TOP</Anchor>
+          <TabIndex>0</TabIndex>
+          <TabStop>true</TabStop>
+          <ImageAlign>LEFT</ImageAlign>
+          <OnClick>cboForm_OnSelectionChanged</OnClick>
+          <VisualStyle>FLAT</VisualStyle>
+        </item>
+        <item xsi:type="Button">
+          <xtype>StarlimsButton</xtype>
+          <Id>_btnSave</Id>
           <Guid>672b0fe4-4080-4861-a4aa-dd44da28fe60</Guid>
           <FromDesigner>true</FromDesigner>
           <Text>Save Changes</Text>
           <Visible>true</Visible>
           <Enabled>true</Enabled>
-          <Left>656</Left>
-          <Top>7</Top>
+          <Left>680</Left>
+          <Top>8</Top>
           <Height>26</Height>
-          <Width>139</Width>
+          <Width>123</Width>
+          <ForeColor>#004000</ForeColor>
+          <BackColor>Honeydew</BackColor>
           <Anchor>RIGHT,TOP</Anchor>
           <TabIndex>0</TabIndex>
           <TabStop>true</TabStop>
-          <Image>htmlruntime/images/DF2BB488-C900-A14F-A012-ACEC17E61D0A</Image>
+          <Image>images/button_ok.png</Image>
           <ImageAlign>LEFT</ImageAlign>
           <OnClick>btnSave_OnClick</OnClick>
           <VisualStyle>FLAT</VisualStyle>
         </item>
         <item xsi:type="ComboBox">
           <xtype>StarlimsComboBox</xtype>
-          <Id>cboForm</Id>
+          <Id>_cboForm</Id>
           <Guid>8891cc47-3741-4445-9293-f85d83ce7f32</Guid>
           <FromDesigner>true</FromDesigner>
           <Visible>true</Visible>
@@ -79,7 +102,7 @@
         </item>
         <item xsi:type="Label">
           <xtype>StarlimsLabel</xtype>
-          <Id>label1</Id>
+          <Id>_lblForm</Id>
           <Guid>bcbbf3fa-4413-428f-8ab0-7b577b184c17</Guid>
           <FromDesigner>true</FromDesigner>
           <Text>Form:</Text>
@@ -103,7 +126,7 @@
     </item>
     <item xsi:type="Panel">
       <xtype>StarlimsPanel</xtype>
-      <Id>pnlProperties</Id>
+      <Id>_pnlProperties</Id>
       <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
       <FromDesigner>true</FromDesigner>
       <Visible>true</Visible>
@@ -119,22 +142,22 @@
       <__array__Controls>
         <item xsi:type="TabControl">
           <xtype>StarlimsTabControl</xtype>
-          <Id>tcProperties</Id>
+          <Id>_tcProperties</Id>
           <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
           <FromDesigner>true</FromDesigner>
           <Visible>true</Visible>
           <Enabled>true</Enabled>
           <Left>0</Left>
           <Top>40</Top>
-          <Height>858</Height>
-          <Width>332</Width>
+          <Height>856</Height>
+          <Width>330</Width>
           <Anchor>LEFT,RIGHT,TOP,BOTTOM</Anchor>
           <TabIndex>0</TabIndex>
           <TabStop>true</TabStop>
           <__array__Items>
             <item>
               <xtype>StarlimsTabPage</xtype>
-              <Id>tpProperties</Id>
+              <Id>_tpProperties</Id>
               <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
               <FromDesigner>true</FromDesigner>
               <Text>Properties</Text>
@@ -142,21 +165,21 @@
               <Enabled>true</Enabled>
               <Left>1</Left>
               <Top>21</Top>
-              <Height>836</Height>
-              <Width>330</Width>
+              <Height>832</Height>
+              <Width>326</Width>
               <TabIndex>0</TabIndex>
               <TabStop>true</TabStop>
               <__array__Controls>
                 <item xsi:type="Label">
                   <xtype>StarlimsLabel</xtype>
-                  <Id>lblDescription</Id>
+                  <Id>_lblDescription</Id>
                   <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
                   <FromDesigner>true</FromDesigner>
                   <Text>Description:</Text>
                   <Visible>true</Visible>
                   <Enabled>true</Enabled>
                   <Left>8</Left>
-                  <Top>730</Top>
+                  <Top>728</Top>
                   <Height>19</Height>
                   <Width>70</Width>
                   <Anchor>LEFT,BOTTOM</Anchor>
@@ -166,15 +189,15 @@
                 </item>
                 <item xsi:type="TextArea">
                   <xtype>StarlimsTextArea</xtype>
-                  <Id>txtDescription</Id>
+                  <Id>_txtDescription</Id>
                   <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
                   <FromDesigner>true</FromDesigner>
                   <Visible>true</Visible>
                   <Enabled>true</Enabled>
                   <Left>7</Left>
-                  <Top>750</Top>
+                  <Top>748</Top>
                   <Height>74</Height>
-                  <Width>317</Width>
+                  <Width>315</Width>
                   <Anchor>LEFT,RIGHT,BOTTOM</Anchor>
                   <TabIndex>0</TabIndex>
                   <TabStop>true</TabStop>
@@ -185,15 +208,15 @@
                 </item>
                 <item xsi:type="DataGrid">
                   <xtype>StarlimsDataGrid</xtype>
-                  <Id>dgdProperties</Id>
+                  <Id>_dgdProperties</Id>
                   <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
                   <FromDesigner>true</FromDesigner>
                   <Visible>true</Visible>
                   <Enabled>true</Enabled>
                   <Left>8</Left>
                   <Top>8</Top>
-                  <Height>714</Height>
-                  <Width>316</Width>
+                  <Height>712</Height>
+                  <Width>314</Width>
                   <Anchor>LEFT,RIGHT,TOP,BOTTOM</Anchor>
                   <TabIndex>0</TabIndex>
                   <TabStop>true</TabStop>
@@ -236,7 +259,7 @@
                         <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
                         <FromDesigner>true</FromDesigner>
                         <Caption>Value</Caption>
-                        <Width>171</Width>
+                        <Width>169</Width>
                         <ReadOnly>false</ReadOnly>
                         <Visible>true</Visible>
                         <DataMember>PROPERTY_VALUE</DataMember>
@@ -332,7 +355,7 @@
             </item>
             <item>
               <xtype>StarlimsTabPage</xtype>
-              <Id>tpOutline</Id>
+              <Id>_tpOutline</Id>
               <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
               <FromDesigner>true</FromDesigner>
               <Text>Outline</Text>
@@ -360,7 +383,7 @@
         </item>
         <item xsi:type="ComboBox">
           <xtype>StarlimsComboBox</xtype>
-          <Id>cboControl</Id>
+          <Id>_cboControl</Id>
           <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
           <FromDesigner>true</FromDesigner>
           <Visible>true</Visible>
@@ -368,7 +391,7 @@
           <Left>8</Left>
           <Top>8</Top>
           <Height>21</Height>
-          <Width>316</Width>
+          <Width>314</Width>
           <Anchor>LEFT,RIGHT,TOP</Anchor>
           <TabIndex>0</TabIndex>
           <TabStop>true</TabStop>
@@ -395,7 +418,7 @@
     </item>
     <item xsi:type="Panel">
       <xtype>StarlimsPanel</xtype>
-      <Id>Form1</Id>
+      <Id>_Form1</Id>
       <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
       <FromDesigner>true</FromDesigner>
       <Visible>true</Visible>
@@ -415,7 +438,7 @@
     </item>
     <item xsi:type="LinkBar">
       <xtype>StarlimsLinkBar</xtype>
-      <Id>lbrControls</Id>
+      <Id>_lbrControls</Id>
       <Guid>9d68271f-18e9-4c8b-89d3-4d6607856ed1</Guid>
       <FromDesigner>true</FromDesigner>
       <Visible>true</Visible>
@@ -743,4 +766,4 @@
   <CloseOnEscape>false</CloseOnEscape>
   <OnCmdKeyPress>frmFormDesigner_OnCmdKeyPress</OnCmdKeyPress>
   <ValidateOnClose>false</ValidateOnClose>
-<ModeSet></ModeSet><BaseMode></BaseMode></Form>
+</Form>

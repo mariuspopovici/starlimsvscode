@@ -13,17 +13,17 @@ Date......... : 2623-07-11
 
 //BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
 
-var _cboForm = form.All("cboForm"); // ComboBox 
-var pnlTop = form.All("pnlTop"); // Panel
-//var tpProperties = form.All( "tpProperties" ); // TabPage
-var tpOutline = form.All("tpOutline"); // TabPage
-var tcProperties = form.All("tcProperties"); // TabControl
-var cboControl = form.All("cboControl"); // ComboBox
-var txtDescription = form.All("txtDescription"); // TextArea
-var lblDescription = form.All("lblDescription"); // Label
-var Form1 = form.All("Form1"); // Panel
-var lbrControls = form.All("lbrControls"); // LinkBar
-var dgdProperties = form.All("dgdProperties"); // DataGrid
+var _cboForm = form.All("_cboForm"); // ComboBox 
+var _pnlTop = form.All("_pnlTop"); // Panel
+//var _tpProperties = form.All( "_tpProperties" ); // TabPage
+var _tpOutline = form.All("_tpOutline"); // TabPage
+var _tcProperties = form.All("_tcProperties"); // TabControl
+var _cboControl = form.All("_cboControl"); // ComboBox
+var _txtDescription = form.All("_txtDescription"); // TextArea
+var _lblDescription = form.All("_lblDescription"); // Label
+var _Form1 = form.All("_Form1"); // Panel
+var _lbrControls = form.All("_lbrControls"); // LinkBar
+var _dgdProperties = form.All("_dgdProperties"); // DataGrid
 
 //END_GLOBAL_DECLARATIONS
 
@@ -31,7 +31,6 @@ var dgdProperties = form.All("dgdProperties"); // DataGrid
 var controlCounter = 0;
 var selectedControl;
 var htControls = new Hashtable();
-var functionNames = [];
 
 async function lbrControls_OnItemClick(sender, eventArgs)
 {
@@ -42,7 +41,7 @@ async function lbrControls_OnItemClick(sender, eventArgs)
 async function dgdProperties_OnUpdatingCell(sender, eventArgs)
 {
     // write properties back to javascript object
-    var sPropertyName = dgdProperties.GetCurrentRowData("PROPERTY_NAME");
+    var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
     var value = eventArgs["value"];
 
     // convert event handler string to function
@@ -117,7 +116,7 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
 
 async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
 {
-    var sPropertyName = dgdProperties.GetCurrentRowData("PROPERTY_NAME");
+    var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
 
     // open image picker for Image property
     if (eventArgs["column"].Id === "PROPERTY_VALUE")
@@ -162,13 +161,17 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
 
 async function dgdProperties_OnRowChange(sender, eventArgs)
 {
-    if (form.Variables["PreventInputEvents"])
+    if (form.Variables["PreventLoadProperties"])
         return;
+    
+    form.Variables["PreventLoadProperties"] = true;
 
-    var sPropertyName = dgdProperties.GetCurrentRowData("PROPERTY_NAME");
+    var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
     var sPropertyValue = eventArgs["record"]["PROPERTY_VALUE"];
     
-    SetProperties(sPropertyName, sPropertyValue);
+    await SetProperties(sPropertyName, sPropertyValue);
+    
+    form.Variables["PreventLoadProperties"] = false;
 }
 
 async function frmFormDesigner_OnLoad(sender, eventArgs)
@@ -183,14 +186,14 @@ async function frmFormDesigner_OnLoad(sender, eventArgs)
     await CreateEmptyForm();
 
     // populate controls combobox
-    form.Variables["PreventInputEvents"] = true;
+    form.Variables["PreventLoadCboControl"] = true;
     LoadCboControls();
-    form.Variables["PreventInputEvents"] = false;
+    form.Variables["PreventLoadCboControl"] = false;
 }
 
 async function cboControl_OnSelectionChanged(sender, eventArgs)
 {
-    if (form.Variables["PreventInputEvents"])
+    if (form.Variables["PreventLoadCboControl"])
         return;
     
     // load control properties into grid
@@ -202,7 +205,7 @@ async function btnSave_OnClick(sender, eventArgs)
     if(_cboForm.SelectedText == "" || _cboForm.SelectedText == null)
         return;
     
-    Form1.mask("Saving form...");
+    _Form1.mask("Saving form...");
     await Application.DoEvents();
     
     var sAppName = _cboForm.SelectedText.split(".")[0];
@@ -210,78 +213,86 @@ async function btnSave_OnClick(sender, eventArgs)
     var sFormLang = _cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
     SaveForm(sAppName, sFormName, sFormLang);
     
-    Form1.unmask();
+    _Form1.unmask();
 }
 
 async function cboForm_OnSelectionChanged(sender, eventArgs)
 {
-    Form1.mask("Loading...");
+    _Form1.mask("Loading...");
     await Application.DoEvents();
 
-    var sFormID = sender.SelectedValue;
+    var sFormID = _cboForm.SelectedValue;
 
     // use regex to get language from brackets in combobox text
-    var sFormLang = sender.SelectedText.match(/\(([^)]+)\)/)[1];
+    var sFormLang = _cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
 
     // read xml from database
     var sXML = await lims.CallServer("FormDesigner.scGetFormCode", [sFormID, sFormLang]);
 
     if (!sXML)
     {
-        Form1.unmask();
+        _Form1.unmask();
         return;
     }
 
     // clear form
-    if (Form1.Controls)
-        Form1.Controls.Clear();
+    if (_Form1.Controls)
+        _Form1.Controls.Clear();
 
     htControls.Clear();
     pnlSelected.Visible = false;
 
-    form.Variables["PreventInputEvents"] = true;
+    form.Variables["PreventLoadProperties"] = true;
+    form.Variables["PreventLoadCboControl"] = true;
     form.Variables["PreventClickEvents"] = true;
 
     await CreateEmptyForm();
     
-    // get function names afrom code behind
+    // get function names from code behind
     let sCode = await lims.CallServer("FormDesigner.scGetFormCodeBehind", [sFormID]);
-    let scriptEl = document.createElement('script');
+    if(sCode)
+    {
+        let scriptEl = document.createElement('script');
 
-    let aFunctions = sCode.match(/function\s+([^\s\(]+)\(\s*sender,\s*eventArgs\s*\)/g);
-    var aFunctionDeclarations = aFunctions.map(function(declaration) {
-        return declaration + '{}';
-    });
-    var aFunctionNames = aFunctions.map(function(declaration) {
-        var sReturn = declaration.replace('function ', '');
-        return sReturn.substring(0, sReturn.indexOf('(')).trim();
-    });
+        let aFunctions = sCode.match(/function\s+([^\s\(]+)\(\s*sender,\s*eventArgs\s*\)/g);
+        if(aFunctions && aFunctions.length > 0)
+        {
+            var aFunctionDeclarations = aFunctions.map(function(declaration) {
+                return declaration + '{}';
+            });
+            var aFunctionNames = aFunctions.map(function(declaration) {
+                var sReturn = declaration.replace('function ', '');
+                return sReturn.substring(0, sReturn.indexOf('(')).trim();
+            });
 
-    scriptEl.textContent = aFunctionDeclarations.join('\n');
-    document.head.appendChild(scriptEl);
+            scriptEl.textContent = aFunctionDeclarations.join('\n');
+            document.head.appendChild(scriptEl);
 
-    form.Variables["FunctionNames"] = aFunctionNames;
+            form.Variables["FunctionNames"] = aFunctionNames;
+        }
+    }
 
     await Application.DoEvents();
 
     // load form from xml
-    Form1 = await LoadFormFromXML(sXML);
-    Form1.Guid = _cboForm.SelectedValue;
-    Form1.Controls.Add(pnlSelected);
-    selectedControl = Form1;
-    treePanel.getRootNode().expand(true);
+    _Form1 = await LoadFormFromXML(sXML);
+    _Form1.Guid = _cboForm.SelectedValue;
+    _Form1.Controls.Add(pnlSelected);
+    selectedControl = _Form1;
+    _treePanel.getRootNode().expand(true);
 
     await Application.DoEvents();
 
     // bind click and mouse drag events to all controls in form
-    BindControlEvents(Form1);
+    BindControlEvents(_Form1);
     
     SetZIndex();
 
-    form.Variables["PreventInputEvents"] = false;
+    form.Variables["PreventLoadProperties"] = false;
+    form.Variables["PreventLoadCboControl"] = false;
     form.Variables["PreventClickEvents"] = false;
 
-    Form1.unmask();
+    _Form1.unmask();
 }
 
 async function frmFormDesigner_OnCmdKeyPress( sender, eventArgs )
@@ -290,7 +301,7 @@ async function frmFormDesigner_OnCmdKeyPress( sender, eventArgs )
 	if(nKeyCode == 46) // del key
 	{
 		// delete control
-        if(selectedControl != Form1)
+        if(selectedControl != _Form1)
             __control_OnDelete(selectedControl);
 	}
 }

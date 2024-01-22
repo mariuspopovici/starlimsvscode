@@ -1,5 +1,5 @@
 Package Name: SCM_API
-Package Date: 2024-01-22 09:27:49
+Package Date: 2024-01-22 16:11:17
 
 Exported languages: English.
 
@@ -24,12 +24,6 @@ Application Category: SCM
 			- scInstall
 
 
-Client Script Category: FormDesigner
-	- ContextMenu
-	- GUIFunctions
-	- ReadXML
-	- SaveXML
-	- TreeView
 Client Script Category: FormDesigner
 	- ContextMenu
 	- GUIFunctions
