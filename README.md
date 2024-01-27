@@ -48,11 +48,20 @@ Features:
 - Global, full text search in scripts / code with code item type selection
 - Search code items by name
 - Explore tables and view table schema
+- HTML Form Designer (alpha version)
 
 To Do:
-
-- Create a HTML form designer
-- Implement table support including a schema and ERD generator / viewer
+- Form Designer:
+  - Add support for all controls (buttonlist, listview, etc.)
+  - implement root table designer
+  - implement group or column editor for button list
+  - add color picker
+  - snap controls to layout grid
+  - move controls via arrow keys
+- VS Code extension:
+  - Add 'create event function' snippet
+  - Editable table definition, indices and foreign keys
+  - Browse code history and revert code to specific version
 
 ## Extension Settings
 
@@ -67,7 +76,6 @@ This extension contributes the following settings:
 ## How to Use
 
 - Install the latest version of the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=MariusPopovici.vscode-starlims&ssr=false#qna)
-- Download the extension files attached to the [current release](https://github.com/mariuspopovici/starlimsvscode/releases) and import the SCM_API.sdp package into STARLIMS
 - Add a local folder to the current VS Code workspace. This will serve as your local STARLIMS code repository.
 - Activate the extension clicking the STARLIMS logo in the VS Code sidebar.
 - Configure the extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time. The root folder should be set as the path to the folder selected in the previous step.
@@ -119,3 +127,4 @@ New features:
 - Move items
 - Misc. bug fixes
 - Support for ESLint in Javascript client scripts and form code behind with specific rules for STARLIMS objects and data types
+- Preliminary version of Form Designer (use with care)

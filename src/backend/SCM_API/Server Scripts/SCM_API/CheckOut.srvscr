@@ -40,6 +40,8 @@ sType := oEnterpriseItem:Type;
 	sAppName := oEnterpriseItem:AppName;
 :ENDIF;
 
+usrmes("sItemID", sItemID);
+
 :BEGINCASE;
 	:CASE sType == "SS";
 		sItemName := sCategory + "." + sItemName;

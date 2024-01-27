@@ -91,6 +91,48 @@
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>8</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>560</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>112</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>26</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Text</PropertyName>
+    <PropertyValue>Refresh Form</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
+    <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>RIGHT,TOP</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>672b0fe4-4080-4861-a4aa-dd44da28fe60</Guid>
     <PropertyName>Guid</PropertyName>
     <PropertyValue>672b0fe4-4080-4861-a4aa-dd44da28fe60</PropertyValue>
@@ -99,19 +141,19 @@
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>672b0fe4-4080-4861-a4aa-dd44da28fe60</Guid>
     <PropertyName>Top</PropertyName>
-    <PropertyValue>7</PropertyValue>
+    <PropertyValue>8</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>672b0fe4-4080-4861-a4aa-dd44da28fe60</Guid>
     <PropertyName>Left</PropertyName>
-    <PropertyValue>656</PropertyValue>
+    <PropertyValue>680</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>672b0fe4-4080-4861-a4aa-dd44da28fe60</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>139</PropertyValue>
+    <PropertyValue>123</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
@@ -279,13 +321,13 @@
     <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
     <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>332</PropertyValue>
+    <PropertyValue>330</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
     <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
     <PropertyName>Height</PropertyName>
-    <PropertyValue>858</PropertyValue>
+    <PropertyValue>856</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
@@ -315,13 +357,13 @@
     <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
     <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>330</PropertyValue>
+    <PropertyValue>326</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
     <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
     <PropertyName>Height</PropertyName>
-    <PropertyValue>836</PropertyValue>
+    <PropertyValue>832</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
@@ -351,7 +393,7 @@
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
     <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
     <PropertyName>Top</PropertyName>
-    <PropertyValue>730</PropertyValue>
+    <PropertyValue>728</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
@@ -393,7 +435,7 @@
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
     <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
     <PropertyName>Top</PropertyName>
-    <PropertyValue>750</PropertyValue>
+    <PropertyValue>748</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
@@ -405,7 +447,7 @@
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
     <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>317</PropertyValue>
+    <PropertyValue>315</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
@@ -441,13 +483,13 @@
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
     <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>316</PropertyValue>
+    <PropertyValue>314</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
     <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
     <PropertyName>Height</PropertyName>
-    <PropertyValue>714</PropertyValue>
+    <PropertyValue>712</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
@@ -495,7 +537,7 @@
     <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
     <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>171</PropertyValue>
+    <PropertyValue>169</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
@@ -591,7 +633,7 @@
     <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
     <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>316</PropertyValue>
+    <PropertyValue>314</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>

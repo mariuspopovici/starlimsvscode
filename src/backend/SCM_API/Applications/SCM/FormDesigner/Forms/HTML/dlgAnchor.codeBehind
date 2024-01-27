@@ -1,0 +1,108 @@
+/*
+Description.. :	Select anchors for control element
+Author....... :	DC
+Date......... : 2024-01-17
+*/
+
+//BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
+
+var btnApply = form.All( "btnApply" ); // Button
+var btnLeft = form.All("btnLeft"); // Button
+var btnRight = form.All("btnRight"); // Button
+var btnTop = form.All("btnTop"); // Button
+var btnBottom = form.All("btnBottom"); // Button
+
+//END_GLOBAL_DECLARATIONS
+
+var htAnchors = new Hashtable();
+
+async function btn_OnClick(sender, eventArgs)
+{
+    var btnName = sender.Id.replace("btn", "").toUpperCase();
+
+    // toggle button color
+    if (sender.BackColor == "White")
+    {
+        sender.BackColor = "Silver";
+
+        if (!htAnchors.Contains(btnName))
+            htAnchors.Add(btnName, btnName);
+    }
+    else
+    {
+        sender.BackColor = "White";
+        if (htAnchors.Contains(btnName))
+            htAnchors.Remove(btnName);
+    }
+}
+
+async function btnApply_OnClick(sender, eventArgs)
+{
+    // build return string from hashtable
+    var sAnchors = "";
+
+    if (htAnchors.Contains("LEFT"))
+        sAnchors += ",LEFT";
+
+    if (htAnchors.Contains("RIGHT"))
+        sAnchors += ",RIGHT";
+
+    if (htAnchors.Contains("TOP"))
+        sAnchors += ",TOP";
+
+    if (htAnchors.Contains("BOTTOM"))
+        sAnchors += ",BOTTOM";
+
+    if (sAnchors.startsWith(","))
+        sAnchors = sAnchors.substring(1);
+
+    // set return value
+    form.returnValue = sAnchors;
+    form.opener.Variables["AnchorWindow"] = false;
+
+    form.Close();
+}
+
+async function Form1_OnLoad(sender, eventArgs)
+{
+    // remove x-mask element via jquery
+    $(".x-mask").hide(); 
+    
+    // get window from dialog
+    var win = form.ownerCt;
+
+    // remove css class x-window-default from window
+    win.el.dom.classList.remove("x-window-default");
+
+    var sAnchors = form.formArguments;
+
+    // enable buttons according to control's anchors
+    if (sAnchors.includes("LEFT"))
+        btn_OnClick(btnLeft, eventArgs);
+    if (sAnchors.includes("RIGHT"))
+        btn_OnClick(btnRight, eventArgs);
+    if (sAnchors.includes("TOP"))
+        btn_OnClick(btnTop, eventArgs);
+    if (sAnchors.includes("BOTTOM"))
+        btn_OnClick(btnBottom, eventArgs);
+
+    form.opener.Variables["AnchorWindow"] = true;
+}
+
+async function Form1_OnShow(sender, eventArgs)
+{
+    await Application.DoEvents();
+
+    // get window from dialog
+    var win = form.ownerCt;
+
+    // adjust style
+    win.setWidth(win.getWidth() - 20);
+    await Application.DoEvents();
+    win.body.setStyle("border", "1px solid lightgrey");
+    win.body.setStyle("padding", "5px 5px 0 5px");
+    win.setStyle("box-shadow", "0 0 3px 2px rgba(0, 0, 0, 0.1)");
+
+    // remove x-mask element via jquery
+    $(".x-mask").hide();
+}
