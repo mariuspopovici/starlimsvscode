@@ -158,3 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Misc. fixes
 - Enhancements to forms designer
+
+## [1.2.82] - 2024-01-31
+
+- Misc. fixes
