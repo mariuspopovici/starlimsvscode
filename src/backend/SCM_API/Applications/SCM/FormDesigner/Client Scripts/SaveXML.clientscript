@@ -76,7 +76,7 @@ async function GetXMLProperties(control, sIndentation = "")
         // skip id in brackets
         if(sPropertyName === "(Id)")
         {
-            control.Id = value;
+            control.Id = control.itemId = value;
             continue;
         }
 
