@@ -1,0 +1,7 @@
+/********************************************************************************
+Description.. :	Get the form's code behind
+Author....... :	DC
+Date......... : 2024-01-19
+*******************************************************************************/;
+:PARAMETERS sFormID;
+:RETURN MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetCodeBehind", {sFormID}));

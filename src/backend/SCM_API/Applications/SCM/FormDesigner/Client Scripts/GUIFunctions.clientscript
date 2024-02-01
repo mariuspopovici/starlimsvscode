@@ -16,43 +16,43 @@ pnlSelected.setStyle("border", "1px dotted #f00");
 async function CreateEmptyForm()
 {
     // create form panel
-    Form1.Id = "Form1";
-    Form1.Type = "Form";
-    Form1.Guid = System.Guid.NewGuid().ToString();
-    Form1.setStyle('border', '1px dotted black');
-    Form1.CloseOnEscape = false;
-    Form1.ValidateOnClose = false;
-    Form1.title = "";
-    htControls.Add(Form1.Id, Form1);
-    Form1.Controls.Add(pnlSelected);
-    selectedControl = Form1;
+    _Form1.Id = "_Form1";
+    _Form1.Type = "Form";
+    _Form1.Guid = System.Guid.NewGuid().ToString();
+    _Form1.setStyle('border', '1px dotted black');
+    _Form1.CloseOnEscape = false;
+    _Form1.ValidateOnClose = false;
+    _Form1.title = "";
+    htControls.Add(_Form1.Id, _Form1);
+    _Form1.Controls.Add(pnlSelected);
+    selectedControl = _Form1;
 
     // load properties into grid
-    LoadDataProperties(Form1);
+    LoadDataProperties(_Form1);
 
     // clear extjs tree store
-    await treePanel.store.getRootNode().removeAll();
+    await _treePanel.store.getRootNode().removeAll();
   
     var node = Ext.create("ControlNode", {
-        text: "Form1",
+        text: "_Form1",
         icon: 'htmlruntime/images/10B98BB5-80D7-B54B-A9BF-F87A586A5675',
         leaf: true,
         expandable: false,
-        control: Form1,
-        properties: Form1.DataPropertiesXml
+        control: _Form1,
+        properties: _Form1.DataPropertiesXml
     });
     
     // add form to outline
-    treePanel.getRootNode().appendChild(node);
-    treePanel.getRootNode().expand(true);
+    _treePanel.getRootNode().appendChild(node);
+    _treePanel.getRootNode().expand(true);
 
     // bind click event
-    $('[automation-id="Form1"]').click(function (event)
+    $('[automation-id="_Form1"]').click(function (event)
     {
-        __control_OnClick(Form1, event);
+        __control_OnClick(_Form1, event);
     });
 
-    selectedControl = Form1;
+    selectedControl = _Form1;
 }
 
 // add new control to form
@@ -295,7 +295,10 @@ async function AddControl(controlType)
             id = controlType + (controlCounter++).toString();
         control.Id = id;
     }
-    control.Text = control.Id;
+
+    if(control.xType != "TabControl")
+        control.Text = control.Id;
+
     control.Top = 20;
     control.Left = 20;
 
@@ -303,13 +306,15 @@ async function AddControl(controlType)
 
     // add control to form or as child of selected control
     if (selectedControl.xType === "TabPage" ||
-        selectedControl.xType === "SplitContainerH" ||
-        selectedControl.xType === "SplitContainerV" ||
+        selectedControl.xType === "SplitterPanel" ||
         selectedControl.xType === "Panel" ||
         selectedControl.xType === "GroupBox")
         selectedControl.Controls.Add(control);
     else
-        Form1.Controls.Add(control);
+    {
+        selectedControl = _Form1;
+        _Form1.Controls.Add(control);
+    }
 
     // add control to hashtable
     htControls.Add(control.Id, control);
@@ -319,7 +324,7 @@ async function AddControl(controlType)
     // add control to outline
     let selectedNode = await FindNodeById(selectedControl.Id);
     AddControlToOutline(control, selectedNode);
-    treePanel.getRootNode().expand(true);
+    _treePanel.getRootNode().expand(true);
 
     // use jquery to bind click event
     $('[automation-id="' + control.Id + '"]').click(function (event)
@@ -333,13 +338,16 @@ async function AddControl(controlType)
 
 async function BindControlEvents(control)
 {
+    // remove existing click event
+    $('[automation-id="' + control.Id + '"]').off("click");
+
     // bind click event
     $('[automation-id="' + control.Id + '"]').click(function (event)
     {
         __control_OnClick(control, event);
     });
 
-    if (control.Id !== "Form1")
+    if (control.Id !== "_Form1")
     {
         // bind mouse drag event
         $('[automation-id="' + control.Id + '"]').mousedown(__control_OnDrag);
@@ -351,18 +359,24 @@ async function BindControlEvents(control)
         for (let i = 0; i < control.Controls.Count; ++i)
             BindControlEvents(control.Controls[i]);
     }
+
+    // recursively bind events to child panels
+    if(control.Panel1)
+        BindControlEvents(control.Panel1);
+    if(control.Panel2)
+        BindControlEvents(control.Panel2);
 }
 
 // load controls from hashtable to combobox
 async function LoadCboControls()
 {
-    cboControl.Items.Clear();
+    _cboControl.Items.Clear();
 
     let keys = htControls.Keys;
     for (let i = 0; i < keys.length; ++i)
-        cboControl.Items.Add(keys[i], keys[i] + " (" + htControls[keys[i]].xType + ")");
+        _cboControl.Items.Add(keys[i], keys[i] + " (" + htControls[keys[i]].xType + ")");
 
-    cboControl.SelectedValue = selectedControl.Id;
+    _cboControl.SelectedValue = selectedControl.Id;
 }
 
 // loads control's properties on click
@@ -371,37 +385,37 @@ async function __control_OnClick(sender, event)
     if (form.Variables["PreventClickEvents"] === true)
         return;
 
-    // prevent other events from firing
-    form.Variables["PreventInputEvents"] = true;
-
     var control = await sender;
     if (control === undefined)
         return;
 
-    // prevent parent form's click event
+    // prevent parent control click event
     if (event != null)
         event.stopPropagation();
 
     // set new selected control
     let controlId = control.Id;
     selectedControl = form.All(controlId);
-    cboControl.SelectedValue = controlId;
 
-    // select node in outline treePanel
+    form.Variables["PreventLoadCboControl"] = true;
+    _cboControl.SelectedValue = controlId;
+    form.Variables["PreventLoadCboControl"] = false;
+
+    // select node in outline _treePanel
     selectedNode = await FindNodeById(controlId);
-    treePanel.getSelectionModel().select(selectedNode);
+    _treePanel.getSelectionModel().select(selectedNode);
 
     // update selection frame
     pnlSelected.Visible = true;
     UpdateSelectionFrame(control);
 
     // update properties grid
-    dgdProperties.Data = control.DataPropertiesXml;
+    _dgdProperties.Data = control.DataPropertiesXml;
 
     // loop over data rows and set values
-    for (let i = 0; i < dgdProperties.RowCount; ++i)
+    for (let i = 0; i < _dgdProperties.RowCount; ++i)
     {
-        let row = dgdProperties.DataSet.Tables[0].Rows[i];
+        let row = _dgdProperties.DataSet.Tables[0].Rows[i];
         let sPropertyName = row["PROPERTY_NAME"];
         
         // skip resources
@@ -432,8 +446,7 @@ async function __control_OnClick(sender, event)
         row["PROPERTY_VALUE"] = value;
     }
 
-    dgdProperties.DataSet.AcceptChanges();
-    form.Variables["PreventInputEvents"] = false;
+    _dgdProperties.DataSet.AcceptChanges();
 }
 
 // make control draggable
@@ -531,33 +544,40 @@ async function __control_OnDelete(control)
     // delete control from hashtable
     htControls.Remove(control.Id);
 
-    // select form in cboControl
-    cboControl.SelectedValue = Form1.Id;
-    UpdateSelectionFrame(Form1);
+    // select form in _cboControl
+    _cboControl.SelectedValue = _Form1.Id;
+    UpdateSelectionFrame(_Form1);
 }
 
 // draw a selection frame around the selected control
 async function UpdateSelectionFrame(sender)
 {
-    $('[automation-id="pnlSelected"]').css("z-index", 9999);
-    $('[automation-id="pnlSelected"]').css("pointer-events", "none");
-
-    pnlSelected.Width = selectedControl.Width + 4;
-    pnlSelected.Height = selectedControl.Height + 4;
+    $('[automation-id="pnlSelected"]').css("cssText", "border: 1px dotted rgb(255, 0, 0); z-index: 99999; pointer-events: none; position: sticky !important;");
 
     // iterate over all parents and add positions to get absolute position
     let top = sender.Top? sender.Top : 0;
     let left = sender.Left? sender.Left : 0;
+    let width = sender.Width? sender.Width + 2 : 0;
+    let height = sender.Height? sender.Height + 2 : 0;
     let parent = sender.Parent;
 
-    while (parent && parent.Id !== "Form1")
+    // don't set width and height above form width
+    width = Math.min(width, _Form1.Width-5);
+    height = Math.min(height, _Form1.Height-5);
+
+    while (parent && parent.Id !== "_Form1")
     {
         top += parent.Top;
         left += parent.Left;
         parent = parent.Parent;
     }
+
     pnlSelected.Top = top - 2;
     pnlSelected.Left = left - 2;
+
+    // use jquery to set width and height to avoid automatic resizing for sticky elements
+    $('[automation-id="pnlSelected"]').width(width);
+    $('[automation-id="pnlSelected"]').height(height);
 }
 
 // add tab page to tab control
@@ -593,12 +613,34 @@ async function __add_tab_page(sender, eventArgs)
 function SetProperties(sPropertyName, sPropertyValue)
 {
     // switch type of PROPERTY_VALUE column depending on PROPERTY_TYPE
-    var sColumn = dgdProperties.RootTable.Columns.FindById("PROPERTY_VALUE");
+    var sColumn = _dgdProperties.RootTable.Columns.FindById("PROPERTY_VALUE");
 
     if (sPropertyValue === "True" || sPropertyValue === "False")
     {
         sColumn.Type = "ComboBox";
         sColumn.DataArray = [["True", "True"], ["False", "False"]];
+        return;
+    }
+
+    // get event handler functions
+    if(sPropertyName.includes("On"))
+    {
+        sColumn.Type = "ComboBox";
+        
+        // convert functionNames array to DataArray
+        let functionNames = form.Variables["FunctionNames"];
+        if(functionNames && functionNames.length > 0)
+        {
+            let aValues = new Array(functionNames.length + 1);
+            
+            aValues[0] = ["", ""];
+            for (let i = 0; i < functionNames.length; ++i)
+                aValues[i+1] = [functionNames[i], functionNames[i]];
+
+            sColumn.DataArray = aValues;
+        }
+        else
+            sColumn.DataArray = [["", ""]];
         return;
     }
 
@@ -645,9 +687,9 @@ function SetProperties(sPropertyName, sPropertyValue)
             break;
         case "ImageAlign":
             sColumn.Type = "ComboBox";
-            if (selectedcontrol.xType === "Button")
+            if (selectedControl.xType === "Button")
                 sColumn.DataArray = [["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["CENTER", "CENTER"]];
-            if (selectedcontrol.xType === "LinkButton")
+            if (selectedControl.xType === "LinkButton")
                 sColumn.DataArray = [["LEFT", "LEFT"], ["MIDDLELEFT", "MIDDLELEFT"], ["RIGHT", "RIGHT"], ["MIDDLERIGHT", "MIDDLERIGHT"], ["TOP", "TOP"], ["TOPCENTER", "TOPCENTER"], ["BOTTOM", "BOTTOM"], ["BOTTOMCENTER", "BOTTOMCENTER"]];
             break;
         case "DataBindingBehavior":
@@ -669,7 +711,7 @@ function SetProperties(sPropertyName, sPropertyValue)
             sColumn.Type = "UD";
             break;
         case "Format":
-            if (selectedcontrol.xType === "DateTimePicker")
+            if (selectedControl.xType === "DateTimePicker")
             {
                 sColumn.Type = "ComboBox";
                 sColumn.DataArray = [["SHORT", "SHORT"], ["LONG", "LONG"], ["TIME", "TIME"], ["CUSTOM", "CUSTOM"]];
@@ -680,6 +722,15 @@ function SetProperties(sPropertyName, sPropertyValue)
         case "FrameStyle":
             sColumn.Type = "ComboBox";
             sColumn.DataArray = [["FRAME", "FRAME"], ["TOP", "TOP"], ["NONE", "NONE"]];
+            break;
+        case "SelectedPage":
+            sColumn.Type = "ComboBox";
+            var aValues = [["0", "0"]];
+
+            for (let i = 1; i <= selectedControl.TabPages.Count; ++i)
+                aValues.push([i.toString(), i.toString()]);
+
+            sColumn.DataArray = aValues;
             break;
         case "ScriptLanguage":
             sColumn.Type = "ComboBox";
@@ -704,10 +755,6 @@ function SetProperties(sPropertyName, sPropertyValue)
         case "Dock":
             sColumn.Type = "ComboBox";
             sColumn.DataArray = [["NONE", "NONE"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["FILL", "FILL"]];
-            break;
-        case "Anchor":
-            sColumn.Type = "ComboBox";
-            sColumn.DataArray = [["NONE", "NONE"], ["TOP", "TOP"], ["BOTTOM", "BOTTOM"], ["LEFT", "LEFT"], ["RIGHT", "RIGHT"], ["TOPLEFT", "TOPLEFT"], ["TOPRIGHT", "TOPRIGHT"], ["BOTTOMLEFT", "BOTTOMLEFT"], ["BOTTOMRIGHT", "BOTTOMRIGHT"]];
             break;
         case "Cursor":
             sColumn.Type = "ComboBox";
@@ -756,4 +803,21 @@ function SetProperties(sPropertyName, sPropertyValue)
             sColumn.Type = "TextBox";
     }
     return sColumn;
+}
+
+async function handleAnchorSelect( sAnchors, pos )
+{
+    if(form.Variables["AnchorWindow"])
+        return;
+	
+    var formArgs = [sAnchors];
+
+	var windowConfig = {
+        resizable: false,
+        x: pos.x,
+        y: pos.y,
+        header: false
+    };
+
+    return await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgAnchor"), formArgs, null, windowConfig);
 }

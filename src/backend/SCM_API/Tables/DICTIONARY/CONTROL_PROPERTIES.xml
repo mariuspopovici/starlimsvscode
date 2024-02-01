@@ -18,17 +18,17 @@
 			<DefaultValue xsi:type="string"></DefaultValue>
 			<Description xsi:type="string">System generated field</Description>
 			<EditPrivilege xsi:type="string"></EditPrivilege>
-			<Id xsi:type="int">0</Id>
+			<Id xsi:type="int">1</Id>
 			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 			<IsNullable xsi:type="bool">false</IsNullable>
-			<LayerID xsi:type="int">200</LayerID>
+			<LayerID xsi:type="int">300</LayerID>
 			<Length xsi:type="int">0</Length>
 			<Name xsi:type="string">ORIGREC</Name>
 			<Picture xsi:type="string"></Picture>
 			<Precision xsi:type="int">0</Precision>
 			<Scale xsi:type="int">0</Scale>
 			<SCaptions xsi:type="string">ORIGREC,ENG,</SCaptions>
-			<Sorter xsi:type="int">0</Sorter>
+			<Sorter xsi:type="int">1</Sorter>
 			<Type xsi:type="string">INTEGER</Type>
 			<ViewPrivilege xsi:type="string"></ViewPrivilege>
 		</item>
@@ -42,42 +42,18 @@
 			<DefaultValue xsi:type="string">N</DefaultValue>
 			<Description xsi:type="string">System generated field</Description>
 			<EditPrivilege xsi:type="string"></EditPrivilege>
-			<Id xsi:type="int">1</Id>
+			<Id xsi:type="int">2</Id>
 			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 			<IsNullable xsi:type="bool">false</IsNullable>
-			<LayerID xsi:type="int">200</LayerID>
+			<LayerID xsi:type="int">300</LayerID>
 			<Length xsi:type="int">1</Length>
 			<Name xsi:type="string">ORIGSTS</Name>
 			<Picture xsi:type="string"></Picture>
 			<Precision xsi:type="int">0</Precision>
 			<Scale xsi:type="int">0</Scale>
 			<SCaptions xsi:type="string">ORIGSTS,ENG,</SCaptions>
-			<Sorter xsi:type="int">1</Sorter>
-			<Type xsi:type="string">CHAR</Type>
-			<ViewPrivilege xsi:type="string"></ViewPrivilege>
-		</item>
-		<item xsi:type="FieldDTO">
-			<__array__Captions xsi:type="object">
-			</__array__Captions>
-			<CommitError xsi:type="string"></CommitError>
-			<CommitState xsi:type="string">OK</CommitState>
-			<ControlType xsi:type="string"></ControlType>
-			<DdlState xsi:type="string"></DdlState>
-			<DefaultValue xsi:type="string"></DefaultValue>
-			<Description xsi:type="string"></Description>
-			<EditPrivilege xsi:type="string"></EditPrivilege>
-			<Id xsi:type="int">2</Id>
-			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
-			<IsNullable xsi:type="bool">true</IsNullable>
-			<LayerID xsi:type="int">200</LayerID>
-			<Length xsi:type="int">30</Length>
-			<Name xsi:type="string">CONTROL_TYPE</Name>
-			<Picture xsi:type="string"></Picture>
-			<Precision xsi:type="int">0</Precision>
-			<Scale xsi:type="int">0</Scale>
-			<SCaptions xsi:type="string">CONTROL_TYPE,ENG,Control Type</SCaptions>
 			<Sorter xsi:type="int">2</Sorter>
-			<Type xsi:type="string">VARCHAR</Type>
+			<Type xsi:type="string">CHAR</Type>
 			<ViewPrivilege xsi:type="string"></ViewPrivilege>
 		</item>
 		<item xsi:type="FieldDTO">
@@ -93,38 +69,14 @@
 			<Id xsi:type="int">3</Id>
 			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 			<IsNullable xsi:type="bool">true</IsNullable>
-			<LayerID xsi:type="int">200</LayerID>
-			<Length xsi:type="int">50</Length>
-			<Name xsi:type="string">PROPERTY_NAME</Name>
+			<LayerID xsi:type="int">300</LayerID>
+			<Length xsi:type="int">30</Length>
+			<Name xsi:type="string">CONTROL_TYPE</Name>
 			<Picture xsi:type="string"></Picture>
 			<Precision xsi:type="int">0</Precision>
 			<Scale xsi:type="int">0</Scale>
-			<SCaptions xsi:type="string">PROPERTY_NAME,ENG,Property Name</SCaptions>
+			<SCaptions xsi:type="string">CONTROL_TYPE,ENG,Control Type</SCaptions>
 			<Sorter xsi:type="int">3</Sorter>
-			<Type xsi:type="string">VARCHAR</Type>
-			<ViewPrivilege xsi:type="string"></ViewPrivilege>
-		</item>
-		<item xsi:type="FieldDTO">
-			<__array__Captions xsi:type="object">
-			</__array__Captions>
-			<CommitError xsi:type="string"></CommitError>
-			<CommitState xsi:type="string">OK</CommitState>
-			<ControlType xsi:type="string"></ControlType>
-			<DdlState xsi:type="string"></DdlState>
-			<DefaultValue xsi:type="string"></DefaultValue>
-			<Description xsi:type="string"></Description>
-			<EditPrivilege xsi:type="string"></EditPrivilege>
-			<Id xsi:type="int">4</Id>
-			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
-			<IsNullable xsi:type="bool">true</IsNullable>
-			<LayerID xsi:type="int">200</LayerID>
-			<Length xsi:type="int">255</Length>
-			<Name xsi:type="string">DEFAULT_VALUE</Name>
-			<Picture xsi:type="string"></Picture>
-			<Precision xsi:type="int">0</Precision>
-			<Scale xsi:type="int">0</Scale>
-			<SCaptions xsi:type="string">DEFAULT_VALUE,ENG,Default Value</SCaptions>
-			<Sorter xsi:type="int">4</Sorter>
 			<Type xsi:type="string">VARCHAR</Type>
 			<ViewPrivilege xsi:type="string"></ViewPrivilege>
 		</item>
@@ -141,19 +93,67 @@
 			<Id xsi:type="int">5</Id>
 			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 			<IsNullable xsi:type="bool">true</IsNullable>
-			<LayerID xsi:type="int">200</LayerID>
+			<LayerID xsi:type="int">300</LayerID>
+			<Length xsi:type="int">50</Length>
+			<Name xsi:type="string">PROPERTY_NAME</Name>
+			<Picture xsi:type="string"></Picture>
+			<Precision xsi:type="int">0</Precision>
+			<Scale xsi:type="int">0</Scale>
+			<SCaptions xsi:type="string">PROPERTY_NAME,ENG,Property Name</SCaptions>
+			<Sorter xsi:type="int">5</Sorter>
+			<Type xsi:type="string">VARCHAR</Type>
+			<ViewPrivilege xsi:type="string"></ViewPrivilege>
+		</item>
+		<item xsi:type="FieldDTO">
+			<__array__Captions xsi:type="object">
+			</__array__Captions>
+			<CommitError xsi:type="string"></CommitError>
+			<CommitState xsi:type="string">OK</CommitState>
+			<ControlType xsi:type="string"></ControlType>
+			<DdlState xsi:type="string"></DdlState>
+			<DefaultValue xsi:type="string"></DefaultValue>
+			<Description xsi:type="string"></Description>
+			<EditPrivilege xsi:type="string"></EditPrivilege>
+			<Id xsi:type="int">6</Id>
+			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
+			<IsNullable xsi:type="bool">true</IsNullable>
+			<LayerID xsi:type="int">300</LayerID>
+			<Length xsi:type="int">255</Length>
+			<Name xsi:type="string">DEFAULT_VALUE</Name>
+			<Picture xsi:type="string"></Picture>
+			<Precision xsi:type="int">0</Precision>
+			<Scale xsi:type="int">0</Scale>
+			<SCaptions xsi:type="string">DEFAULT_VALUE,ENG,Default Value</SCaptions>
+			<Sorter xsi:type="int">6</Sorter>
+			<Type xsi:type="string">VARCHAR</Type>
+			<ViewPrivilege xsi:type="string"></ViewPrivilege>
+		</item>
+		<item xsi:type="FieldDTO">
+			<__array__Captions xsi:type="object">
+			</__array__Captions>
+			<CommitError xsi:type="string"></CommitError>
+			<CommitState xsi:type="string">OK</CommitState>
+			<ControlType xsi:type="string"></ControlType>
+			<DdlState xsi:type="string"></DdlState>
+			<DefaultValue xsi:type="string"></DefaultValue>
+			<Description xsi:type="string"></Description>
+			<EditPrivilege xsi:type="string"></EditPrivilege>
+			<Id xsi:type="int">7</Id>
+			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
+			<IsNullable xsi:type="bool">true</IsNullable>
+			<LayerID xsi:type="int">300</LayerID>
 			<Length xsi:type="int">255</Length>
 			<Name xsi:type="string">PROPERTY_GROUP</Name>
 			<Picture xsi:type="string"></Picture>
 			<Precision xsi:type="int">0</Precision>
 			<Scale xsi:type="int">0</Scale>
 			<SCaptions xsi:type="string">PROPERTY_GROUP,ENG,Group</SCaptions>
-			<Sorter xsi:type="int">5</Sorter>
+			<Sorter xsi:type="int">7</Sorter>
 			<Type xsi:type="string">VARCHAR</Type>
 			<ViewPrivilege xsi:type="string"></ViewPrivilege>
 		</item>
 	</__array__Fields>
-	<Id xsi:type="string">15A3F8CB-2F7B-4C98-BA59-8FA367542412</Id>
+	<Id xsi:type="string">CBC76334-376E-4CD9-A806-9447B4BA2AAE</Id>
 	<__array__Indexes xsi:type="object">
 		<item xsi:type="IndexDTO">
 			<CommitError xsi:type="string"></CommitError>
@@ -171,7 +171,7 @@
 					<Sorter xsi:type="int">1</Sorter>
 				</item>
 			</__array__Fields>
-			<Id xsi:type="int">0</Id>
+			<Id xsi:type="int">1</Id>
 			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 			<Name xsi:type="string">PK_CONTROL_PROPERTIES</Name>
 			<Type xsi:type="string">P</Type>
@@ -202,7 +202,7 @@
 					<Sorter xsi:type="int">2</Sorter>
 				</item>
 			</__array__Fields>
-			<Id xsi:type="int">1</Id>
+			<Id xsi:type="int">2</Id>
 			<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 			<Name xsi:type="string">IX_U_CONTROL_PROPERTIES02</Name>
 			<Type xsi:type="string">U</Type>
@@ -210,7 +210,7 @@
 	</__array__Indexes>
 	<IsMetadataDirty xsi:type="bool">false</IsMetadataDirty>
 	<IsSystem xsi:type="bool">true</IsSystem>
-	<LayerID xsi:type="int">200</LayerID>
+	<LayerID xsi:type="int">300</LayerID>
 	<Name xsi:type="string">CONTROL_PROPERTIES</Name>
 	<OrigrecAsIdentity xsi:type="bool">true</OrigrecAsIdentity>
 	<__array__Relations xsi:type="object">
