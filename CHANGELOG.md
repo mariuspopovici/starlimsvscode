@@ -153,3 +153,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for ESLint rules when editing Javascript form code behind with STARLIMS specific objects and types. Config file .eslintrc.json and package.json is automatically deployed in the root folder during activation
 - Integrated proof-of-concept forms designer application in backend package
 - Added urlSuffix setting for handling API calls on older STARLIMS runtime where HTTPServices web.config key is not recognized
+
+## [1.2.81] - 2024-01-27
+
+- Misc. fixes
+- Enhancements to forms designer
+
+## [1.2.82] - 2024-01-31
+
+- Misc. fixes
