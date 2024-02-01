@@ -5,11 +5,11 @@ Description.. :	HTML Forms Designer
 Author....... :	DC
 Date......... : 2623-07-11
 */
-#include "FormDesigner.ContextMenu"
-#include "FormDesigner.GUIFunctions"
-#include "FormDesigner.TreeView"
-#include "FormDesigner.ReadXML"
-#include "FormDesigner.SaveXML"
+//#include "FormDesigner.ContextMenu"
+//#include "FormDesigner.GUIFunctions"
+//#include "FormDesigner.TreeView"
+//#include "FormDesigner.ReadXML"
+//#include "FormDesigner.SaveXML"
 
 //BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
 
@@ -56,6 +56,9 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
 
     switch (sPropertyName)
     {
+        case "(Id)":
+            selectedControl.itemId = value;
+            return;
         case "Visible":
             // change opacity
             if (value === "True")
