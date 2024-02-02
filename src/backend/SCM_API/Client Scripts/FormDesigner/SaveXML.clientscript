@@ -1,8 +1,8 @@
-/********************************************************************************
+/*
 Description.. :	Save form as XML in database
 Author....... :	DC
 Date......... : 2023-11-16
-*******************************************************************************/
+*/
 
 // generate XML from form and save it to database
 async function SaveForm(sApplicationName, sFormName, sFormLang)
@@ -55,10 +55,8 @@ async function GetXMLProperties(control, sIndentation = "")
         control.Guid = System.Guid.NewGuid().ToString();
 
     sXML += sIndentation + "<Guid>" + control.Guid + "</Guid>\n";
-
-    if(control.Id)
-        sXML += sIndentation + "<Id>" + control.Id + "</Id>\n";
-
+    
+    
     // loop over control's properties
     for (let row of aProperties)
     {
@@ -74,6 +72,13 @@ async function GetXMLProperties(control, sIndentation = "")
         // skip invalid values
         if (value === undefined || value === null || value === "" || value === "default")
             continue;
+
+        // skip id in brackets
+        if(sPropertyName === "(Id)")
+        {
+            control.itemId = value;
+            continue;
+        }
 
         if (control.xType === "TabPage" || control.xType === "Form")
         {
@@ -98,6 +103,10 @@ async function GetXMLProperties(control, sIndentation = "")
 
         sXML += sIndentation + "<" + sPropertyName + ">" + value + "</" + sPropertyName + ">\n";
     }
+
+    // add control id
+    sXML += sIndentation + "<Id>" + control.Id + "</Id>\n";
+
     return sXML;
 }
 
