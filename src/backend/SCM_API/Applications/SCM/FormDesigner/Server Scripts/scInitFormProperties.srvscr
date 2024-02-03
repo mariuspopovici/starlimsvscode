@@ -34,7 +34,7 @@ aControlProperties := {
 	{'Button',	'Top',	NIL,	'Layout'},
 	{'Button',	'Width',	NIL,	'Layout'},
 	{'Button',	'Height',	NIL,	'Layout'},
-	{'Button',	'{Id)',	NIL,	'Other'},
+	{'Button',	'(Id)',	NIL,	'Other'},
 	{'ButtonBar',	'BackColor',	NIL,	'Appearance'},
 	{'ButtonBar',	'BorderStyle',	'SINGLE',	'Appearance'},
 	{'ButtonBar',	'Cursor',	NIL,	'Appearance'},
