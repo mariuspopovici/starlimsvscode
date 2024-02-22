@@ -242,7 +242,7 @@
       {
         "command": "STARLIMS.GoToItem",
         "key": "f11",
-        "when": "editorTextFocus && (resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL') || (inOutput && editorLangId == 'Log')"
+        "when": "editorTextFocus && (resourceDirname =~ /SLVSCODE/ && editorLangId != 'log' && editorLangId != 'SLSQL') || (focusedView == 'workbench.panel.output' && resourceExtname == '.vscode-starlims-#2-STARLIMS Log')"
       },
       {
         "command": "STARLIMS.RunScript",
@@ -277,12 +277,12 @@
       {
         "command": "STARLIMS.RefreshLogChannel",
         "key": "f5",
-        "when": "inOutput && editorLangId == 'Log'"
+        "when": "focusedView == 'workbench.panel.output'"
       },
       {
         "command": "STARLIMS.ClearLogChannel",
         "key": "ctrl+f5",
-        "when": "inOutput && editorLangId == 'Log'"
+        "when": "focusedView == 'workbench.panel.output'"
       },
       {
         "command": "STARLIMS.GlobalCodeSearch",
@@ -516,7 +516,7 @@
         },
         {
           "submenu": "STARLIMS.ServerLog",
-          "when": "inOutput && editorLangId == 'Log'",
+          "when": "focusedView == 'workbench.panel.output' && resourceExtname == '.vscode-starlims-#2-STARLIMS Log'",
           "group": "ServerLog"
         }
       ],

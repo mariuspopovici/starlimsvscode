@@ -115,10 +115,10 @@ export async function activate(context: vscode.ExtensionContext) {
   const enterpriseService = new EnterpriseService(config, secretStorage);
 
   // create output channel for the extension
-  const outputChannel = vscode.window.createOutputChannel("STARLIMS");
+  const outputChannel = vscode.window.createOutputChannel("STARLIMS", 'log');
 
   // create output channel for the log
-  const logChannel = vscode.window.createOutputChannel("STARLIMS Log");
+  const logChannel = vscode.window.createOutputChannel("STARLIMS Log", 'log');
 
   // install ESlint to SLVSCODE folder if not already installed
   // check for .eslintrc.json file
