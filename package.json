@@ -277,12 +277,12 @@
       {
         "command": "STARLIMS.RefreshLogChannel",
         "key": "f5",
-        "when": "focusedView == 'workbench.panel.output'"
+        "when": "focusedView == 'workbench.panel.output' && resourceExtname == '.vscode-starlims-#2-STARLIMS Log'"
       },
       {
         "command": "STARLIMS.ClearLogChannel",
         "key": "ctrl+f5",
-        "when": "focusedView == 'workbench.panel.output'"
+        "when": "focusedView == 'workbench.panel.output' && resourceExtname == '.vscode-starlims-#2-STARLIMS Log'"
       },
       {
         "command": "STARLIMS.GlobalCodeSearch",
