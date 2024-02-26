@@ -184,8 +184,8 @@ export class ResourcesDataViewPanel {
               xmlData +=
                 "\t<ResourcesTable>\n" +
                 `\t\t<Guid>${row[0]}</Guid>\n` +
-                `\t\t<ResourceId>${this.escapeXml(row[1])}</ResourceId>\n` +
-                `\t\t<ResourceValue>${this.escapeXml(row[2])}</ResourceValue>\n` +
+                `\t\t<ResourceId>${escapeXml(row[1])}</ResourceId>\n` +
+                `\t\t<ResourceValue>${escapeXml(row[2])}</ResourceValue>\n` +
                 "\t</ResourcesTable>\n";
             }
             xmlData += "</ResourcesDataset>";
@@ -237,17 +237,17 @@ export class ResourcesDataViewPanel {
       this.disposables
     );
   }
+}
 
-  /*
-   * escape xml tag text special symbol
-   */
-  private escapeXml(unsafe: string) {
-    var result
-    result = unsafe.replace("<", "&lt;")
-    result = unsafe.replace(">", "&gt;")
-    result = unsafe.replace("&", "&amp;")
-    result = unsafe.replace("\'", "&apos;")
-    result = unsafe.replace("\"", "&quot;")
-    return result
-  }
+/*
+* escape xml tag text special symbol
+*/
+export function escapeXml(unsafe: string) {
+  let result = unsafe;
+  result = result.replace(/&/g, "&amp;"); // first handle symbol '&' because other escape operations generate '&'
+  result = result.replace(/</g, "&lt;");
+  result = result.replace(/>/g, "&gt;");
+  result = result.replace(/'/g, "&apos;");
+  result = result.replace(/"/g, "&quot;");
+  return result;
 }
