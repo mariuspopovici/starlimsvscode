@@ -225,7 +225,7 @@
               <ItemCategory>FormDesigner</ItemCategory>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -237,7 +237,7 @@
               <ItemCategory>FormDesigner</ItemCategory>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -249,7 +249,7 @@
               <ItemCategory>FormDesigner</ItemCategory>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -261,7 +261,7 @@
               <ItemCategory>FormDesigner</ItemCategory>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -273,7 +273,7 @@
               <ItemCategory>FormDesigner</ItemCategory>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -614,7 +614,7 @@
           <ItemContent>Client Scripts\FormDesigner\ContextMenu.clientscript</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -627,7 +627,7 @@
           <ItemContent>Client Scripts\FormDesigner\GUIFunctions.clientscript</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -640,7 +640,7 @@
           <ItemContent>Client Scripts\FormDesigner\ReadXML.clientscript</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -653,7 +653,7 @@
           <ItemContent>Client Scripts\FormDesigner\SaveXML.clientscript</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -666,7 +666,7 @@
           <ItemContent>Client Scripts\FormDesigner\TreeView.clientscript</ItemContent>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -690,7 +690,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -702,7 +702,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -714,7 +714,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -726,7 +726,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -738,7 +738,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -762,7 +762,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -774,7 +774,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -786,7 +786,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -798,7 +798,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
@@ -810,7 +810,7 @@
           <ItemCategory>FormDesigner</ItemCategory>
           <IsMandatory>false</IsMandatory>
           <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
+          <ItemProgrammingLanguage>JSCRIPT</ItemProgrammingLanguage>
           <ItemIsOwned>N</ItemIsOwned>
           <IsReferred>false</IsReferred>
         </ClientScript>
