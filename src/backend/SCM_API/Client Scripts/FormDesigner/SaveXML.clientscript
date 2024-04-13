@@ -76,7 +76,7 @@ async function GetXMLProperties(control, sIndentation = "")
         // skip id in brackets
         if(sPropertyName === "(Id)")
         {
-            control.itemId = value;
+            control.Id = control.itemId = value;
             continue;
         }
 
@@ -194,7 +194,7 @@ async function GetXMLControl(node, sIndentation = "")
             sXML += sIndentation + "\t\t</item>\n";
         }
         sXML += sIndentation + "\t</__array__Columns>\n";
-        sXML += sIndentation + "\t<__array__ChildTables />\n";
+        sXML += sIndentation + "\t<__array__ChildTables/>\n";
         sXML += sIndentation + "</RootTable>\n";
     }
     
