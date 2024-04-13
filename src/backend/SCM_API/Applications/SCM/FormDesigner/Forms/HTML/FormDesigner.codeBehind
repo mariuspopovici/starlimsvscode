@@ -5,11 +5,11 @@ Description.. :	HTML Forms Designer
 Author....... :	DC
 Date......... : 2623-07-11
 */
-//#include "FormDesigner.ContextMenu"
-//#include "FormDesigner.GUIFunctions"
-//#include "FormDesigner.TreeView"
-//#include "FormDesigner.ReadXML"
-//#include "FormDesigner.SaveXML"
+#include "FormDesigner.ContextMenu"
+#include "FormDesigner.GUIFunctions"
+#include "FormDesigner.TreeView"
+#include "FormDesigner.ReadXML"
+#include "FormDesigner.SaveXML"
 
 //BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
 
@@ -30,6 +30,7 @@ var _dgdProperties = form.All("_dgdProperties"); // DataGrid
 // variables for GUIFunctions.js
 var controlCounter = 0;
 var selectedControl;
+var pnlSelected;
 var htControls = new Hashtable();
 
 async function lbrControls_OnItemClick(sender, eventArgs)

@@ -108,8 +108,12 @@ async function CreateControlFromXML(xmlNode, xmlParentNode, control)
     // get control type
     var sType = nodeElement[0].textContent.replace("Starlims", "");
 
-    // get control id
-    var sGuid = xmlNode.getElementsByTagName("Guid")[0].textContent;
+    // get control's guid
+    var sGuid;
+    if(xmlNode && xmlNode.getElementsByTagName("Guid").length > 0)
+        sGuid = xmlNode.getElementsByTagName("Guid")[0].textContent;
+    else
+        sGuid = System.Guid.NewGuid().ToString();
 
     if (sType === "Form")
     {
@@ -348,11 +352,22 @@ async function GetNodeFromXML(xmlNode, xmlParentNode)
 // get property value from xml node
 function GetProperty(column, name)
 {
-    let element = column.getElementsByTagName(name);
-    if (element.length > 0 && element[0].textContent)
-        return element[0].textContent;
+    if(!column && !column.childNodes[0])
+        return;
+
+    var nodes;
+
+    // use childNode if only one child
+    if(column.childNodes.length === 1)
+        nodes = column.childNodes[0].childNodes;
     else
-        return null;
+        nodes = column.childNodes;
+
+    for (let property of nodes)
+    {
+        if (property.nodeName === name)
+            return property.textContent;
+    }
 }
 
 // load control properties
