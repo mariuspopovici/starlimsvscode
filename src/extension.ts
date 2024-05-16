@@ -1582,6 +1582,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // move item
   vscode.commands.registerCommand(
     "STARLIMS.Move",
     async () => {

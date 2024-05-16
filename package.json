@@ -425,12 +425,12 @@
         },
         {
           "command": "STARLIMS.Rename",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY",
           "group": "addRemove"
         },
         {
           "command": "STARLIMS.Move",
-          "when": "view == STARLIMSMainTree && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY && !(viewItem =~ /cat/i)",
+          "when": "(view == STARLIMSMainTree || view == STARLIMSCheckedOutTree) && viewItem != SERVERLOG && viewItem != CATEGORY && viewItem != TABLE && viewItem != ENT_TABLES_DATABASE && viewItem != ENT_TABLES_DICTIONARY && !(viewItem =~ /cat/i)",
           "group": "addRemove"
         }
       ],

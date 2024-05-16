@@ -17,7 +17,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 
 oEnterpriseItem := oUtils:ParseURI(sURI);
 
-:IF Empty(oEnterpriseItem:Type);
+:IF !oEnterpriseItem:IsProperty("Type") .OR. Empty(oEnterpriseItem:Type);
 	oResult := CreateUDObject({
 		{"success", .F.},
 		{"error", "Invalid Type"}
@@ -25,8 +25,6 @@ oEnterpriseItem := oUtils:ParseURI(sURI);
 	Response:StatusCode := 400;
 	:RETURN oResult;
 :ENDIF;
-
-/*usrmes("type:", oEnterpriseItem:Type);
 
 aItems := {};
 

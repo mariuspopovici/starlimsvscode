@@ -5,7 +5,7 @@ Author....... :	MARIUS
 Date......... : 2023-07-31
 ********************************************************************************/;
 :DECLARE sVersion;
-sVersion := "1.2.85";
+sVersion := "1.2.87";
 
 :DECLARE oResponse;
 oResponse := CreateUDObject({

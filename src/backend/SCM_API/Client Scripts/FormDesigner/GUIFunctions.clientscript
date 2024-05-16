@@ -108,6 +108,7 @@ async function AddControl(controlType)
             control.Width = 100;
             control.Height = 26;
             control.xType = "DateTimePicker";
+            control.Value = new Date();
             break;
         case "Frame":
             control = new Frame();
@@ -296,7 +297,7 @@ async function AddControl(controlType)
         control.Id = id;
     }
 
-    if(control.xType != "TabControl")
+    if(control.xType != "TabControl" && control.xType != "DateTimePicker")
         control.Text = control.Id;
 
     control.Top = 20;
