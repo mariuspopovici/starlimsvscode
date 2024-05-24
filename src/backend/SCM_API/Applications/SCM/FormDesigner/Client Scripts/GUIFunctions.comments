@@ -1,1 +1,1 @@
-update limsSOURCECONTROL set REASONFORCHECKOUT = '' where versionID = ?
+update limsSOURCECONTROL set REASONFORCHECKOUT = 'Checked in from VSCode' where versionID = ?

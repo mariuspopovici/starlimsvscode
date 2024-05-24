@@ -1060,6 +1060,9 @@ export async function activate(context: vscode.ExtensionContext) {
           }
         );
         language = oReturn.label;
+
+        // add item language to the selected item type
+        selectedItemType = `${selectedItemType}/${itemLanguage}`;
       }
 
       // check out the item
@@ -1582,6 +1585,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // move item
   vscode.commands.registerCommand(
     "STARLIMS.Move",
     async () => {

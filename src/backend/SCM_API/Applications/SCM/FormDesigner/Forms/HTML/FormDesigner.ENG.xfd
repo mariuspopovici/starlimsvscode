@@ -766,4 +766,4 @@
   <CloseOnEscape>false</CloseOnEscape>
   <OnCmdKeyPress>frmFormDesigner_OnCmdKeyPress</OnCmdKeyPress>
   <ValidateOnClose>false</ValidateOnClose>
-</Form>
+<ModeSet></ModeSet><BaseMode></BaseMode></Form>

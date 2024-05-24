@@ -142,4 +142,4 @@
   <OnShow>Form1_OnShow</OnShow>
   <CloseOnEscape>false</CloseOnEscape>
   <ValidateOnClose>false</ValidateOnClose>
-</Form>
+<ModeSet></ModeSet><BaseMode></BaseMode></Form>
