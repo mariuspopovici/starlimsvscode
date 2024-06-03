@@ -112,7 +112,7 @@ async function CreateControlFromXML(xmlNode, xmlParentNode, control)
     var sGuid;
     if(xmlNode && xmlNode.getElementsByTagName("Guid").length > 0)
         sGuid = xmlNode.getElementsByTagName("Guid")[0].textContent;
-    else
+else
         sGuid = System.Guid.NewGuid().ToString();
 
     if (sType === "Form")

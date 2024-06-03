@@ -58,7 +58,11 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
     switch (sPropertyName)
     {
         case "(Id)":
+            let sFormID = _cboForm.SelectedValue;
+            let oldId = selectedControl.itemId;
             selectedControl.itemId = value;
+            // update form behind code
+            lims.CallServer("FormDesigner.scModifyCodeBehind.ReplaceString", [sFormID, oldId, value]);
             return;
         case "Visible":
             // change opacity
@@ -308,4 +312,23 @@ async function frmFormDesigner_OnCmdKeyPress( sender, eventArgs )
         if(selectedControl != _Form1)
             __control_OnDelete(selectedControl);
 	}
+}
+
+async function _dgdProperties_OnCellDoubleClick( sender, eventArgs )
+{
+    var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
+    var sFunction = _dgdProperties.GetCurrentRowData("PROPERTY_VALUE");
+
+    if(sPropertyName.includes("On") && (sFunction == null || sFunction == ""))
+    {
+        let sFunctionName = selectedControl.itemId + "_" + sPropertyName;
+        let sFormID = _cboForm.SelectedValue;
+        await lims.CallServer("FormDesigner.scModifyCodeBehind.AddFunction", [sFormID, sFunctionName]);
+
+        form.Variables["PreventLoadProperties"] = true;
+        await SetProperties(sPropertyName, sFunctionName);
+        form.Variables["PreventLoadProperties"] = false;
+
+        _dgdProperties.SetCurrentRowData("PROPERTY_VALUE", sFunctionName);
+    }
 }
