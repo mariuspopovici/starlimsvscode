@@ -207,6 +207,16 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
   }
 
   /**
+   * Search for tree item by its GUID
+   * @param guid The GUID of the tree item to search for
+   * @returns The tree item for the document
+   */
+  async getTreeItemByGuid(guid: string, itemType: EnterpriseItemType): Promise<TreeEnterpriseItem | undefined> {
+    const enterpriseItems: TreeEnterpriseItem[] = this.treeItems;
+    return enterpriseItems.find((item) => item.guid === guid && item.type === itemType);
+  }
+  
+  /**
    * Returns a URI for the item if it is checked out by the current user.
    * @param item The item to check
    * @returns A URI for the item if it is checked out by the current user, otherwise undefined.

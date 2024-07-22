@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import { EnterpriseFileDecorationProvider } from "./providers/enterpriseFileDecorationProvider";
 import { EnterpriseItemType, EnterpriseTreeDataProvider, TreeEnterpriseItem } from "./providers/enterpriseTreeDataProvider";
 import { EnterpriseService } from "./services/enterpriseService";
+import { ExpressServer } from "./services/expressServer";
 import { EnterpriseTextDocumentContentProvider } from "./providers/enterpriseTextContentProvider";
 import path = require("path");
 import { ResourcesDataViewPanel } from "./panels/ResourcesDataViewPanel";
@@ -114,6 +115,9 @@ export async function activate(context: vscode.ExtensionContext) {
   // create enterprise service
   const enterpriseService = new EnterpriseService(config, secretStorage);
 
+  const expressServer = new ExpressServer();
+  expressServer.start();
+
   // create output channel for the extension
   const outputChannel = vscode.window.createOutputChannel("STARLIMS", 'log');
 
@@ -213,6 +217,10 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.window.registerTreeDataProvider("STARLIMSMainTree", enterpriseTreeProvider);
 
   // register a custom tree data provider for the STARLIMS checked out items
+  let checkedOutItems = await enterpriseService.getCheckedOutItems(false);
+  const checkedOutTreeDataProvider = new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService);
+  vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree", checkedOutTreeDataProvider);
+
   vscode.commands.registerCommand(
     "STARLIMS.GetCheckedOutItems",
     async () => {
@@ -292,7 +300,9 @@ export async function activate(context: vscode.ExtensionContext) {
     async (item: TreeEnterpriseItem | any) => {
       // if no item is defined, get the item from the active editor
       if (!(item instanceof TreeEnterpriseItem)) {
-        item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false) as TreeEnterpriseItem;
+        if (item.path !== undefined) {
+          item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false) as TreeEnterpriseItem;
+        }
       }
 
       // set the selected item
@@ -1083,7 +1093,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (newItem !== undefined) {
         vscode.commands.executeCommand("STARLIMS.selectEnterpriseItem", newItem);
       }
-      
+
       // refresh checkout tree
       vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
     }
@@ -1606,7 +1616,7 @@ export async function activate(context: vscode.ExtensionContext) {
         // refresh trees
         enterpriseTreeProvider.refresh();
         vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
-        
+
         // close and delete (local copies) open documents with the old name
         const filteredTextDocuments = vscode.workspace.textDocuments.filter(td => td.fileName.indexOf(itemName) > 0);
         for (const td of filteredTextDocuments) {
@@ -1722,8 +1732,34 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // refresh the checked out items tree
-  vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+  // register the OpenCodeBehind command
+  vscode.commands.registerCommand("STARLIMS.OpenCodeBehind", async (formId: string | any, functionName: string | any) => {
+    // get tree item from formId
+    var item = await enterpriseService.getItemByGUID(formId, EnterpriseItemType.HTMLFormCode);
+    if (item === null) {
+      vscode.window.showErrorMessage("Could not find the selected item.");
+      return;
+    }
+
+    if (item !== undefined) {
+      vscode.commands.executeCommand("STARLIMS.GetLocal", item);
+
+      // go to the function name
+      if (functionName !== undefined) {
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+          const text = editor.document.getText();
+          const regex = new RegExp(`async function ${functionName}\\(`, "mig");
+          const match = regex.exec(text);
+          if (match) {
+            const position = editor.document.positionAt(match.index);
+            editor.selection = new vscode.Selection(position, position);
+            editor.revealRange(new vscode.Range(position, position));
+          }
+        }
+      }
+    }
+  });
 
   // show the connection message
   vscode.window.showInformationMessage(

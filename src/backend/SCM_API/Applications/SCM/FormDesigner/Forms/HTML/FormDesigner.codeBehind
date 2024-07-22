@@ -58,11 +58,11 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
     switch (sPropertyName)
     {
         case "(Id)":
-            let sFormID = _cboForm.SelectedValue;
-            let oldId = selectedControl.itemId;
             selectedControl.itemId = value;
-            // update form behind code
-            lims.CallServer("FormDesigner.scModifyCodeBehind.ReplaceString", [sFormID, oldId, value]);
+            // refresh tree node
+            let oldId = selectedControl.Id;
+            let newId = value;
+            UpdateTreeNodeId(oldId, newId);
             return;
         case "Visible":
             // change opacity
@@ -122,6 +122,28 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
     }
 }
 
+async function dgdProperties_OnCellDoubleClick(sender, eventArgs)
+{
+    var value = eventArgs["record"][0];
+    if(eventArgs["column"].Id !== "PROPERTY_NAME" || !value.includes("On"))
+        return;
+
+    var sFormID = form.Variables["FormID"];
+    var sFunctionName = _cboControl.Text.split('(')[0].replace(" ", "_") + value;
+
+    // create a new function
+    lims.CallServer("FormDesigner.scModifyCodeBehind.AddFunction", [sFormID, sFunctionName]);
+
+    // execute HTTP GET request to http://localhost:3000/OpenCodeBehind/FormID
+    var sURL = "http://localhost:3000/OpenCodeBehind/" + sFormID + "/" + sFunctionName;
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", sURL, true);
+    oReq.send();
+
+    // set new function name in grid
+    eventArgs["record"][1] = sFunctionName;
+}
+
 async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
 {
     var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
@@ -174,6 +196,8 @@ async function dgdProperties_OnRowChange(sender, eventArgs)
     
     form.Variables["PreventLoadProperties"] = true;
 
+    await Application.DoEvents();
+
     var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
     var sPropertyValue = eventArgs["record"]["PROPERTY_VALUE"];
     
@@ -184,13 +208,15 @@ async function dgdProperties_OnRowChange(sender, eventArgs)
 
 async function frmFormDesigner_OnLoad(sender, eventArgs)
 {
+    _dgdProperties.OnCellDoubleClick = dgdProperties_OnCellDoubleClick;
+
     if(form.formArguments)
     {
         var sFormID = form.formArguments;
         _cboForm.SelectedValue = sFormID;
         return;
     }
-
+    
     await CreateEmptyForm();
 
     // populate controls combobox
@@ -205,7 +231,8 @@ async function cboControl_OnSelectionChanged(sender, eventArgs)
         return;
     
     // load control properties into grid
-    __control_OnClick(htControls[sender.SelectedValue], null);
+    var event = { target: htControls[sender.SelectedValue] };
+    __control_OnClick(event);
 }
 
 async function btnSave_OnClick(sender, eventArgs)
@@ -229,7 +256,7 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
     _Form1.mask("Loading...");
     await Application.DoEvents();
 
-    var sFormID = _cboForm.SelectedValue;
+    var sFormID = form.Variables["FormID"] = _cboForm.SelectedValue;
 
     // use regex to get language from brackets in combobox text
     var sFormLang = _cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
@@ -312,23 +339,4 @@ async function frmFormDesigner_OnCmdKeyPress( sender, eventArgs )
         if(selectedControl != _Form1)
             __control_OnDelete(selectedControl);
 	}
-}
-
-async function _dgdProperties_OnCellDoubleClick( sender, eventArgs )
-{
-    var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
-    var sFunction = _dgdProperties.GetCurrentRowData("PROPERTY_VALUE");
-
-    if(sPropertyName.includes("On") && (sFunction == null || sFunction == ""))
-    {
-        let sFunctionName = selectedControl.itemId + "_" + sPropertyName;
-        let sFormID = _cboForm.SelectedValue;
-        await lims.CallServer("FormDesigner.scModifyCodeBehind.AddFunction", [sFormID, sFunctionName]);
-
-        form.Variables["PreventLoadProperties"] = true;
-        await SetProperties(sPropertyName, sFunctionName);
-        form.Variables["PreventLoadProperties"] = false;
-
-        _dgdProperties.SetCurrentRowData("PROPERTY_VALUE", sFunctionName);
-    }
 }

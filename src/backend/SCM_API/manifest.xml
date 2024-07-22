@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>A95C94DF-54DF-4557-8DED-B1EB569C772C</ItemID>
+  <ItemID>80DF7D43-2198-4E95-97D6-6F7234EAAF24</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2024-06-03T14:09:07.7144975+02:00</PackageDate>
+  <PackageDate>2024-07-22T10:18:15.9651077+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -455,6 +455,19 @@
           <IsReferred>false</IsReferred>
         </ServerScript>
         <ServerScript>
+          <ItemID>FE2B20E2-67F4-460C-988C-9F18BB90C29A</ItemID>
+          <ItemName>GetItemByGUID</ItemName>
+          <LayerId>300</LayerId>
+          <ItemDescription />
+          <ItemCategory>SCM_API</ItemCategory>
+          <ItemContent>Server Scripts\SCM_API\GetItemByGUID.srvscr</ItemContent>
+          <IsMandatory>false</IsMandatory>
+          <ItemBehaviour>overwrite</ItemBehaviour>
+          <ItemProgrammingLanguage>STARLIMS</ItemProgrammingLanguage>
+          <ItemIsOwned>N</ItemIsOwned>
+          <IsReferred>false</IsReferred>
+        </ServerScript>
+        <ServerScript>
           <ItemID>B49E36CE-7F6C-42C8-AE08-72EB606DCEC5</ItemID>
           <ItemName>GetItemGUID</ItemName>
           <LayerId>300</LayerId>
@@ -885,7 +898,7 @@
       <Hidden>true</Hidden>
     </ClientScriptCategory>
     <ClientScriptCategory>
-      <ItemID>FDDBD4BD-0429-46E0-9545-93F2E4B2BA32</ItemID>
+      <ItemID>63E1CB3B-3C01-4AEF-83E2-E2B7F1CD633F</ItemID>
       <ItemName>FormDesigner</ItemName>
       <LayerId>300</LayerId>
       <ItemDescription />
@@ -962,7 +975,6 @@
       <Hidden>true</Hidden>
     </ClientScriptCategory>
   </ClientScriptCategoryCollection>
-  <DataSourceCategoryCollection />
   <LanguageCollection>
     <Language>
       <ItemID>ENG</ItemID>

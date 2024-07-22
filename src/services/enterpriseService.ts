@@ -678,6 +678,16 @@ export class EnterpriseService implements IEnterpriseService {
   }
 
   /**
+   * Search for enterprise items by its GUID and type
+   * @param guid the GUID of the enterprise item
+   * @param itemType the type of the enterprise item
+   * @returns the enterprise item found
+   */
+  public async searchForItemByGUID(guid: string, itemType: string): Promise<any> {
+  // get item from GUID first
+  const url = `${this.baseUrl}/SCM_API.GetItemByGUID.${this.urlSuffix}?GUID=${guid}&ItemType=${itemType}`;
+  }
+  /**
    * Global search for items by occuring text
    * @param searchString the text to search for
    * @returns the enterprise items found
@@ -1092,6 +1102,36 @@ export class EnterpriseService implements IEnterpriseService {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  /**
+   * Get enterprise item by its GUID and type
+   * @param guid the GUID of the enterprise item
+   * @param itemType the type of the enterprise item
+   * @returns the enterprise item found
+   */
+  public async getItemByGUID(guid: string, itemType: string) {
+    const url = `${this.baseUrl}/SCM_API.GetItemByGUID.${this.urlSuffix}?guid=${guid}&itemType=${itemType}`;
+    const headers = new Headers(await this.getAPIHeaders());
+    const options: any = {
+      method: "GET",
+      headers
+    };
+    try {
+      const response = await fetch(url, options);
+      const { success, data }: { success: boolean; data: any } = await response.json();
+      if (success) {
+        return data.items[0];
+      } else {
+        vscode.window.showErrorMessage("Could not retrieve item.");
+        console.error(data);
+        return null;
+      }
+    } catch (e: any) {
+      vscode.window.showErrorMessage("Could not retrieve item.");
+      console.error(e);
+      return null;
     }
   }
 }

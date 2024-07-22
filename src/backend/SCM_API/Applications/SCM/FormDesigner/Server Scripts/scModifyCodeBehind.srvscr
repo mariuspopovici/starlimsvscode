@@ -21,7 +21,7 @@ ExecFunction("Enterprise_Data_Providers.FormProvider.SaveCodeBehind", {sFormId, 
 sCodeBehind := ExecFunction("FormDesigner.scGetFormCodeBehind", {sFormId});
 
 /* check if function already exists;
-:IF At(sFunctionName, sCodeBehind) > 0
+:IF At(sFunctionName, sCodeBehind) > 0;
 	:RETURN;
 :ENDIF;
 

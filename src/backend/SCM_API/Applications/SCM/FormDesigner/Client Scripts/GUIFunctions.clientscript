@@ -17,7 +17,7 @@ async function CreateEmptyForm()
 {
     // create form panel
     _Form1.Id = "_Form1";
-    _Form1.Type = "Form";
+    _Form1.Type = _Form1.xType = "Form";
     _Form1.Guid = System.Guid.NewGuid().ToString();
     _Form1.setStyle('border', '1px dotted black');
     _Form1.CloseOnEscape = false;
@@ -32,7 +32,7 @@ async function CreateEmptyForm()
 
     // clear extjs tree store
     await _treePanel.store.getRootNode().removeAll();
-  
+
     var node = Ext.create("ControlNode", {
         text: "_Form1",
         icon: 'htmlruntime/images/10B98BB5-80D7-B54B-A9BF-F87A586A5675',
@@ -41,16 +41,13 @@ async function CreateEmptyForm()
         control: _Form1,
         properties: _Form1.DataPropertiesXml
     });
-    
+
     // add form to outline
     _treePanel.getRootNode().appendChild(node);
     _treePanel.getRootNode().expand(true);
 
     // bind click event
-    $('[automation-id="_Form1"]').click(function (event)
-    {
-        __control_OnClick(_Form1, event);
-    });
+    $('[automation-id="_Form1"]').click(__control_OnClick);
 
     selectedControl = _Form1;
 }
@@ -293,11 +290,13 @@ async function AddControl(controlType)
         let id = controlType + (controlCounter++).toString();
         // check if id already exists
         while (htControls.ContainsKey(id))
+        {
             id = controlType + (controlCounter++).toString();
+        }
         control.Id = id;
     }
 
-    if(control.xType != "TabControl" && control.xType != "DateTimePicker")
+    if (control.xType != "TabControl" && control.xType != "DateTimePicker")
         control.Text = control.Id;
 
     control.Top = 20;
@@ -319,39 +318,62 @@ async function AddControl(controlType)
 
     // add control to hashtable
     htControls.Add(control.Id, control);
-    __control_OnClick(control, null);
+    let event = new Object();
+    event.target = control;
+    __control_OnClick(event);
     LoadCboControls();
 
     // add control to outline
     let selectedNode = await FindNodeById(selectedControl.Id);
-    AddControlToOutline(control, selectedNode);
+    await AddControlToOutline(control, selectedNode);
+
+    // add root table to outline
+    if (control.xType === "DataGrid")
+    {
+        let rootTable = new StarlimsDataGridTable();
+        rootTable.xType = "StarlimsDataGridTable";
+        rootTable.Id = control.Id + "_RootTable";
+        control.RootTable = rootTable;
+        LoadDataProperties(rootTable);
+        let node = await FindNodeById(control.Id);
+        AddControlToOutline(rootTable, node);
+    }
+
     _treePanel.getRootNode().expand(true);
 
-    // use jquery to bind click event
-    $('[automation-id="' + control.Id + '"]').click(function (event)
-    {
-        __control_OnClick(control, event);
-    });
+    control = $('[automation-id="' + control.Id + '"]');
+
+    // bind events to control
+    // click event
+    control.click(__control_OnClick);
 
     // make control draggable
-    $('[automation-id="' + control.Id + '"]').mousedown(__control_OnDrag);
+    control.mousedown(__control_OnDrag);
+
+    // move control via arrow keys
+    control.keydown(__control_OnKeyDown);
+
+    // recalculate z-index
+    SetZIndex();
 }
 
 async function BindControlEvents(control)
 {
+    var control = $('[automation-id="' + control.Id + '"]');
+
     // remove existing click event
-    $('[automation-id="' + control.Id + '"]').off("click");
+    control.off("click");
 
     // bind click event
-    $('[automation-id="' + control.Id + '"]').click(function (event)
-    {
-        __control_OnClick(control, event);
-    });
+    control.click(__control_OnClick);
 
     if (control.Id !== "_Form1")
     {
         // bind mouse drag event
-        $('[automation-id="' + control.Id + '"]').mousedown(__control_OnDrag);
+        control.mousedown(__control_OnDrag);
+
+        // bind keyDown event
+        control.keydown(__control_OnKeyDown);
     }
 
     // recursively bind events to child controls
@@ -362,9 +384,9 @@ async function BindControlEvents(control)
     }
 
     // recursively bind events to child panels
-    if(control.Panel1)
+    if (control.Panel1)
         BindControlEvents(control.Panel1);
-    if(control.Panel2)
+    if (control.Panel2)
         BindControlEvents(control.Panel2);
 }
 
@@ -381,29 +403,44 @@ async function LoadCboControls()
 }
 
 // loads control's properties on click
-async function __control_OnClick(sender, event)
+async function __control_OnClick(e)
 {
     if (form.Variables["PreventClickEvents"] === true)
         return;
 
-    var control = await sender;
-    if (control === undefined)
+    // get clicked dom element
+    let element = e.target;
+
+    // get dom element id
+    var elementId;
+    if (!element.id)
+        if(element.parentElement && element.parentElement.id)
+            elementId = element.parentElement.id;
+        else
+            return;
+    else
+        elementId = element.id;
+
+    // get extjs control from element
+    let control = Ext.Component.from(elementId);
+
+    if (!control)
         return;
 
-    // prevent parent control click event
-    if (event != null)
-        event.stopPropagation();
+    if (!control.Id)
+        return;
 
-    // set new selected control
-    let controlId = control.Id;
-    selectedControl = form.All(controlId);
+    if(e.stopPropagation !== undefined)
+        e.stopPropagation();
+
+    selectedControl = control;
 
     form.Variables["PreventLoadCboControl"] = true;
-    _cboControl.SelectedValue = controlId;
+    _cboControl.SelectedValue = control.Id;
     form.Variables["PreventLoadCboControl"] = false;
 
     // select node in outline _treePanel
-    selectedNode = await FindNodeById(controlId);
+    selectedNode = await FindNodeById(control.Id);
     _treePanel.getSelectionModel().select(selectedNode);
 
     // update selection frame
@@ -418,9 +455,9 @@ async function __control_OnClick(sender, event)
     {
         let row = _dgdProperties.DataSet.Tables[0].Rows[i];
         let sPropertyName = row["PROPERTY_NAME"];
-        
+
         // skip resources
-        if(sPropertyName === "Resources")
+        if (sPropertyName === "Resources")
             continue;
 
         let value = control[sPropertyName];
@@ -443,40 +480,60 @@ async function __control_OnClick(sender, event)
 
         if (sPropertyName === "(Id)")
             value = control.Id;
-        
+
         row["PROPERTY_VALUE"] = value;
     }
 
     _dgdProperties.DataSet.AcceptChanges();
 }
 
+// move control via arrow keys
+function __control_OnKeyDown(e)
+{
+    // get clicked dom element
+    let element = e.target;
+
+    // get extjs control from element
+    let control = Ext.Component.from(element.id);
+
+    // move control when arrow keys are pressed
+    if (e.keyCode === 37)
+        control.Left -= 1;
+    else if (e.keyCode === 38)
+        control.Top -= 1;
+    else if (e.keyCode === 39)
+        control.Left += 1;
+    else if (e.keyCode === 40)
+        control.Top += 1;
+
+    // update selection frame
+    UpdateSelectionFrame(selectedControl);
+}
+
 // make control draggable
 function __control_OnDrag(e)
 {
-    // prevent to drag parent elements
-    e.stopPropagation();
-
-    // get extjs control from currentTarget
-    let control = Ext.getCmp(this.id);
+    // get extjs control from element
+    let control = selectedControl;
 
     // move control when shift key is pressed
     if (e.shiftKey)
     {
         pnlSelected.Visible = false;
 
-        var my_dragging = {};
-        my_dragging.pageX0 = e.pageX;
-        my_dragging.pageY0 = e.pageY;
-        my_dragging.elem = this;
-        my_dragging.offset0 = $(this).offset();
+        let event = {
+            pageX0: e.pageX,
+            pageY0: e.pageY,
+            elem: control,
+            top0: control.Top,
+            left0: control.Left
+        };
 
         function handle_dragging(e)
         {
             pnlSelected.Visible = false;
-
-            var left = my_dragging.offset0.left + (e.pageX - my_dragging.pageX0);
-            var top = my_dragging.offset0.top + (e.pageY - my_dragging.pageY0);
-            $(my_dragging.elem).offset({ top: top, left: left });
+            event.elem.Left = event.left0 + e.pageX - event.pageX0;
+            event.elem.Top = event.top0 + e.pageY - event.pageY0;
         }
 
         function handle_mouseup()
@@ -485,6 +542,8 @@ function __control_OnDrag(e)
 
             // stop listening for movement and mouseup
             $('body').off('mousemove', handle_dragging).off('mouseup', handle_mouseup);
+
+            UpdateSelectionFrame(control);
         }
 
         $('body').on('mouseup', handle_mouseup).on('mousemove', handle_dragging);
@@ -494,26 +553,25 @@ function __control_OnDrag(e)
     // resize control when ctrl key is pressed
     if (e.ctrlKey)
     {
-        var my_resizing = {};
-        my_resizing.pageX0 = e.pageX;
-        my_resizing.pageY0 = e.pageY;
-        my_resizing.elem = this;
-        my_resizing.offset0 = $(this).offset();
-        my_resizing.width0 = $(this).width();
-        my_resizing.height0 = $(this).height();
+        let event = {
+            pageX0: e.pageX,
+            pageY0: e.pageY,
+            elem: control,
+            width0: control.Width,
+            height0: control.Height
+        };
 
         // resize handler
         function handle_resizing(e)
         {
-            var width = my_resizing.width0 + (e.pageX - my_resizing.pageX0);
-            var height = my_resizing.height0 + (e.pageY - my_resizing.pageY0);
-            $(my_resizing.elem).width(width).height(height);
+            event.elem.Width = event.width0 + (e.pageX - event.pageX0);
+            event.elem.Height = event.height0 + (e.pageY - event.pageY0);
         }
 
         function handle_mouseup(e)
         {
-            control.Width = $(my_resizing.elem).width();
-            control.Height = $(my_resizing.elem).height();
+            control.Width = event.elem.Width;
+            control.Height = event.elem.Height;
 
             // stop listening for movement and mouseup
             $('body').off('mousemove', handle_resizing).off('mouseup', handle_mouseup);
@@ -556,59 +614,35 @@ async function UpdateSelectionFrame(sender)
     $('[automation-id="pnlSelected"]').css("cssText", "border: 1px dotted rgb(255, 0, 0); z-index: 99999; pointer-events: none; position: sticky !important;");
 
     // iterate over all parents and add positions to get absolute position
-    let top = sender.Top? sender.Top : 0;
-    let left = sender.Left? sender.Left : 0;
-    let width = sender.Width? sender.Width + 2 : 0;
-    let height = sender.Height? sender.Height + 2 : 0;
+    let top = sender.Top ? sender.Top : 0;
+    let left = sender.Left ? sender.Left : 0;
+    let width = sender.Width ? sender.Width + 2 : 0;
+    let height = sender.Height ? sender.Height + 2 : 0;
     let parent = sender.Parent;
 
     // don't set width and height above form width
-    width = Math.min(width, _Form1.Width-5);
-    height = Math.min(height, _Form1.Height-5);
+    width = Math.min(width, _Form1.Width - 5);
+    height = Math.min(height, _Form1.Height - 5);
 
+    let nTabPages = 0;
     while (parent && parent.Id !== "_Form1")
     {
+        if (parent.xType === "TabControl" && parent.ShowTabs == true)
+            nTabPages++;
+
         top += parent.Top;
         left += parent.Left;
         parent = parent.Parent;
     }
-
-    pnlSelected.Top = top - 2;
-    pnlSelected.Left = left - 2;
+    const tabHeaderSize = 27;
+    let tabCorrectionTop = nTabPages * tabHeaderSize;
+    let tabCorrectionLeft = nTabPages * 2;
+    pnlSelected.Top = top - 2 + tabCorrectionTop;
+    pnlSelected.Left = left - 2 + tabCorrectionLeft;
 
     // use jquery to set width and height to avoid automatic resizing for sticky elements
     $('[automation-id="pnlSelected"]').width(width);
     $('[automation-id="pnlSelected"]').height(height);
-}
-
-// add tab page to tab control
-async function __add_tab_page(sender, eventArgs)
-{
-    var tabControl = sender;
-    var tabPage = new TabPage();
-    tabPage.Id = tabControl.Id + "_tabPage_" + tabControl.TabPages.Count;
-    tabPage.Text = "New Tab";
-    tabPage.xType = "TabPage";
-    tabPage.Selected = false;
-    LoadDataProperties(tabPage);
-    tabControl.TabPages.Add(tabPage);
-    tabControl.SelectedPage = tabControl.TabPages.Count;
-
-    // bind click event
-    $('[automation-id="' + tabPage.Id + '"]').click(function (event)
-    {
-        __control_OnClick(tabPage, event);
-    });
-
-    htControls.Add(tabPage.Id, tabPage);
-    __control_OnClick(tabPage, null);
-    LoadCboControls();
-
-    // add tab page to outline
-    let selectedNode = await FindNodeById(tabControl.Id);
-    AddControlToOutline(tabPage, selectedNode);
-
-    selectedControl = tabPage;
 }
 
 function SetProperties(sPropertyName, sPropertyValue)
@@ -624,19 +658,19 @@ function SetProperties(sPropertyName, sPropertyValue)
     }
 
     // get event handler functions
-    if(sPropertyName.includes("On"))
+    if (sPropertyName.includes("On"))
     {
         sColumn.Type = "ComboBox";
-        
+
         // convert functionNames array to DataArray
         let functionNames = form.Variables["FunctionNames"];
-        if(functionNames && functionNames.length > 0)
+        if (functionNames && functionNames.length > 0)
         {
             let aValues = new Array(functionNames.length + 1);
-            
+
             aValues[0] = ["", ""];
             for (let i = 0; i < functionNames.length; ++i)
-                aValues[i+1] = [functionNames[i], functionNames[i]];
+                aValues[i + 1] = [functionNames[i], functionNames[i]];
 
             sColumn.DataArray = aValues;
         }
@@ -806,14 +840,14 @@ function SetProperties(sPropertyName, sPropertyValue)
     return sColumn;
 }
 
-async function handleAnchorSelect( sAnchors, pos )
+async function handleAnchorSelect(sAnchors, pos)
 {
-    if(form.Variables["AnchorWindow"])
+    if (form.Variables["AnchorWindow"])
         return;
-	
+
     var formArgs = [sAnchors];
 
-	var windowConfig = {
+    var windowConfig = {
         resizable: false,
         x: pos.x,
         y: pos.y,

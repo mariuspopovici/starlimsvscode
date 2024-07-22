@@ -27,4 +27,5 @@ export interface IEnterpriseService {
   renameItem(uri: string, newName: string): any;
   deleteItem(uri: string): any;
   moveItem(uri: string, destination: string): any;
+  getItemByGUID(guid: string, itemType: string): any;
 }

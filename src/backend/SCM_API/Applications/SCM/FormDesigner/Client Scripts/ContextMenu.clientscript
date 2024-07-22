@@ -6,51 +6,77 @@ Author....... :	DC
 Date......... : 2023-10-27
 */
 const DEFAULT = "";
-const ADD_TAB_PAGE = "Add Tab Page|htmlruntime/images/0D66B508-7742-DE45-A2B8-C53380801516";
+const ADD_TAB_PAGE = "Add Tab Page|images/designer/edit_add.png";
+const ADD_LINKBAR_GROUP = "Add LinkBar Group|images/designer/edit_add.png";
+const ADD_LINKBAR_ITEM = "Add LinkBar Item|images/designer/edit_add.png";
 
 // extends a context menu with base functionality
-function ApplyContextMenu(control)
+function ApplyContextMenu()
 {
-	if(control instanceof TabControl)
+	if(selectedControl instanceof TabControl)
 	{
-        control.EnableContextMenu = true;
-        var oMenu = control.ContextMenu;
+        selectedControl.EnableContextMenu = true;
+        var oMenu = selectedControl.ContextMenu;
         if(!oMenu)
         {
             oMenu = new Menu();
-            control.ContextMenu = oMenu;
+            selectedControl.ContextMenu = oMenu;
             __addItem(oMenu, form.Resources[ADD_TAB_PAGE], "__add_tab_page");
         }
     }
-	
-	// handle events
-	if(control.OnContextMenuClick)
+
+	if(selectedControl instanceof LinkBarGroup)
 	{
-		if(!control.OnContextMenuClick.name !== "_newOnContextMenuClick")
+		selectedControl.EnableContextMenu = true;
+		var oMenu = selectedControl.ContextMenu;
+		if(!oMenu)
 		{
-			let aux = control.OnContextMenuClick;
-			control.OnContextMenuClick = function _newOnContextMenuClick(sender, eventArgs) {
+			oMenu = new Menu();
+			selectedControl.ContextMenu = oMenu;
+			__addItem(oMenu, form.Resources[ADD_LINKBAR_ITEM], "__add_linkbar_item");
+		}
+	}
+
+	// if(selectedControl instanceof LinkBar)
+	// {
+	// 	selectedControl.EnableContextMenu = true;
+	// 	var oMenu = selectedControl.ContextMenu;
+	// 	if(!oMenu)
+	// 	{
+	// 		oMenu = new Menu();
+	// 		selectedControl.ContextMenu = oMenu;
+	// 		__addItem(oMenu, form.Resources[ADD_LINKBAR_GROUP], "__add_linkbar_group");
+	// 	}
+	// }
+
+	// handle events
+	if(_treePanel.OnContextMenuClick)
+	{
+		if(!_treePanel.OnContextMenuClick.name !== "_newOnContextMenuClick")
+		{
+			let aux = _treePanel.OnContextMenuClick;
+			_treePanel.OnContextMenuClick = function _newOnContextMenuClick(sender, eventArgs) {
 				if (!__base_menu_OnContextMenuClick(sender, eventArgs))
 					aux(sender, eventArgs);
 			};
 		}
 	}
 	else
-		control.OnContextMenuClick = __base_menu_OnContextMenuClick;
+		_treePanel.OnContextMenuClick = __base_menu_OnContextMenuClick;
 	
-	if (control.OnContextMenuPopup)
+	if (_treePanel.OnContextMenuPopup)
 	{
-		if (!control.OnContextMenuPopup.name !== "_newContextMenuPopup")
+		if (!_treePanel.OnContextMenuPopup.name !== "_newContextMenuPopup")
 		{
-			let aux = control.OnContextMenuPopup;
-			control.OnContextMenuPopup = function _newContextMenuPopup(sender, eventArgs) {
+			let aux = _treePanel.OnContextMenuPopup;
+			_treePanel.OnContextMenuPopup = function _newContextMenuPopup(sender, eventArgs) {
 				aux(sender, eventArgs);
 				__base_menu_OnContextMenuPopup(sender, eventArgs);
 			};
 		}
 	}
 	else
-		control.OnContextMenuPopup = "__base_menu_OnContextMenuPopup(sender, eventArgs)";
+		_treePanel.OnContextMenuPopup = "__base_menu_OnContextMenuPopup(sender, eventArgs)";
 }
 
 function __findByText(oMenu, sText, aAlternateTexts)

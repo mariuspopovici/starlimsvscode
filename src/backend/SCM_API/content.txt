@@ -1,5 +1,5 @@
 Package Name: SCM_API
-Package Date: 2024-06-03 14:09:07
+Package Date: 2024-07-22 10:18:15
 
 Exported languages: English.
 
@@ -62,6 +62,7 @@ Server Script Category: SCM_API
 	- GetCheckedOutItems
 	- GetCode
 	- GetEnterpriseItems
+	- GetItemByGUID
 	- GetItemGUID
 	- GetLanguages
 	- GetSessions
