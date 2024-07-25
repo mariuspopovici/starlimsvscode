@@ -24,7 +24,11 @@ export class EnterpriseTextDocumentContentProvider implements vscode.TextDocumen
    * @returns The text document content.
    */
   async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
-    const result: any = await this.service.getEnterpriseItemCode(uri.path, undefined);
+    var item = await this.enterpriseTreeProvider.getTreeItemFromPath(uri.path, true);
+    if (item === undefined) {
+      return "";
+    }
+    const result: any = await this.service.getEnterpriseItemCode(uri.path, item.language);
     return result.code || "";
   }
 

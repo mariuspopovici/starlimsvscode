@@ -475,8 +475,8 @@ export class EnterpriseService implements IEnterpriseService {
    * @param returnCode if true, the function will return the code as a string instead of the local file path
    * @returns the local file path if returnCode is false, otherwise the code as a string
    */
-  public async getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean = false): Promise<string | null> {
-    const item = await this.getEnterpriseItemCode(uri, undefined);
+  public async getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean = false, language: string): Promise<string | null> {
+    const item = await this.getEnterpriseItemCode(uri, language);
     if (item) {
       // create local file path
       const localFilePath = path.join(workspaceFolder, `${uri}.${item.language.toLowerCase().replace("sql", "slsql")}`);

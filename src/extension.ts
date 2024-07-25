@@ -334,7 +334,9 @@ export async function activate(context: vscode.ExtensionContext) {
         (item.path
           ? item.path.slice(0, item.path.lastIndexOf("."))
           : undefined),
-        rootPath!
+        rootPath!,
+        false,
+        item.language
       );
       if (localFilePath) {
         let uri: vscode.Uri = vscode.Uri.file(localFilePath);
@@ -411,7 +413,7 @@ export async function activate(context: vscode.ExtensionContext) {
         );
 
         // update local copy
-        await enterpriseService.getLocalCopy(remoteUri, rootPath!);
+        await enterpriseService.getLocalCopy(remoteUri, rootPath!, false, item.language);
 
         // show the document
         await vscode.window.showTextDocument(openDocument);
@@ -427,7 +429,9 @@ export async function activate(context: vscode.ExtensionContext) {
       // get local copy of the item
       const localFilePath = await enterpriseService.getLocalCopy(
         item.uri,
-        rootPath!
+        rootPath!,
+        false,
+        item.language
       );
 
       // open the item locally
