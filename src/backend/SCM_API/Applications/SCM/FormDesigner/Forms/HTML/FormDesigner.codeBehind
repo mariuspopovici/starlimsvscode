@@ -116,6 +116,10 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
             }
             UpdateSelectionFrame(selectedControl);
             return;
+        case "Anchor":
+            // circumvent bug in starlims-all.js (which prevents unsetting of anchor)
+            selectedControl.m_dto.Anchor = selectedControl._FixAnchor(value);
+            return;
         default:
             selectedControl[sPropertyName] = value;
     }
@@ -184,6 +188,8 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
             var sAnchors = await handleAnchorSelect(eventArgs["Value"], mousePos);
 
             eventArgs.Set("Value", sAnchors);
+            
+            dgdProperties_OnUpdatingCell(sender, eventArgs);
         }
     }
 }
