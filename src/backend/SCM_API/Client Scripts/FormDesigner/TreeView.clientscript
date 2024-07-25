@@ -43,27 +43,38 @@ const _treePanel = Ext.create('Ext.tree.Panel', {
                 SetZIndex();
 
                 // reset control's position to new parent control position
-                data.records[0].data.control.getEl().setXY(overModel.data.control.getEl().getXY());
+                var newNode = overModel.data.control.getEl();
+
+                if(newNode)
+                    data.records[0].data.control.getEl().setXY(newNode.getXY());
             },
             select: function (node, record)
             {
                 // set selected control
                 selectedControl = record.data.control;
                 UpdateSelectionFrame(selectedControl);
-                _cboControl.SelectedValue = selectedControl.Id ? selectedControl.Id : selectedControl.Text;
+                _cboControl.SelectedValue = selectedControl.Guid;
             }
         }
     }
 });
 
-// use ext.componentquery to add tree to tpOutline
-Ext.ComponentQuery.query('tabpanel')[0].add(_treePanel);
+// get treePanel node from xml node 
+async function GetNodeFromXML(xmlNode)
+{
+    let sGuid = xmlNode.getElementsByTagName("Guid")[0].textContent;
+    let node = await FindNodeByGuid(sGuid);
+    return node;
+}
 
 // add control to outline tree
-async function AddControlToOutline(control, parentNode)
+async function AddControlToOutline(control, parentNode, parentNodeId)
 {
-    if (!control)
+    if (!control && (!parentNode || !parentNodeId))
         return;
+
+    if(parentNodeId)
+        parentNode = await FindNodeByGuid(parentNodeId);
 
     var isLeafNode = true;
 
@@ -74,14 +85,15 @@ async function AddControlToOutline(control, parentNode)
     // check if control is leaf node
     if (control.xType === "TabControl" || control.xType === "TabPage" || control.xType === "SplitterPanel" ||
         control.xType === "Panel" || control.xType === "GroupBox" || control.xType === "TreeView" ||
-        control.xType === "DataGrid" || control.xType === "DataGridTable" || control.xType === "LinkBarGroup")
+        control.xType === "DataGrid" || control.xType === "DataGridTable" || 
+        control.xType === "LinkBarGroup" || control.xType === "ButtonBarGroup")
         isLeafNode = false;
 
     // set icon
     let icon;
     if (control.xType === "TabPage")
         icon = "images/designer/tabcontrol.png";
-    else if (control.xType === "DataGridTable")
+    else if (control.xType === "DataGridTable" || control.xType === "DataGridColumn")
     {
         icon = "images/designer/multichoice.png";
     }
@@ -92,6 +104,10 @@ async function AddControlToOutline(control, parentNode)
     else if (control.xType === "LinkBarItem" || control.xType === "ButtonBarItem")
     {
         icon = "images/designer/view_text.png";
+    }
+    else if (control.xType === "Panel" || control.xType === "SplitterPanel")
+    {
+        icon = "images/designer/panel.png";
     }
     else
     {
@@ -106,8 +122,9 @@ async function AddControlToOutline(control, parentNode)
 
     parentNode.set('leaf', false);
     parentNode.set('expandable', true);
-
+    
     const newNode = Ext.create("ControlNode", {
+        guid: control.Guid,
         text: control.Id,
         icon: icon,
         leaf: isLeafNode,
@@ -125,27 +142,27 @@ async function AddControlToOutline(control, parentNode)
 // update tree node id
 async function UpdateTreeNodeId(oldId, newId)
 {
-    let node = await FindNodeById(oldId);
+    let node = await FindNodeByGuid(oldId);
     if (node)
-        node.set('text', newId);
+        node.set('id', newId);
 }
 
 // find tree node by id, starting from parentNode
-async function FindNodeById(id, parentNode)
+async function FindNodeByGuid(guid, parentNode)
 {
     if (!parentNode)
         parentNode = _treePanel.getRootNode().firstChild;
 
-    if (parentNode.data.control.Id === id)
+    if (parentNode.data.guid === guid)
         return parentNode;
 
     for (let child of parentNode.childNodes)
     {
-        if (child.data.control.Id === id)
+        if (child.data.guid === guid)
             return child;
         else
         {
-            let node = await FindNodeById(id, child);
+            let node = await FindNodeByGuid(guid, child);
             if (node)
                 return node;
         }
@@ -215,117 +232,14 @@ const _treePanelContextMenu = Ext.create('Ext.menu.Menu', {
                 {
                     __add_bar_item(selectedControl);
                 }
+                else if (selectedControl instanceof DataGridTable)
+                {
+                    __add_column(selectedControl);
+                }
             }
         }
     ]
 });
-
-// add tab page to tab control
-async function __add_tab_page(sender, eventArgs)
-{
-    var tabControl = sender;
-    var tabPage = new TabPage();
-    tabPage.Id = tabControl.Id + "_tabPage_" + tabControl.TabPages.Count;
-    tabPage.Text = "New Tab";
-    tabPage.xType = "TabPage";
-    tabPage.Selected = false;
-    LoadDataProperties(tabPage);
-    tabControl.TabPages.Add(tabPage);
-    tabControl.SelectedPage = tabControl.TabPages.Count;
-
-    // bind click event
-    $('[automation-id="' + tabPage.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(tabPage.Id, tabPage);
-    let event = new Object();
-    event.target = tabPage;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add tab page to outline
-    let selectedNode = await FindNodeById(tabControl.Id);
-    AddControlToOutline(tabPage, selectedNode);
-
-    selectedControl = tabPage;
-}
-
-// add group to link bar
-async function __add_bar_group(sender, eventArgs)
-{
-    var control = sender;
-    var group;
-    if(sender instanceof ButtonBar)
-    {
-        group = new ButtonBarGroup();
-        group.xType = "ButtonBarGroup";
-    }
-    else if (sender instanceof LinkBar)
-    {
-        group = new LinkBarGroup();
-        group.xType = "LinkBarGroup";
-    }
-    else
-        return;
-
-    group.Id = control.Id + "_group_" + control.Groups.Count;
-    group.Text = "New Group";
-    LoadDataProperties(group);
-    control.Groups.Add(group);
-
-    // bind click event
-    $('[automation-id="' + group.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(group.Id, group);
-    let event = new Object();
-    event.target = group;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add group to outline
-    let selectedNode = await FindNodeById(control.Id);
-    AddControlToOutline(group, selectedNode);
-
-    selectedControl = group;
-}
-
-// add item to link bar group
-async function __add_bar_item(sender, eventArgs)
-{
-    var group = sender;
-    var item;
-    if(group instanceof ButtonBarGroup)
-    {
-        item = new ButtonBarItem();
-        item.xType = "ButtonBarItem";
-    }
-    else if (group instanceof LinkBarGroup)
-    {
-        item = new LinkBarItem();
-        item.xType = "LinkBarItem";
-    }
-    else
-        return;
-
-    item.Id = group.Id + "_item_" + group.Items.Count;
-    item.Text = "New Item";
-    LoadDataProperties(item);
-    group.Items.Add(item);
-
-    // bind click event
-    $('[automation-id="' + item.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(item.Id, item);
-    let event = new Object();
-    event.target = item;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add item to outline
-    let selectedNode = await FindNodeById(group.Id);
-    AddControlToOutline(item, selectedNode);
-
-    selectedControl = item;
-}
 
 // add context menu to treePanel
 _treePanel.on('itemcontextmenu', function (view, record, item, index, e)
@@ -342,6 +256,8 @@ _treePanel.on('itemcontextmenu', function (view, record, item, index, e)
         _treePanelContextMenu.items.items[1].setText('Add Group');
     else if (selectedControl instanceof LinkBarGroup || selectedControl instanceof ButtonBarGroup)
         _treePanelContextMenu.items.items[1].setText('Add Item');
+    else if (selectedControl instanceof DataGridTable)
+        _treePanelContextMenu.items.items[1].setText('Add Column');
     else
         _treePanelContextMenu.items.items[1].setVisible(false);
 

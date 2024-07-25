@@ -67,7 +67,7 @@ async function SaveForm(sApplicationName, sFormName, sFormLang)
 // check if control is extended control (not directly addable to form)
 function isExtendedControl(controlType)
 {
-    const extendedControls = ["TabPage", "StarlimsDataGridColumn", "StarlimsDataGridTable"];
+    const extendedControls = ["TabPage", "DataGridColumn", "DataGridTable"];
     return extendedControls.includes(controlType);
 }
 
@@ -158,9 +158,10 @@ async function GetXMLControl(node, sIndentation = "")
         await Dialogs.MessageBox("Control " + control.Id + " not supported", "Error", "ERROR", "OKONLY");
         return "";
     }
-    if (control.xType !== "Form")
+
+    if (control.xType !== "Form" && control.xType !== "SplitterPanel" && control.xType !== "DataGridTable")
     {
-        // add xsi item tag for regular controls only
+        // add xsi type tag for regular controls only
         if (isExtendedControl(control.xType))
             sXML += sIndentation + "<item>\n";
         else if (control.xType !== "SplitterPanel")
@@ -173,7 +174,7 @@ async function GetXMLControl(node, sIndentation = "")
     sXML += await GetXMLProperties(control, sIndentation);
 
     // iterate over child controls
-    if (node.childNodes.length > 0 && control.xType !== "SplitterPanel")
+    if (node.childNodes.length > 0 && !control.xType.includes("SplitContainer"))
     {
         // get group descriptor dependent on control type
         let sGroupDescriptor;
@@ -181,10 +182,14 @@ async function GetXMLControl(node, sIndentation = "")
             sGroupDescriptor = "<__array__Items>";
         else if (control.xType === "LinkBar" || control.xType === "ButtonBar")
             sGroupDescriptor = "<__array__Groups>";
+        else if (control.xType === "DataGrid")
+            sGroupDescriptor = "<RootTable>";
+        else if (control.xType === "DataGridTable")
+            sGroupDescriptor = "<__array__Columns>";
         else
             sGroupDescriptor = "<__array__Controls>";
         
-            sXML += sIndentation + sGroupDescriptor + "\n";
+        sXML += sIndentation + sGroupDescriptor + "\n";
 
         for (let childNode of node.childNodes)
         {
@@ -197,21 +202,8 @@ async function GetXMLControl(node, sIndentation = "")
     }
 
     // add empty controls array for SplitContainer
-    if (control.xType.includes("SplitContainer"))
+    if (control.xType.includes("SplitContainer") && node.childNodes.length === 0)
         sXML += sIndentation + "<__array__Controls/>\n";
-
-    // // iterate over tab pages
-    // if (control.xType == "TabControl" && control.TabPages.Count > 0)
-    // {
-    //     sXML += sIndentation + "<__array__Items>\n";
-
-    //     for (let tabPage of control.TabPages)
-    //     {
-    //         let tabPageNode = await FindNodeById(tabPage.Id);
-    //         sXML += await GetXMLControl(tabPageNode, sIndentation + "\t");
-    //     }
-    //     sXML += sIndentation + "</__array__Items>\n";
-    // }
 
     // generate splitter panels
     if (control.xType.includes("SplitContainer"))
@@ -224,28 +216,8 @@ async function GetXMLControl(node, sIndentation = "")
         sXML += sIndentation + "</Panel2>\n";
     }
 
-    // add root table definition to DataGrid
-    if (control.xType === "DataGrid" && control.RootTable)
-    {
-        // add table properties
-        sXML += sIndentation + "<RootTable>\n";
-        sXML += await GetXMLProperties(control.RootTable, sIndentation + "\t");
-
-        // add columns
-        sXML += sIndentation + "\t<__array__Columns>\n";
-        for (let column of control.RootTable.Columns)
-        {
-            sXML += sIndentation + "\t\t<item>\n";
-            sXML += await GetXMLProperties(column, sIndentation + "\t\t");
-            sXML += sIndentation + "\t\t</item>\n";
-        }
-        sXML += sIndentation + "\t</__array__Columns>\n";
-        sXML += sIndentation + "\t<__array__ChildTables />\n";
-        sXML += sIndentation + "</RootTable>\n";
-    }
-
-    // add item tag for controls only
-    if (control.xType !== "Form" && control.xType !== "SplitterPanel")
+    // add item tag for normal controls only
+    if (control.xType !== "Form" && control.xType !== "SplitterPanel" && control.xType !== "DataGridTable")
     {
         sIndentation = sIndentation.slice(0, -1);
         sXML += sIndentation + "</item>\n";

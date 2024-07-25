@@ -1,5 +1,5 @@
 Package Name: SCM_API
-Package Date: 2024-07-22 10:18:15
+Package Date: 2024-07-25 14:36:58
 
 Exported languages: English.
 
@@ -8,7 +8,6 @@ Application Category: SCM
 		HTML Forms: 
 			- dlgAnchor
 			- dlgImagePicker
-			- dlgRootTableEditor
 			- FormDesigner
 		Data Sources: 
 			- dsBool
@@ -25,6 +24,12 @@ Application Category: SCM
 			- scModifyCodeBehind
 
 
+Client Script Category: FormDesigner
+	- ContextMenu
+	- GUIFunctions
+	- ReadXML
+	- SaveXML
+	- TreeView
 Client Script Category: FormDesigner
 	- ContextMenu
 	- GUIFunctions
