@@ -15,6 +15,49 @@
   <__array__Controls>
     <item xsi:type="Panel">
       <xtype>StarlimsPanel</xtype>
+      <Id>_pnlFormDesigner</Id>
+      <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+      <FromDesigner>true</FromDesigner>
+      <Visible>true</Visible>
+      <Enabled>true</Enabled>
+      <Left>160</Left>
+      <Top>40</Top>
+      <Height>856</Height>
+      <Width>792</Width>
+      <Anchor>LEFT,RIGHT,TOP,BOTTOM</Anchor>
+      <TabIndex>0</TabIndex>
+      <TabStop>true</TabStop>
+      <__array__Controls>
+        <item xsi:type="Panel">
+          <xtype>StarlimsPanel</xtype>
+          <Id>_Form1</Id>
+          <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+          <FromDesigner>true</FromDesigner>
+          <Visible>true</Visible>
+          <Enabled>true</Enabled>
+          <Left>0</Left>
+          <Top>0</Top>
+          <Height>640</Height>
+          <Width>616</Width>
+          <Anchor>LEFT,TOP</Anchor>
+          <TabIndex>0</TabIndex>
+          <TabStop>true</TabStop>
+          <__array__Controls />
+          <Padding>0</Padding>
+          <Stretch>false</Stretch>
+          <AutoScroll>false</AutoScroll>
+          <DataOverridesValidatingType>false</DataOverridesValidatingType>
+          <RecordId>ORIGREC</RecordId>
+        </item>
+      </__array__Controls>
+      <Padding>0</Padding>
+      <Stretch>false</Stretch>
+      <AutoScroll>true</AutoScroll>
+      <DataOverridesValidatingType>false</DataOverridesValidatingType>
+      <RecordId>ORIGREC</RecordId>
+    </item>
+    <item xsi:type="Panel">
+      <xtype>StarlimsPanel</xtype>
       <Id>_pnlTop</Id>
       <Guid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</Guid>
       <FromDesigner>true</FromDesigner>
@@ -458,8 +501,8 @@
           <Enabled>true</Enabled>
           <Left>264</Left>
           <Top>40</Top>
-          <Height>852</Height>
-          <Width>276</Width>
+          <Height>846</Height>
+          <Width>270</Width>
           <Anchor>LEFT,RIGHT,TOP,BOTTOM</Anchor>
           <TabIndex>0</TabIndex>
           <TabStop>true</TabStop>
@@ -474,7 +517,7 @@
               <Left>8</Left>
               <Top>8</Top>
               <Height>21</Height>
-              <Width>260</Width>
+              <Width>254</Width>
               <Anchor>LEFT,RIGHT,TOP</Anchor>
               <TabIndex>0</TabIndex>
               <TabStop>true</TabStop>
@@ -500,7 +543,7 @@
               <Visible>true</Visible>
               <Enabled>true</Enabled>
               <Left>0</Left>
-              <Top>767</Top>
+              <Top>761</Top>
               <Height>21</Height>
               <Width>81</Width>
               <Anchor>LEFT,BOTTOM</Anchor>
@@ -517,8 +560,8 @@
               <Enabled>true</Enabled>
               <Left>0</Left>
               <Top>32</Top>
-              <Height>732</Height>
-              <Width>268</Width>
+              <Height>726</Height>
+              <Width>262</Width>
               <Anchor>LEFT,RIGHT,TOP,BOTTOM</Anchor>
               <TabIndex>0</TabIndex>
               <TabStop>true</TabStop>
@@ -532,7 +575,7 @@
                     <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
                     <FromDesigner>true</FromDesigner>
                     <Caption>Property Name</Caption>
-                    <Width>133</Width>
+                    <Width>130</Width>
                     <ReadOnly>true</ReadOnly>
                     <Visible>true</Visible>
                     <DataMember>PROPERTY_NAME</DataMember>
@@ -561,7 +604,7 @@
                     <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
                     <FromDesigner>true</FromDesigner>
                     <Caption>Value</Caption>
-                    <Width>133</Width>
+                    <Width>130</Width>
                     <ReadOnly>false</ReadOnly>
                     <Visible>true</Visible>
                     <DataMember>PROPERTY_VALUE</DataMember>
@@ -654,9 +697,9 @@
               <Visible>true</Visible>
               <Enabled>true</Enabled>
               <Left>0</Left>
-              <Top>788</Top>
+              <Top>782</Top>
               <Height>64</Height>
-              <Width>268</Width>
+              <Width>262</Width>
               <Anchor>LEFT,RIGHT,BOTTOM</Anchor>
               <TabIndex>0</TabIndex>
               <TabStop>true</TabStop>
@@ -681,15 +724,15 @@
           <Enabled>true</Enabled>
           <Left>0</Left>
           <Top>40</Top>
-          <Height>852</Height>
-          <Width>260</Width>
+          <Height>846</Height>
+          <Width>254</Width>
           <Anchor>LEFT,RIGHT,TOP,BOTTOM</Anchor>
           <TabIndex>0</TabIndex>
           <TabStop>true</TabStop>
           <__array__Controls />
           <Padding>0</Padding>
           <Stretch>false</Stretch>
-          <AutoScroll>false</AutoScroll>
+          <AutoScroll>true</AutoScroll>
           <DataOverridesValidatingType>false</DataOverridesValidatingType>
           <RecordId>ORIGREC</RecordId>
         </item>
@@ -700,27 +743,6 @@
       <DataOverridesValidatingType>false</DataOverridesValidatingType>
       <RecordId>ORIGREC</RecordId>
       <BorderStyle>FIXEDSINGLE</BorderStyle>
-    </item>
-    <item xsi:type="Panel">
-      <xtype>StarlimsPanel</xtype>
-      <Id>_Form1</Id>
-      <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-      <FromDesigner>true</FromDesigner>
-      <Visible>true</Visible>
-      <Enabled>true</Enabled>
-      <Left>160</Left>
-      <Top>40</Top>
-      <Height>856</Height>
-      <Width>792</Width>
-      <Anchor>LEFT,TOP</Anchor>
-      <TabIndex>0</TabIndex>
-      <TabStop>true</TabStop>
-      <__array__Controls />
-      <Padding>0</Padding>
-      <Stretch>false</Stretch>
-      <AutoScroll>false</AutoScroll>
-      <DataOverridesValidatingType>false</DataOverridesValidatingType>
-      <RecordId>ORIGREC</RecordId>
     </item>
   </__array__Controls>
   <Padding>0</Padding>
@@ -741,7 +763,7 @@
   </__array__Scripts>
   <Resources>
     <FromDesigner>true</FromDesigner>
-    <Data>RUNTIME_SUPPORT.GetFormResources.lims?formID=1D09BB79-2D28-4594-8B03-26306F5C8AEC&amp;languageID=GER&amp;isProgramatic=Y</Data>
+    <Data>RUNTIME_SUPPORT.GetFormResources.lims?formID=1D09BB79-2D28-4594-8B03-26306F5C8AEC&amp;languageID=ENG&amp;isProgramatic=Y</Data>
     <KeyItem>ResourceId</KeyItem>
     <TextItem>ResourceValue</TextItem>
     <ResolveEscapeChars>true</ResolveEscapeChars>

@@ -361,3 +361,8 @@ async function frmFormDesigner_OnShow(sender, eventArgs)
     _treePanel.setWidth(_pnlTree.Width);
     _treePanel.setHeight(_pnlTree.Height);
 }
+//BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
+
+
+//END_GLOBAL_DECLARATIONS
+

@@ -64,8 +64,6 @@ async function LoadFormFromXML(sXML)
     formNode.getElementsByTagName("Id")[0].textContent = "_Form1";
 
     var newForm = await CreateControlFromXML(formNode);
-    newForm.Left = 160;
-    newForm.Top = 40;
     await LoadCboControls();
     return newForm;
 }

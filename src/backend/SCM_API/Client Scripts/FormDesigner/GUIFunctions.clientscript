@@ -520,6 +520,10 @@ function __control_OnDrag(e)
     // move control when shift key is pressed
     if (e.shiftKey)
     {
+        // don't move form
+        if (control.Id === "_Form1")
+            return;
+
         pnlSelected.Visible = false;
 
         let event = {
@@ -554,6 +558,8 @@ function __control_OnDrag(e)
     // resize control when ctrl key is pressed
     if (e.ctrlKey)
     {
+        pnlSelected.Visible = false;
+
         let event = {
             pageX0: e.pageX,
             pageY0: e.pageY,
@@ -571,6 +577,8 @@ function __control_OnDrag(e)
 
         function handle_mouseup(e)
         {
+            pnlSelected.Visible = true;
+
             control.Width = event.elem.Width;
             control.Height = event.elem.Height;
 
@@ -582,50 +590,6 @@ function __control_OnDrag(e)
 
         $('body').on('mouseup', handle_mouseup).on('mousemove', handle_resizing);
     }
-}
-
-// delete selected control
-async function __control_OnDelete(control)
-{
-    // delete children first
-    if (control.Controls)
-    {
-        for (let i = control.Controls.Count - 1; i >= 0; --i)
-            __control_OnDelete(control.Controls[i]);
-    }
-
-    let parent = control.Parent;
-
-    // delete column
-    if (control.xType === "DataGridColumn")
-        parent.RootTable.Columns.Remove(control);
-
-    // delete tab page
-    if (control.xType === "TabPage")
-        parent.TabPages.Remove(control);
-
-    // delete link bar group
-    if (control.xType === "LinkBarGroup" || control.xType === "ButtonBarGroup")
-        parent.Groups.Remove(control);
-
-    // delete link bar item
-    if (control.xType === "LinkBarItem" || control.xType === "ButtonBarItem")
-        parent.Items.Remove(control);
-
-    // delete control
-    if (control.Dispose !== undefined)
-        control.Dispose();
-
-    // delete control from outline treeview
-    var node = await FindNodeByGuid(control.Guid);
-    node.remove();
-
-    // delete control from hashtable
-    htControls.Remove(control.Guid);
-
-    // select form in _cboControl
-    _cboControl.SelectedValue = _Form1.Id;
-    UpdateSelectionFrame(_Form1);
 }
 
 // draw a selection frame around the selected control
@@ -875,144 +839,4 @@ async function handleAnchorSelect(sAnchors, pos)
     };
 
     return await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgAnchor"), formArgs, null, windowConfig);
-}
-
-// add tab page to tab control
-async function __add_tab_page(sender, eventArgs)
-{
-    var tabControl = sender;
-    var tabPage = new TabPage();
-    tabPage.Id = tabControl.Id + "_tabPage_" + tabControl.TabPages.Count;
-    tabPage.Guid = System.Guid.NewGuid().ToString();
-    tabPage.Text = "New Tab";
-    tabPage.xType = "TabPage";
-    tabPage.Selected = false;
-    LoadDataProperties(tabPage);
-    tabControl.TabPages.Add(tabPage);
-    tabControl.SelectedPage = tabControl.TabPages.Count;
-
-    // bind click event
-    $('[automation-id="' + tabPage.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(tabPage.Guid, tabPage);
-    let event = new Object();
-    event.target = tabPage;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add tab page to outline
-    let selectedNode = await FindNodeByGuid(tabControl.Guid);
-    AddControlToOutline(tabPage, selectedNode);
-
-    selectedControl = tabPage;
-}
-
-// add group to link bar
-async function __add_bar_group(sender, eventArgs)
-{
-    var control = sender;
-    var group;
-    if (sender instanceof ButtonBar)
-    {
-        group = new ButtonBarGroup();
-        group.xType = "ButtonBarGroup";
-    }
-    else if (sender instanceof LinkBar)
-    {
-        group = new LinkBarGroup();
-        group.xType = "LinkBarGroup";
-    }
-    else
-        return;
-
-    group.Id = control.Id + "_group_" + control.Groups.Count;
-    group.Guid = System.Guid.NewGuid().ToString();
-    group.Text = "New Group";
-    LoadDataProperties(group);
-    control.Groups.Add(group);
-
-    // bind click event
-    $('[automation-id="' + group.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(group.Guid, group);
-    let event = new Object();
-    event.target = group;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add group to outline
-    let selectedNode = await FindNodeByGuid(control.Guid);
-    AddControlToOutline(group, selectedNode);
-
-    selectedControl = group;
-}
-
-// add item to link bar group
-async function __add_bar_item(sender, eventArgs)
-{
-    var group = sender;
-    var item;
-    if (group instanceof ButtonBarGroup)
-    {
-        item = new ButtonBarItem();
-        item.xType = "ButtonBarItem";
-    }
-    else if (group instanceof LinkBarGroup)
-    {
-        item = new LinkBarItem();
-        item.xType = "LinkBarItem";
-    }
-    else
-        return;
-
-    item.Id = group.Id + "_item_" + group.Items.Count;
-    item.Guid = System.Guid.NewGuid().ToString();
-    item.Text = "New Item";
-    LoadDataProperties(item);
-    group.Items.Add(item);
-
-    // bind click event
-    $('[automation-id="' + item.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(item.Guid, item);
-    let event = new Object();
-    event.target = item;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add item to outline
-    let selectedNode = await FindNodeByGuid(group.Guid);
-    AddControlToOutline(item, selectedNode);
-
-    selectedControl = item;
-}
-
-// add column to datagrid
-async function __add_column(sender, eventArgs)
-{
-    var control = sender;
-    var column = new StarlimsDataGridColumn();
-    column.xType = "DataGridColumn";
-    column.Id = control.Id + "_column_" + control.Columns.Count;
-    column.Guid = System.Guid.NewGuid().ToString();
-    column.Text = column.Caption = "New Column";
-    column.Width = 100;
-    column.Visible = true;
-    LoadDataProperties(column);
-    control.Columns.Add(column);
-
-    // bind click event
-    $('[automation-id="' + column.Id + '"]').click(__control_OnClick);
-
-    htControls.Add(column.Guid, column);
-    let event = new Object();
-    event.target = column;
-    __control_OnClick(event);
-    LoadCboControls();
-
-    // add column to outline
-    let selectedNode = await FindNodeByGuid(control.Guid);
-    AddControlToOutline(column, selectedNode);
-
-    selectedControl = column;
 }

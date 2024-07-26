@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>92B11D08-B259-4654-B14B-CE97F296576A</ItemID>
+  <ItemID>3621DC7D-0D7C-459C-AEBD-816B2A3D452A</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2024-07-25T14:36:58.1432356+02:00</PackageDate>
+  <PackageDate>2024-07-26T09:54:22.1222742+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />
@@ -238,7 +238,7 @@
               <ItemContent>Applications\SCM\FormDesigner\Client Scripts\ContextMenu.clientscript</ItemContent>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -251,7 +251,7 @@
               <ItemContent>Applications\SCM\FormDesigner\Client Scripts\GUIFunctions.clientscript</ItemContent>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -264,7 +264,7 @@
               <ItemContent>Applications\SCM\FormDesigner\Client Scripts\ReadXML.clientscript</ItemContent>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -277,7 +277,7 @@
               <ItemContent>Applications\SCM\FormDesigner\Client Scripts\SaveXML.clientscript</ItemContent>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -290,7 +290,7 @@
               <ItemContent>Applications\SCM\FormDesigner\Client Scripts\TreeView.clientscript</ItemContent>
               <IsMandatory>false</IsMandatory>
               <ItemBehaviour>overwrite</ItemBehaviour>
-              <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
+              <ItemProgrammingLanguage>JS        </ItemProgrammingLanguage>
               <ItemIsOwned>Y</ItemIsOwned>
               <IsReferred>false</IsReferred>
             </ClientScript>
@@ -959,85 +959,7 @@
       </ClientScriptCollection>
       <Hidden>true</Hidden>
     </ClientScriptCategory>
-    <ClientScriptCategory>
-      <ItemID>FDDBD4BD-0429-46E0-9545-93F2E4B2BA32</ItemID>
-      <ItemName>FormDesigner</ItemName>
-      <LayerId>300</LayerId>
-      <ItemDescription />
-      <IsMandatory>false</IsMandatory>
-      <ItemBehaviour>merge</ItemBehaviour>
-      <ItemIsSystem>N</ItemIsSystem>
-      <ClientScriptCollection>
-        <ClientScript>
-          <ItemID>0DF5B87C-F163-413B-8010-ED18BDB85E0F</ItemID>
-          <ItemName>ContextMenu</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>FormDesigner</ItemCategory>
-          <ItemContent>Client Scripts\FormDesigner\ContextMenu.clientscript</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ClientScript>
-        <ClientScript>
-          <ItemID>2F57C813-B6E7-4425-A73D-96C9115FC20E</ItemID>
-          <ItemName>GUIFunctions</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>FormDesigner</ItemCategory>
-          <ItemContent>Client Scripts\FormDesigner\GUIFunctions.clientscript</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ClientScript>
-        <ClientScript>
-          <ItemID>34BE2829-428D-400D-9AD3-54AB11A8743A</ItemID>
-          <ItemName>ReadXML</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>FormDesigner</ItemCategory>
-          <ItemContent>Client Scripts\FormDesigner\ReadXML.clientscript</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ClientScript>
-        <ClientScript>
-          <ItemID>49986D66-2117-42FF-AA41-7326D5329477</ItemID>
-          <ItemName>SaveXML</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>FormDesigner</ItemCategory>
-          <ItemContent>Client Scripts\FormDesigner\SaveXML.clientscript</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ClientScript>
-        <ClientScript>
-          <ItemID>69071B46-06C9-4E5F-B9E9-8528C6F72BD4</ItemID>
-          <ItemName>TreeView</ItemName>
-          <LayerId>300</LayerId>
-          <ItemDescription />
-          <ItemCategory>FormDesigner</ItemCategory>
-          <ItemContent>Client Scripts\FormDesigner\TreeView.clientscript</ItemContent>
-          <IsMandatory>false</IsMandatory>
-          <ItemBehaviour>overwrite</ItemBehaviour>
-          <ItemProgrammingLanguage>JSCRIPT   </ItemProgrammingLanguage>
-          <ItemIsOwned>N</ItemIsOwned>
-          <IsReferred>false</IsReferred>
-        </ClientScript>
-      </ClientScriptCollection>
-      <Hidden>true</Hidden>
-    </ClientScriptCategory>
   </ClientScriptCategoryCollection>
-  <DataSourceCategoryCollection />
   <LanguageCollection>
     <Language>
       <ItemID>ENG</ItemID>
