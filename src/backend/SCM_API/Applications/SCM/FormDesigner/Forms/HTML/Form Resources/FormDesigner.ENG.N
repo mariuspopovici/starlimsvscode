@@ -27,7 +27,7 @@
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>1757C600-E4BF-448E-B854-12EF0DFF117D</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>1388</PropertyValue>
+    <PropertyValue>1500</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
@@ -38,6 +38,102 @@
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>1757C600-E4BF-448E-B854-12EF0DFF117D</Guid>
+    <PropertyName>Stretch</PropertyName>
+    <PropertyValue>false</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>ca389093-c6f5-4410-a90e-b84e65929311</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>40</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>160</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>792</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>856</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,RIGHT,TOP,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Padding</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>ca389093-c6f5-4410-a90e-b84e65929311</Guid>
+    <PropertyName>Stretch</PropertyName>
+    <PropertyValue>false</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>616</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>640</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,TOP</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
+    <PropertyName>Padding</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>ca389093-c6f5-4410-a90e-b84e65929311</ParentGuid>
+    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
     <PropertyName>Stretch</PropertyName>
     <PropertyValue>false</PropertyValue>
   </Table1>
@@ -57,13 +153,13 @@
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</Guid>
     <PropertyName>Left</PropertyName>
-    <PropertyValue>240</PropertyValue>
+    <PropertyValue>0</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>808</PropertyValue>
+    <PropertyValue>1500</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
@@ -105,7 +201,7 @@
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>9d0a0477-3c30-4ea1-9fc2-05b36516cde9</Guid>
     <PropertyName>Left</PropertyName>
-    <PropertyValue>560</PropertyValue>
+    <PropertyValue>1252</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
@@ -147,7 +243,7 @@
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>672b0fe4-4080-4861-a4aa-dd44da28fe60</Guid>
     <PropertyName>Left</PropertyName>
-    <PropertyValue>680</PropertyValue>
+    <PropertyValue>1372</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
@@ -183,7 +279,7 @@
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>8891cc47-3741-4445-9293-f85d83ce7f32</Guid>
     <PropertyName>Top</PropertyName>
-    <PropertyValue>8</PropertyValue>
+    <PropertyValue>9</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
@@ -219,7 +315,7 @@
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>bcbbf3fa-4413-428f-8ab0-7b577b184c17</Guid>
     <PropertyName>Top</PropertyName>
-    <PropertyValue>11</PropertyValue>
+    <PropertyValue>12</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
@@ -231,13 +327,13 @@
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>bcbbf3fa-4413-428f-8ab0-7b577b184c17</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>37</PropertyValue>
+    <PropertyValue>43</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
     <Guid>bcbbf3fa-4413-428f-8ab0-7b577b184c17</Guid>
     <PropertyName>Height</PropertyName>
-    <PropertyValue>19</PropertyValue>
+    <PropertyValue>21</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>9d2c94f3-5eb9-4a49-b7cd-9ac2214a8399</ParentGuid>
@@ -253,444 +349,6 @@
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>c3f23988-1667-41ca-85e0-6fdd6fa9731f</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>0</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>1052</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>336</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>900</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Anchor</PropertyName>
-    <PropertyValue>RIGHT,TOP,BOTTOM</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Padding</PropertyName>
-    <PropertyValue>0</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
-    <PropertyName>Stretch</PropertyName>
-    <PropertyValue>false</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>74605808-4abd-4ac4-b134-35933aa68a8b</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>40</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>0</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>330</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>856</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>74605808-4abd-4ac4-b134-35933aa68a8b</Guid>
-    <PropertyName>Anchor</PropertyName>
-    <PropertyValue>LEFT,RIGHT,TOP,BOTTOM</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>cd3694b9-9a57-4957-8a4d-63fd72e17beb</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>21</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>1</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>326</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>832</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Text</PropertyName>
-    <PropertyValue>Properties</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Padding</PropertyName>
-    <PropertyValue>0</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</Guid>
-    <PropertyName>Stretch</PropertyName>
-    <PropertyValue>false</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>148c25c7-48ec-4672-81a1-5ad1587dcd14</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>728</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>8</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>70</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>19</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Text</PropertyName>
-    <PropertyValue>Description:</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
-    <PropertyName>Anchor</PropertyName>
-    <PropertyValue>LEFT,BOTTOM</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>748</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>7</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>315</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>74</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
-    <PropertyName>Anchor</PropertyName>
-    <PropertyValue>LEFT,RIGHT,BOTTOM</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>8</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>8</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>314</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>712</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>cd3694b9-9a57-4957-8a4d-63fd72e17beb</ParentGuid>
-    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
-    <PropertyName>Anchor</PropertyName>
-    <PropertyValue>LEFT,RIGHT,TOP,BOTTOM</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</ParentGuid>
-    <Guid>c2130984-a167-4698-b23b-ade2e3b24a39</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>c2130984-a167-4698-b23b-ade2e3b24a39</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</ParentGuid>
-    <Guid>c2130984-a167-4698-b23b-ade2e3b24a39</Guid>
-    <PropertyName>Caption</PropertyName>
-    <PropertyValue>CONTROL_PROPERTIES</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>5446269d-ff88-43aa-b393-bc1541822a5b</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>143</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
-    <PropertyName>Caption</PropertyName>
-    <PropertyValue>Property Name</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>169</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
-    <PropertyName>Caption</PropertyName>
-    <PropertyValue>Value</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>c54320dc-fd4a-4d1f-ba44-15727013d050</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>c54320dc-fd4a-4d1f-ba44-15727013d050</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>c54320dc-fd4a-4d1f-ba44-15727013d050</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>120</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
-    <Guid>c54320dc-fd4a-4d1f-ba44-15727013d050</Guid>
-    <PropertyName>Caption</PropertyName>
-    <PropertyValue>:</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>d665e256-6ff5-41b9-b482-645cbd6dc7b8</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>21</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>1</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>332</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>834</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Text</PropertyName>
-    <PropertyValue>Outline</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Padding</PropertyName>
-    <PropertyValue>0</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>74605808-4abd-4ac4-b134-35933aa68a8b</ParentGuid>
-    <Guid>d665e256-6ff5-41b9-b482-645cbd6dc7b8</Guid>
-    <PropertyName>Stretch</PropertyName>
-    <PropertyValue>false</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>284e440f-e7d0-4ba5-975e-976aff863115</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>8</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>8</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>314</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>21</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
-    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
-    <PropertyName>Anchor</PropertyName>
-    <PropertyValue>LEFT,RIGHT,TOP</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Guid</PropertyName>
-    <PropertyValue>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Top</PropertyName>
-    <PropertyValue>40</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Left</PropertyName>
-    <PropertyValue>240</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Width</PropertyName>
-    <PropertyValue>808</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Height</PropertyName>
-    <PropertyValue>856</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Padding</PropertyName>
-    <PropertyValue>0</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
-    <Guid>4913926e-efc1-4fd7-bdd9-e2de0c7bca5a</Guid>
-    <PropertyName>Stretch</PropertyName>
-    <PropertyValue>false</PropertyValue>
-  </Table1>
-  <Table1>
-    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>9d68271f-18e9-4c8b-89d3-4d6607856ed1</Guid>
     <PropertyName>Guid</PropertyName>
     <PropertyValue>9d68271f-18e9-4c8b-89d3-4d6607856ed1</PropertyValue>
@@ -699,7 +357,7 @@
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>9d68271f-18e9-4c8b-89d3-4d6607856ed1</Guid>
     <PropertyName>Top</PropertyName>
-    <PropertyValue>0</PropertyValue>
+    <PropertyValue>40</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
@@ -711,13 +369,13 @@
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>9d68271f-18e9-4c8b-89d3-4d6607856ed1</Guid>
     <PropertyName>Width</PropertyName>
-    <PropertyValue>240</PropertyValue>
+    <PropertyValue>160</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
     <Guid>9d68271f-18e9-4c8b-89d3-4d6607856ed1</Guid>
     <PropertyName>Height</PropertyName>
-    <PropertyValue>900</PropertyValue>
+    <PropertyValue>856</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
@@ -735,7 +393,7 @@
     <ParentGuid>9d68271f-18e9-4c8b-89d3-4d6607856ed1</ParentGuid>
     <Guid>a00f2d92-07e3-4928-8ff3-c10b6c741d99</Guid>
     <PropertyName>Text</PropertyName>
-    <PropertyValue>HTML Controls</PropertyValue>
+    <PropertyValue>Add HTML Controls</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>a00f2d92-07e3-4928-8ff3-c10b6c741d99</ParentGuid>
@@ -868,6 +526,18 @@
     <Guid>01fa9c04-f1cc-4b18-b5df-1ce81bd87506</Guid>
     <PropertyName>Text</PropertyName>
     <PropertyValue>Label</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>a00f2d92-07e3-4928-8ff3-c10b6c741d99</ParentGuid>
+    <Guid>e698f714-a257-4a60-a7a5-c3e024010362</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>e698f714-a257-4a60-a7a5-c3e024010362</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>a00f2d92-07e3-4928-8ff3-c10b6c741d99</ParentGuid>
+    <Guid>e698f714-a257-4a60-a7a5-c3e024010362</Guid>
+    <PropertyName>Text</PropertyName>
+    <PropertyValue>Line</PropertyValue>
   </Table1>
   <Table1>
     <ParentGuid>a00f2d92-07e3-4928-8ff3-c10b6c741d99</ParentGuid>
@@ -1132,5 +802,365 @@
     <Guid>28babb8a-b751-44bd-b44d-5531babe8556</Guid>
     <PropertyName>Text</PropertyName>
     <PropertyValue>WebBrowser</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>c3f23988-1667-41ca-85e0-6fdd6fa9731f</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>952</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>548</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>900</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>RIGHT,TOP,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Padding</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>1757C600-E4BF-448E-B854-12EF0DFF117D</ParentGuid>
+    <Guid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</Guid>
+    <PropertyName>Stretch</PropertyName>
+    <PropertyValue>false</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>34f2b701-712f-46da-a967-607f25297b15</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>40</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>264</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>270</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>846</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,RIGHT,TOP,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Padding</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>34f2b701-712f-46da-a967-607f25297b15</Guid>
+    <PropertyName>Stretch</PropertyName>
+    <PropertyValue>false</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>284e440f-e7d0-4ba5-975e-976aff863115</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>8</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>8</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>254</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>21</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>284e440f-e7d0-4ba5-975e-976aff863115</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,RIGHT,TOP</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>148c25c7-48ec-4672-81a1-5ad1587dcd14</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>761</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>81</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>21</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Text</PropertyName>
+    <PropertyValue>Description:</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>148c25c7-48ec-4672-81a1-5ad1587dcd14</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>32</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>262</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>726</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,RIGHT,TOP,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</ParentGuid>
+    <Guid>c2130984-a167-4698-b23b-ade2e3b24a39</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>c2130984-a167-4698-b23b-ade2e3b24a39</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>b1d6b80a-7915-44d6-b883-e6a290ea3b3b</ParentGuid>
+    <Guid>c2130984-a167-4698-b23b-ade2e3b24a39</Guid>
+    <PropertyName>Caption</PropertyName>
+    <PropertyValue>CONTROL_PROPERTIES</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>5446269d-ff88-43aa-b393-bc1541822a5b</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>130</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>5446269d-ff88-43aa-b393-bc1541822a5b</Guid>
+    <PropertyName>Caption</PropertyName>
+    <PropertyValue>Property Name</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>130</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>f6b00eb6-bedb-4e1e-9b34-9cf5e2d4fdbc</Guid>
+    <PropertyName>Caption</PropertyName>
+    <PropertyValue>Value</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>c54320dc-fd4a-4d1f-ba44-15727013d050</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>c54320dc-fd4a-4d1f-ba44-15727013d050</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>c54320dc-fd4a-4d1f-ba44-15727013d050</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>120</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c2130984-a167-4698-b23b-ade2e3b24a39</ParentGuid>
+    <Guid>c54320dc-fd4a-4d1f-ba44-15727013d050</Guid>
+    <PropertyName>Caption</PropertyName>
+    <PropertyValue>:</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>782</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>262</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>64</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>34f2b701-712f-46da-a967-607f25297b15</ParentGuid>
+    <Guid>092e7ff7-54ac-40b3-970d-59bbbaea6fb6</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,RIGHT,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Guid</PropertyName>
+    <PropertyValue>0e108aad-0eaa-46f2-9896-a73a0fd92876</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Top</PropertyName>
+    <PropertyValue>40</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Left</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Width</PropertyName>
+    <PropertyValue>254</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Height</PropertyName>
+    <PropertyValue>846</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Anchor</PropertyName>
+    <PropertyValue>LEFT,RIGHT,TOP,BOTTOM</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Padding</PropertyName>
+    <PropertyValue>0</PropertyValue>
+  </Table1>
+  <Table1>
+    <ParentGuid>c3f23988-1667-41ca-85e0-6fdd6fa9731f</ParentGuid>
+    <Guid>0e108aad-0eaa-46f2-9896-a73a0fd92876</Guid>
+    <PropertyName>Stretch</PropertyName>
+    <PropertyValue>false</PropertyValue>
   </Table1>
 </NewDataSet>

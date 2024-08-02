@@ -4,7 +4,7 @@
 export interface IEnterpriseService {
   getEnterpriseItems(uri: string, bSilent: boolean): any;
   getEnterpriseItemCode(uri: string, language: string | undefined): any;
-  getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean): Promise<string | null>;
+  getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean, language: string): Promise<string | null>;
   getConfig(): any;
   saveEnterpriseItemCode(uri: string, code: string, language: string): any;
   runScript(uri: string): any;
@@ -27,4 +27,5 @@ export interface IEnterpriseService {
   renameItem(uri: string, newName: string): any;
   deleteItem(uri: string): any;
   moveItem(uri: string, destination: string): any;
+  getItemByGUID(guid: string, itemType: string): any;
 }

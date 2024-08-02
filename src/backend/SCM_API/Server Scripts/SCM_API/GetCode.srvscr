@@ -84,8 +84,9 @@ sItemType := oEnterpriseItem:Type;
 		:ELSE;
 			nRowNo := 0;
 		:ENDIF;
+
 		oResult:code := MimeDecode(DoProc("Enterprise_Data_Providers.FormProvider.GetXFDDocument",
-										 {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"]}, sUserLang));
+										 {oDataSet:Tables[0]:Rows[nRowNo]["FORMID"], sUserLang}));
 		oResult:language := "XML";
 	:EXITCASE;
 	:CASE sItemType == "HTMLFORMCODE" .OR. sItemType == "XFDFORMCODE";

@@ -1,0 +1,1 @@
+Expand-Archive -LiteralPath .\SCM_API.sdp -DestinationPath .\SCM_API -Force

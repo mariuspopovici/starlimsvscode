@@ -13,11 +13,10 @@ Date......... : 2623-07-11
 
 //BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
 
+var _pnlTree = form.All("_pnlTree"); // Panel
 var _cboForm = form.All("_cboForm"); // ComboBox 
 var _pnlTop = form.All("_pnlTop"); // Panel
 //var _tpProperties = form.All( "_tpProperties" ); // TabPage
-var _tpOutline = form.All("_tpOutline"); // TabPage
-var _tcProperties = form.All("_tcProperties"); // TabControl
 var _cboControl = form.All("_cboControl"); // ComboBox
 var _txtDescription = form.All("_txtDescription"); // TextArea
 var _lblDescription = form.All("_lblDescription"); // Label
@@ -59,6 +58,10 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
     {
         case "(Id)":
             selectedControl.itemId = value;
+            // refresh tree node
+            let oldId = selectedControl.Id;
+            let newId = value;
+            UpdateTreeNodeId(oldId, newId);
             return;
         case "Visible":
             // change opacity
@@ -87,35 +90,61 @@ async function dgdProperties_OnUpdatingCell(sender, eventArgs)
             selectedControl.TabPages[value].Selected = true;
             return;
         case "Dock":
-            if(!value)
+            if (!value)
                 value = "NONE";
             selectedControl.Dock = value;
 
-            if(value === "FILL" || value === "TOP" || value === "BOTTOM")
+            if (value === "FILL" || value === "TOP" || value === "BOTTOM")
             {
-                if(value === "TOP" || value === "FILL")
+                if (value === "TOP" || value === "FILL")
                     selectedControl.Top = 0;
-                if(value === "BOTTOM")
+                if (value === "BOTTOM")
                     selectedControl.Top = selectedControl.Parent.Height - selectedControl.Height;
-                
+
                 selectedControl.Left = 0;
                 selectedControl.Width = selectedControl.Parent.Width;
             }
-            if(value === "LEFT" || value === "RIGHT" || value === "FILL")
+            if (value === "LEFT" || value === "RIGHT" || value === "FILL")
             {
-                if(value === "LEFT" || value === "FILL")
+                if (value === "LEFT" || value === "FILL")
                     selectedControl.Left = 0;
-                if(value === "RIGHT")
+                if (value === "RIGHT")
                     selectedControl.Left = selectedControl.Parent.Width - selectedControl.Width;
-                
+
                 selectedControl.Top = 0;
                 selectedControl.Height = selectedControl.Parent.Height;
             }
             UpdateSelectionFrame(selectedControl);
             return;
+        case "Anchor":
+            // circumvent bug in starlims-all.js (which prevents unsetting of anchor)
+            selectedControl.m_dto.Anchor = selectedControl._FixAnchor(value);
+            return;
         default:
             selectedControl[sPropertyName] = value;
     }
+}
+
+async function dgdProperties_OnCellDoubleClick(sender, eventArgs)
+{
+    var value = eventArgs["record"][0];
+    if (eventArgs["column"].Id !== "PROPERTY_NAME" || !value.includes("On"))
+        return;
+
+    var sFormID = form.Variables["FormID"];
+    var sFunctionName = _cboControl.Text.split('(')[0].replace(" ", "_") + value;
+
+    // create a new function
+    lims.CallServer("FormDesigner.scModifyCodeBehind.AddFunction", [sFormID, sFunctionName]);
+
+    // execute HTTP GET request to http://localhost:3000/OpenCodeBehind/FormID
+    var sURL = "http://localhost:3000/OpenCodeBehind/" + sFormID + "/" + sFunctionName;
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", sURL, true);
+    oReq.send();
+
+    // set new function name in grid
+    eventArgs["record"][1] = sFunctionName;
 }
 
 async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
@@ -125,7 +154,7 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
     // open image picker for Image property
     if (eventArgs["column"].Id === "PROPERTY_VALUE")
     {
-        if(sPropertyName.includes("Image"))
+        if (sPropertyName.includes("Image"))
         {
             var sImageID = await form.ShowModalDialog(lims.GetFormSource("FormDesigner.dlgImagePicker"));
 
@@ -150,15 +179,17 @@ async function dgdProperties_OnUdCellEditorRequest(sender, eventArgs)
 
             eventArgs.Set("Value", sImageID);
         }
-        if(sPropertyName === "Anchor")
+        if (sPropertyName === "Anchor")
         {
             // get mouse position from event
-            var mousePos = { x: event.pageX-100, y: event.pageY };
+            var mousePos = { x: event.pageX - 100, y: event.pageY };
 
             // open anchor window
             var sAnchors = await handleAnchorSelect(eventArgs["Value"], mousePos);
 
             eventArgs.Set("Value", sAnchors);
+            
+            dgdProperties_OnUpdatingCell(sender, eventArgs);
         }
     }
 }
@@ -167,20 +198,24 @@ async function dgdProperties_OnRowChange(sender, eventArgs)
 {
     if (form.Variables["PreventLoadProperties"])
         return;
-    
+
     form.Variables["PreventLoadProperties"] = true;
+
+    await Application.DoEvents();
 
     var sPropertyName = _dgdProperties.GetCurrentRowData("PROPERTY_NAME");
     var sPropertyValue = eventArgs["record"]["PROPERTY_VALUE"];
-    
+
     await SetProperties(sPropertyName, sPropertyValue);
-    
+
     form.Variables["PreventLoadProperties"] = false;
 }
 
 async function frmFormDesigner_OnLoad(sender, eventArgs)
 {
-    if(form.formArguments)
+    _dgdProperties.OnCellDoubleClick = dgdProperties_OnCellDoubleClick;
+
+    if (form.formArguments)
     {
         var sFormID = form.formArguments;
         _cboForm.SelectedValue = sFormID;
@@ -199,24 +234,25 @@ async function cboControl_OnSelectionChanged(sender, eventArgs)
 {
     if (form.Variables["PreventLoadCboControl"])
         return;
-    
+
     // load control properties into grid
-    __control_OnClick(htControls[sender.SelectedValue], null);
+    var event = { target: htControls[sender.SelectedValue] };
+    __control_OnClick(event);
 }
 
 async function btnSave_OnClick(sender, eventArgs)
 {
-    if(_cboForm.SelectedText == "" || _cboForm.SelectedText == null)
+    if (_cboForm.SelectedText == "" || _cboForm.SelectedText == null)
         return;
-    
+
     _Form1.mask("Saving form...");
     await Application.DoEvents();
-    
+
     var sAppName = _cboForm.SelectedText.split(".")[0];
     var sFormName = _cboForm.SelectedText.split(".")[1];
     var sFormLang = _cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
     SaveForm(sAppName, sFormName, sFormLang);
-    
+
     _Form1.unmask();
 }
 
@@ -225,7 +261,7 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
     _Form1.mask("Loading...");
     await Application.DoEvents();
 
-    var sFormID = _cboForm.SelectedValue;
+    var sFormID = form.Variables["FormID"] = _cboForm.SelectedValue;
 
     // use regex to get language from brackets in combobox text
     var sFormLang = _cboForm.SelectedText.match(/\(([^)]+)\)/)[1];
@@ -251,20 +287,22 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
     form.Variables["PreventClickEvents"] = true;
 
     await CreateEmptyForm();
-    
+
     // get function names from code behind
     let sCode = await lims.CallServer("FormDesigner.scGetFormCodeBehind", [sFormID]);
-    if(sCode)
+    if (sCode)
     {
         let scriptEl = document.createElement('script');
 
         let aFunctions = sCode.match(/function\s+([^\s\(]+)\(\s*sender,\s*eventArgs\s*\)/g);
-        if(aFunctions && aFunctions.length > 0)
+        if (aFunctions && aFunctions.length > 0)
         {
-            var aFunctionDeclarations = aFunctions.map(function(declaration) {
+            var aFunctionDeclarations = aFunctions.map(function (declaration)
+            {
                 return declaration + '{}';
             });
-            var aFunctionNames = aFunctions.map(function(declaration) {
+            var aFunctionNames = aFunctions.map(function (declaration)
+            {
                 var sReturn = declaration.replace('function ', '');
                 return sReturn.substring(0, sReturn.indexOf('(')).trim();
             });
@@ -289,7 +327,7 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
 
     // bind click and mouse drag events to all controls in form
     BindControlEvents(_Form1);
-    
+
     SetZIndex();
 
     form.Variables["PreventLoadProperties"] = false;
@@ -299,13 +337,32 @@ async function cboForm_OnSelectionChanged(sender, eventArgs)
     _Form1.unmask();
 }
 
-async function frmFormDesigner_OnCmdKeyPress( sender, eventArgs )
+async function frmFormDesigner_OnCmdKeyPress(sender, eventArgs)
 {
-	var nKeyCode = event.keyCode;
-	if(nKeyCode == 46) // del key
-	{
-		// delete control
-        if(selectedControl != _Form1)
+    var nKeyCode = event.keyCode;
+    if (nKeyCode == 46) // del key
+    {
+        // delete control
+        if (selectedControl != _Form1)
             __control_OnDelete(selectedControl);
-	}
+    }
 }
+
+async function frmFormDesigner_OnShow(sender, eventArgs)
+{
+    // hide x-tool css class from LinkBarGroup in _lbrControls
+    $('[automation-id="_lbrControls"] .x-tool').css("display", "none");
+
+    // add tree to _pnlTree
+    var _pnlTree = Ext.ComponentQuery.query('#_pnlTree')[0];
+    _pnlTree.add(_treePanel);
+
+    // let treePanel fill whole panel
+    _treePanel.setWidth(_pnlTree.Width);
+    _treePanel.setHeight(_pnlTree.Height);
+}
+//BEGIN_GLOBAL_DECLARATIONS (place global declarations inside this section)
+
+
+//END_GLOBAL_DECLARATIONS
+

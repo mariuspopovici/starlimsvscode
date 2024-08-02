@@ -1,0 +1,36 @@
+/******************************************************************************
+Description.. :	Function collection to sync layout actions to code behind
+Author....... :	DC
+Date......... : 2024-05-16
+*******************************************************************************/;
+
+/* change id of control in code behind;
+:PROCEDURE ReplaceString;
+:PARAMETERS sFormId, oldString, newString;
+
+:DECLARE sCodeBehind;
+sCodeBehind := ExecFunction("FormDesigner.scGetFormCodeBehind", {sFormId});
+sCodeBehind := Replace(sCodeBehind, oldString, newString);
+ExecFunction("Enterprise_Data_Providers.FormProvider.SaveCodeBehind", {sFormId, sCodeBehind});
+:ENDPROC;
+
+/* add event handler to code behind;
+:PROCEDURE AddFunction;
+:PARAMETERS sFormId, sFunctionName;
+:DECLARE sCodeBehind;
+sCodeBehind := ExecFunction("FormDesigner.scGetFormCodeBehind", {sFormId});
+
+/* check if function already exists;
+:IF At(sFunctionName, sCodeBehind) > 0;
+	:RETURN;
+:ENDIF;
+
+sCodeBehind +=
+"
+async function " + sFunctionName + "(sender, eventArgs)
+{
+
+}
+";
+ExecFunction("Enterprise_Data_Providers.FormProvider.SaveCodeBehind", {sFormId, sCodeBehind});
+:ENDPROC;

@@ -43,27 +43,38 @@ const _treePanel = Ext.create('Ext.tree.Panel', {
                 SetZIndex();
 
                 // reset control's position to new parent control position
-                data.records[0].data.control.getEl().setXY(overModel.data.control.getEl().getXY());
+                var newNode = overModel.data.control.getEl();
+
+                if(newNode)
+                    data.records[0].data.control.getEl().setXY(newNode.getXY());
             },
             select: function (node, record)
-            {               
+            {
                 // set selected control
                 selectedControl = record.data.control;
                 UpdateSelectionFrame(selectedControl);
-                _cboControl.SelectedValue = selectedControl.Id;
+                _cboControl.SelectedValue = selectedControl.Guid;
             }
         }
     }
 });
 
-// use ext.componentquery to add tree to tpOutline
-Ext.ComponentQuery.query('tabpanel')[0].add(_treePanel);
+// get treePanel node from xml node 
+async function GetNodeFromXML(xmlNode)
+{
+    let sGuid = xmlNode.getElementsByTagName("Guid")[0].textContent;
+    let node = await FindNodeByGuid(sGuid);
+    return node;
+}
 
 // add control to outline tree
-async function AddControlToOutline(control, parentNode)
+async function AddControlToOutline(control, parentNode, parentNodeId)
 {
-    if (!control)
+    if (!control && (!parentNode || !parentNodeId))
         return;
+
+    if(parentNodeId)
+        parentNode = await FindNodeByGuid(parentNodeId);
 
     var isLeafNode = true;
 
@@ -74,13 +85,30 @@ async function AddControlToOutline(control, parentNode)
     // check if control is leaf node
     if (control.xType === "TabControl" || control.xType === "TabPage" || control.xType === "SplitterPanel" ||
         control.xType === "Panel" || control.xType === "GroupBox" || control.xType === "TreeView" ||
-        control.xType === "DataGrid" || control.xType === "StarlimsDataGridTable")
+        control.xType === "DataGrid" || control.xType === "DataGridTable" || 
+        control.xType === "LinkBarGroup" || control.xType === "ButtonBarGroup")
         isLeafNode = false;
 
     // set icon
     let icon;
     if (control.xType === "TabPage")
         icon = "images/designer/tabcontrol.png";
+    else if (control.xType === "DataGridTable" || control.xType === "DataGridColumn")
+    {
+        icon = "images/designer/multichoice.png";
+    }
+    else if (control.xType === "LinkBarGroup" || control.xType === "ButtonBarGroup")
+    {
+        icon = "images/designer/kpager.png";
+    }
+    else if (control.xType === "LinkBarItem" || control.xType === "ButtonBarItem")
+    {
+        icon = "images/designer/view_text.png";
+    }
+    else if (control.xType === "Panel" || control.xType === "SplitterPanel")
+    {
+        icon = "images/designer/panel.png";
+    }
     else
     {
         // get image from lbrControls
@@ -94,8 +122,9 @@ async function AddControlToOutline(control, parentNode)
 
     parentNode.set('leaf', false);
     parentNode.set('expandable', true);
-
+    
     const newNode = Ext.create("ControlNode", {
+        guid: control.Guid,
         text: control.Id,
         icon: icon,
         leaf: isLeafNode,
@@ -106,26 +135,34 @@ async function AddControlToOutline(control, parentNode)
 
     // add node to tree
     parentNode.appendChild(newNode);
-    
+
     return newNode;
 }
 
+// update tree node id
+async function UpdateTreeNodeId(oldId, newId)
+{
+    let node = await FindNodeByGuid(oldId);
+    if (node)
+        node.set('id', newId);
+}
+
 // find tree node by id, starting from parentNode
-async function FindNodeById(id, parentNode)
+async function FindNodeByGuid(guid, parentNode)
 {
     if (!parentNode)
         parentNode = _treePanel.getRootNode().firstChild;
 
-    if (parentNode.data.control.Id === id)
+    if (parentNode.data.guid === guid)
         return parentNode;
 
     for (let child of parentNode.childNodes)
     {
-        if (child.data.control.Id === id)
+        if (child.data.guid === guid)
             return child;
         else
         {
-            let node = await FindNodeById(id, child);
+            let node = await FindNodeByGuid(guid, child);
             if (node)
                 return node;
         }
@@ -151,11 +188,11 @@ async function SetZIndex(parentNode, level)
         ++level;
 
     // set z-index as level
-    if(control.getEl === undefined)
+    if (control.getEl === undefined)
         return;
 
     var element = control.getEl();
-    if(element)
+    if (element)
         element.setStyle('z-index', level);
 
     // iterate through all nodes recursively
@@ -163,4 +200,255 @@ async function SetZIndex(parentNode, level)
     {
         SetZIndex(child, level + 1);
     }
+}
+
+//add context menu to treePanel
+const _treePanelContextMenu = Ext.create('Ext.menu.Menu', {
+    items: [
+        {
+            text: 'Delete',
+            icon: 'images/designer/button_cancel.png',
+            handler: function ()
+            {
+                __control_OnDelete(selectedControl);
+            }
+        },
+        {
+            text: 'Add Tab Page',
+            icon: 'images/designer/edit_add.png',
+            handler: function ()
+            {
+                if (selectedControl instanceof TabControl)
+                {
+                    __add_tab_page(selectedControl);
+                }
+                else if (selectedControl instanceof LinkBar ||
+                         selectedControl instanceof ButtonBar)
+                {
+                    __add_bar_group(selectedControl);
+                }
+                else if (selectedControl instanceof LinkBarGroup ||
+                         selectedControl instanceof ButtonBarGroup)
+                {
+                    __add_bar_item(selectedControl);
+                }
+                else if (selectedControl instanceof DataGridTable)
+                {
+                    __add_column(selectedControl);
+                }
+            }
+        }
+    ]
+});
+
+// add context menu to treePanel
+_treePanel.on('itemcontextmenu', function (view, record, item, index, e)
+{
+    e.stopEvent();
+
+    if(_treePanelContextMenu.items && _treePanelContextMenu.items.items)
+        _treePanelContextMenu.items.items[1].setVisible(true);
+
+    // change text of context menu item according to selected control
+    if (selectedControl instanceof TabControl)
+        _treePanelContextMenu.items.items[1].setText('Add Tab Page');
+    else if (selectedControl instanceof LinkBar || selectedControl instanceof ButtonBar)
+        _treePanelContextMenu.items.items[1].setText('Add Group');
+    else if (selectedControl instanceof LinkBarGroup || selectedControl instanceof ButtonBarGroup)
+        _treePanelContextMenu.items.items[1].setText('Add Item');
+    else if (selectedControl instanceof DataGridTable)
+        _treePanelContextMenu.items.items[1].setText('Add Column');
+    else
+        _treePanelContextMenu.items.items[1].setVisible(false);
+
+    _treePanelContextMenu.showAt(e.getXY());
+    return false;
+});
+
+// add tab page to tab control
+async function __add_tab_page(sender, eventArgs)
+{
+    var tabControl = sender;
+    var tabPage = new TabPage();
+    tabPage.Id = tabControl.Id + "_tabPage_" + tabControl.TabPages.Count;
+    tabPage.Guid = System.Guid.NewGuid().ToString();
+    tabPage.Text = "New Tab";
+    tabPage.xType = "TabPage";
+    tabPage.Selected = false;
+    LoadDataProperties(tabPage);
+    tabControl.TabPages.Add(tabPage);
+    tabControl.SelectedPage = tabControl.TabPages.Count;
+
+    // bind click event
+    $('[automation-id="' + tabPage.Id + '"]').click(__control_OnClick);
+
+    htControls.Add(tabPage.Guid, tabPage);
+    let event = new Object();
+    event.target = tabPage;
+    __control_OnClick(event);
+    LoadCboControls();
+
+    // add tab page to outline
+    let selectedNode = await FindNodeByGuid(tabControl.Guid);
+    AddControlToOutline(tabPage, selectedNode);
+
+    selectedControl = tabPage;
+}
+
+// add group to link bar
+async function __add_bar_group(sender, eventArgs)
+{
+    var control = sender;
+    var group;
+    if (sender instanceof ButtonBar)
+    {
+        group = new ButtonBarGroup();
+        group.xType = "ButtonBarGroup";
+    }
+    else if (sender instanceof LinkBar)
+    {
+        group = new LinkBarGroup();
+        group.xType = "LinkBarGroup";
+    }
+    else
+        return;
+
+    group.Id = control.Id + "_group_" + control.Groups.Count;
+    group.Guid = System.Guid.NewGuid().ToString();
+    group.Text = "New Group";
+    LoadDataProperties(group);
+    control.Groups.Add(group);
+
+    // bind click event
+    $('[automation-id="' + group.Id + '"]').click(__control_OnClick);
+
+    htControls.Add(group.Guid, group);
+    let event = new Object();
+    event.target = group;
+    __control_OnClick(event);
+    LoadCboControls();
+
+    // add group to outline
+    let selectedNode = await FindNodeByGuid(control.Guid);
+    AddControlToOutline(group, selectedNode);
+
+    selectedControl = group;
+}
+
+// add item to link bar group
+async function __add_bar_item(sender, eventArgs)
+{
+    var group = sender;
+    var item;
+    if (group instanceof ButtonBarGroup)
+    {
+        item = new ButtonBarItem();
+        item.xType = "ButtonBarItem";
+    }
+    else if (group instanceof LinkBarGroup)
+    {
+        item = new LinkBarItem();
+        item.xType = "LinkBarItem";
+    }
+    else
+        return;
+
+    item.Id = group.Id + "_item_" + group.Items.Count;
+    item.Guid = System.Guid.NewGuid().ToString();
+    item.Text = "New Item";
+    LoadDataProperties(item);
+    group.Items.Add(item);
+
+    // bind click event
+    $('[automation-id="' + item.Id + '"]').click(__control_OnClick);
+
+    htControls.Add(item.Guid, item);
+    let event = new Object();
+    event.target = item;
+    __control_OnClick(event);
+    LoadCboControls();
+
+    // add item to outline
+    let selectedNode = await FindNodeByGuid(group.Guid);
+    AddControlToOutline(item, selectedNode);
+
+    selectedControl = item;
+}
+
+// add column to datagrid
+async function __add_column(sender, eventArgs)
+{
+    var control = sender;
+    var column = new StarlimsDataGridColumn();
+    column.xType = "DataGridColumn";
+    column.Id = control.Id + "_column_" + control.Columns.Count;
+    column.Guid = System.Guid.NewGuid().ToString();
+    column.Text = column.Caption = "New Column";
+    column.Width = 100;
+    column.Visible = true;
+    LoadDataProperties(column);
+    control.Columns.Add(column);
+
+    // bind click event
+    $('[automation-id="' + column.Id + '"]').click(__control_OnClick);
+
+    htControls.Add(column.Guid, column);
+    let event = new Object();
+    event.target = column;
+    __control_OnClick(event);
+    LoadCboControls();
+
+    // add column to outline
+    let selectedNode = await FindNodeByGuid(control.Guid);
+    AddControlToOutline(column, selectedNode);
+
+    selectedControl = column;
+}
+
+// delete selected control
+async function __control_OnDelete(control)
+{
+    // don't delete form
+    if (control === _Form1)
+        return;
+
+    // delete children first
+    if (control.Controls)
+    {
+        for (let i = control.Controls.Count - 1; i >= 0; --i)
+            __control_OnDelete(control.Controls[i]);
+    }
+
+    let parent = control.Parent;
+
+    // delete column
+    if (control.xType === "DataGridColumn")
+        parent.RootTable.Columns.Remove(control);
+
+    // delete tab page
+    if (control.xType === "TabPage")
+        parent.TabPages.Remove(control);
+
+    // delete link bar group
+    if (control.xType === "LinkBarGroup" || control.xType === "ButtonBarGroup")
+        parent.Groups.Remove(control);
+
+    // delete link bar item
+    if (control.xType === "LinkBarItem" || control.xType === "ButtonBarItem")
+        parent.Items.Remove(control);
+
+    // delete control
+    if (control.Dispose !== undefined)
+        control.Dispose();
+
+    // delete control from outline treeview
+    var node = await FindNodeByGuid(control.Guid);
+    node.remove();
+
+    // delete control from hashtable
+    htControls.Remove(control.Guid);
+
+    // select form in _cboControl
+    _cboControl.SelectedValue = _Form1.Id;
+    UpdateSelectionFrame(_Form1);
 }

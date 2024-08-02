@@ -1,0 +1,264 @@
+
+/******************************************************************************
+Description.. :	Find item by guid and return it
+Author....... :	DC
+Date......... : 2023-06-29
+*******************************************************************************/;
+:DECLARE sSQL, sGuid, sItemType, aItems, oResult, oUtils, nLayerID, String;
+String := "";
+oUtils := CreateUDObject("SCM_API.Utils", {});
+oResponse := CreateUDObject({
+	{"success", .F.},
+	{"data", NIL}
+});
+
+:IF Request:QueryString:IsProperty("guid");
+	sGuid := Request:QueryString:guid;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "guid");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+:IF Request:QueryString:IsProperty("itemType");
+	sItemType := Request:QueryString:itemType;
+:ELSE;
+	Response:StatusCode := 400;
+	oResponse:success := .F.;
+	oResponse:data := String:Format("Missing required parameter: {0}", "itemType");
+	usrmes(oResponse:data);
+	:RETURN oResponse;
+:ENDIF;
+
+/*usrmes(sGuid);
+/*usrmes(sItemType);
+
+nLayerID := GetSystemLayerId();
+
+sSQL := "select * from (";
+
+:IF sItemType == "HTMLFORMCODE";
+	sSQL += "select
+	f.DISPLAYTEXT as name,
+	'HTMLFORMCODE' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/CodeBehind/' + f.DISPLAYTEXT as uri,
+	f.CHECKEDOUTBY as checkedOutBy,
+	'JS' as language,
+	'N' as isFolder,
+	f.FORMID as guid
+	from LIMSXFDFORMS f
+	join LIMSAPPLICATIONS a on a.APPID = f.APPID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where f.FORMID = ?sGuid? and f.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "XFDFORMCODE";
+	sSQL += "select
+	f.DISPLAYTEXT as name,
+    'XFDFORMCODE' as type,
+    '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/XFDForms/CodeBehind/' + f.DISPLAYTEXT as uri,
+    f.CHECKEDOUTBY as checkedOutBy,
+    'JS' as language,
+    'N' as isFolder,
+    f.FORMID as guid
+    from LIMSXFDFORMS f
+    join LIMSAPPLICATIONS a on a.APPID = f.APPID
+    join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+    where f.FORMID = ?sGuid? and f.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "HTMLFORMXML";
+	sSQL += "select
+	f.DISPLAYTEXT as name,
+	'HTMLFORMXML' as type,
+    '/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/XML/' + f.DISPLAYTEXT
+		 as uri,
+	f.CHECKEDOUTBY as checkedOutBy,
+	'XML' as language,
+	'N' as isFolder,
+	f.FORMID as guid
+	from LIMSXFDFORMS f
+	join LIMSAPPLICATIONS a on a.APPID = f.APPID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where f.FORMID = ?sGuid? and f.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "HTMLFORMGUIDE";
+	sSQL += "select
+	f.DISPLAYTEXT as name,
+	'HTMLFORMGUIDE' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/HTMLForms/Guide/' + f.DISPLAYTEXT as uri,
+	f.CHECKEDOUTBY as checkedOutBy,
+	'JSON' as language,
+	'N' as isFolder,
+	f.FORMID as guid
+	from LIMSXFDFORMS f
+	join LIMSAPPLICATIONS a on a.APPID = f.APPID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where f.FORMID = ?sGuid? and f.LAYERID = ?nLayerID? and f.FORMTYPE = 'HTML'";
+:ENDIF;
+
+:IF sItemType == "APPSS";
+	sSQL += "select
+	s.DISPLAYTEXT as name, 
+	'APPSS' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ServerScripts/' + s.DISPLAYTEXT as URI,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSAPPLICATIONS a
+	join LIMSAPPSERVERSCRIPTS aps on aps.APPID = a.APPID
+	join LIMSSERVERSCRIPTS s on s.SCRIPTID = aps.SCRIPTID
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	where s.SCRIPTID = ?sGUID? and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "APPCS";
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'APPCS' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/ClientScripts/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSAPPLICATIONS a
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	join LIMSAPPCLIENTSCRIPTS apc on apc.APPID = a.APPID
+	join LIMSCLIENTSCRIPTS s on s.SCRIPTID = apc.SCRIPTID
+	where s.SCRIPTID = ?sGUID? and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "APPDS";
+	sSQL += "select
+	s.DISPLAYTEXT as name, 
+	'APPDS' as type,
+	'/Applications/' + c.DISPLAYTEXT + '/' + a.DISPLAYTEXT + '/DataSources/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.DATASOURCEID as guid
+	from LIMSAPPLICATIONS a
+	join LIMSAPPCATEGORIES c on c.CATEGORYID = a.CATEGORYID
+	join LIMSAPPDATASOURCES aps on aps.APPID = a.APPID
+	join LIMSDATASOURCES s on s.DATASOURCEID = aps.DATASOURCEID
+	where s.DATASOURCEID = ?sGUID? and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "SS";
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'SS' as type,
+	'/ServerScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSSERVERSCRIPTCATEGORIES c
+	join LIMSSERVERSCRIPTS s on s.CATEGORYID = c.CATEGORYID
+	left join LIMSAPPSERVERSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
+	where s.SCRIPTID = ?sGUID? and aps.SCRIPTID is null and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "DS";
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'DS' as type,
+	'/DataSources/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.DATASOURCEID as guid
+	from LIMSDATASOURCECATEGORIES c
+	join LIMSDATASOURCES s on s.CATEGORYID = c.CATEGORYID
+	left join LIMSAPPDATASOURCES aps on aps.DATASOURCEID = s.DATASOURCEID
+	where s.DATASOURCEID = ?sGUID? and aps.DATASOURCEID is null and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "CS";
+	sSQL += "select
+	s.DISPLAYTEXT as name,
+	'CS' as type,
+	'/ClientScripts/' + c.DISPLAYTEXT + '/' + s.DISPLAYTEXT as uri,
+	s.CHECKEDOUTBY as checkedOutBy,
+	s.SCRIPTLANGUAGE as language,
+	'N' as isFolder,
+	s.SCRIPTID as guid
+	from LIMSCLIENTSCRIPTCATEGORIES c
+	join LIMSCLIENTSCRIPTS s on s.CATEGORYID = c.CATEGORYID
+	left join LIMSAPPCLIENTSCRIPTS aps on aps.SCRIPTID = s.SCRIPTID
+	where s.SCRIPTID = ?sGUID? and aps.SCRIPTID is null and s.LAYERID = ?nLayerID?";
+:ENDIF;
+
+:IF sItemType == "TABLE";
+	sSQL += "select
+	TABLENAME as name,
+	'TABLE' as type,
+	'/Tables/Dictionary/' + TABLENAME as uri,
+	CHECKEDOUTBY as checkedOutBy,
+	'' as language,
+	'N' as isFolder,
+	TABLEID as guid
+	from LIMSTABLES
+	where TABLEID = ?sGuid?
+	and upper(ISSYSTEM) = 'Y' 
+	and TABLENAME not like 'LIMS%'
+	and LAYERID = ?nLayerID?
+	
+	union
+	
+	select
+	TABLENAME as name,
+	'TABLE' as type,
+	'/Tables/Database/' + TABLENAME as uri,
+	CHECKEDOUTBY as checkedOutBy,
+	'' as language,
+	'N' as isFolder,
+	TABLEID as guid
+	from LIMSTABLES
+	where TABLEID = ?sGuid?
+	and upper(ISSYSTEM) = 'N'
+	and TABLENAME not like 'LIMS%'
+	and LAYERID = ?nLayerID?";
+:ENDIF;
+
+/* remove the types from uri before ordering;
+sSQL += ") t order by REPLACE(REPLACE(REPLACE(REPLACE(t.uri, '/HTMLForms', ''), '/XML', ''), '/Guide', ''), '/CodeBehind', ''), t.name";
+usrmes(sSQL);
+
+aItems := SQLexecute(sSQL, "Dictionary");
+
+:DECLARE i, aResultItems, sLanguage;
+aResultItems := {};
+:FOR i:=1 :TO Len(aItems);
+	sLanguage := aItems[i][5];
+	
+	:IF Upper(sLanguage) = "STARLIMS";
+			sLanguage := "SSL";
+	:ENDIF;
+	:IF Upper(sLanguage) = "JSCRIPT";
+			sLanguage := "JS";
+	:ENDIF;
+
+	oItem := oUtils:RemoveDBNull(CreateUDObject({
+		{"name", aItems[i][3] + '.' + Lower(sLanguage)},
+		{"type", aItems[i][2]},
+		{"uri", aItems[i][3]},
+		{"checkedOutBy", aItems[i][4]},
+		{"language", sLanguage},
+		{"isFolder", .F.},
+		{"guid", aItems[i][7]}
+	}));
+	AAdd(aResultItems, oItem);
+:NEXT;
+
+oResult := CreateUDObject({
+	{"success", .T.},
+	{"data", CreateUDObject({{"items", aResultItems}})}
+});
+
+Response:StatusCode := 200;
+:RETURN oResult;

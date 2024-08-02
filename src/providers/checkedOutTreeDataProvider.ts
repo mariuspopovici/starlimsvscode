@@ -10,7 +10,7 @@ import path from "path";
  * Implements the VS Code TreeDataProvider to build the STARLIMS Checked out tree.
  */
 export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeEnterpriseItem> {
-  private data: TreeEnterpriseItem[] = [];
+  private treeItems: TreeEnterpriseItem[] = [];
   private _onDidChangeTreeData: vscode.EventEmitter<TreeEnterpriseItem | null> =
     new vscode.EventEmitter<TreeEnterpriseItem | null>();
   readonly onDidChangeTreeData: vscode.Event<TreeEnterpriseItem | null> = this._onDidChangeTreeData.event;
@@ -22,7 +22,7 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @returns CheckedOutTreeDataProvider
    */
   constructor(xmlDS: string, private service: EnterpriseService) {
-    this.data = this.getDataObject(xmlDS);
+    this.treeItems = this.getDataObject(xmlDS);
   }
 
   /**
@@ -57,12 +57,36 @@ export class CheckedOutTreeDataProvider implements vscode.TreeDataProvider<TreeE
   }
 
   /**
+   * Search for tree item by its GUID
+   * @param guid The GUID of the tree item to search for
+   * @returns The tree item for the document
+   */
+  async getTreeItemByGuid(guid: string, itemType: EnterpriseItemType, startFrom: TreeEnterpriseItem | undefined): Promise<TreeEnterpriseItem | undefined> {
+    const treeItems: TreeEnterpriseItem[] = this.treeItems;
+    // traverse through the tree to find item
+    for (const item of treeItems) {
+      if (item.type === itemType && item.guid === guid) {
+        return item;
+      }
+
+      if (item.children) {
+        for (const child of item.children) {
+          const foundItem = await this.getTreeItemByGuid(guid, itemType, child);
+          if (foundItem) {
+            return foundItem;
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Get the children of the tree view item.
    * @param item Tree view item
    * @returns Children of the tree view item.
    */
   getChildren(item?: TreeEnterpriseItem): Thenable<TreeEnterpriseItem[] | undefined> {
-    return (item && Promise.resolve(item.children ?? [])) || Promise.resolve(this.data);
+    return (item && Promise.resolve(item.children ?? [])) || Promise.resolve(this.treeItems);
   }
 
   /**
