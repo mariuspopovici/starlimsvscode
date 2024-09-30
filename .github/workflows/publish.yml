@@ -19,7 +19,7 @@ jobs:
           git config user.email "<>"
 
       - name: Setup node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -41,7 +41,7 @@ jobs:
       - name: Build VSIX package
         run: npm run build -- -o vscode-starlims.v${{ steps.calculateVersion.outputs.AppVersion }}.vsix
 
-      - uses: lannonbr/vsce-action@3.0.0
+      - uses: lannonbr/vsce-action@4.0.0
         name: Publish extension package
         with:
           args: "publish -p $VSCODE_MARKETPLACE_TOKEN"
