@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ItemID>3621DC7D-0D7C-459C-AEBD-816B2A3D452A</ItemID>
+  <ItemID>F11BB302-6B4B-4F00-A47E-52B8787267E0</ItemID>
   <ItemName>SCM_API</ItemName>
   <IsMandatory>false</IsMandatory>
   <ItemBehaviour>merge</ItemBehaviour>
-  <PackageDate>2024-07-26T09:54:22.1222742+02:00</PackageDate>
+  <PackageDate>2024-09-19T15:04:37.7840997+02:00</PackageDate>
   <PathReadMe />
   <PathEULA />
   <PathLogo />

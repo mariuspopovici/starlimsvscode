@@ -176,9 +176,12 @@ async function CreateControlFromXML(xmlNode, xmlParentNode, control)
         let sPropertyName = node.nodeName;
         let value = node.textContent;
 
-        if (sPropertyName === "Guid")
+        if(value === "" || value === null)
             continue;
 
+        if (sPropertyName === "Guid")
+            continue;
+        
         // skip form title
         if (control.xType === "Form" && sPropertyName === "Text")
         {
