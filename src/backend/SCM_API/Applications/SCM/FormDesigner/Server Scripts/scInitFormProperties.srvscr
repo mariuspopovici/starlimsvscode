@@ -1188,7 +1188,7 @@ aControlProperties :={
 {'DataGridTable', 'TotalRow', 'False', 'Data'},
 {'DataGridTable', 'TotalRowFormat', NIL, 'Data'},
 {'DataGridTable', 'TranslateAttrColumn', 'False', 'Data'},
-{'DataGridTable', '(Id)', NIL, 'Other'}
+{'DataGridTable', '(Id)', NIL, 'Other'},
 
 {'Line', 'Anchor', NIL, 'Layout'},
 {'Line', 'Horizontal', 'True', 'Layout'},
