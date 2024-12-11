@@ -87,7 +87,7 @@ sCategory := oEnterpriseItem:CategoryName;
 			DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Delete", {sItemID});
 		:EXITCASE;
 
-		:CASE sItemType == "SSCAT";
+		:CASE sItemType == "SSCAT" .OR. sItemType == "SSCATEGORY";
             sItemID := oUtils:GetItemGUID(sItemName, sItemType);
 			DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Delete", {sItemID});
 		:EXITCASE;
@@ -98,7 +98,7 @@ sCategory := oEnterpriseItem:CategoryName;
 			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Delete", {sItemID});
 		:EXITCASE;
 
-		:CASE sItemType == "DSCAT";
+		:CASE sItemType == "DSCAT"  .OR. sItemType == "DSCATEGORY";
 			sItemID := oUtils:GetItemGUID(sCategory, "DSCAT");
 			DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Delete", {sItemID});
 		:EXITCASE;
@@ -109,7 +109,7 @@ sCategory := oEnterpriseItem:CategoryName;
 			DoProc("Enterprise_Data_Providers.DataSourceProvider.Delete", {sItemID});
 		:EXITCASE;
 
-		:CASE sItemType == "CSCAT";
+		:CASE sItemType == "CSCAT" .OR. sItemType == "CSCATEGORY";
             sItemID := oUtils:GetItemGUID(sItemName, sItemType);
 			DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Delete", {sItemID});
 		:EXITCASE;

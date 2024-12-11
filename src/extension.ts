@@ -1079,12 +1079,14 @@ export async function activate(context: vscode.ExtensionContext) {
         selectedItemType = `${selectedItemType}/${itemLanguage}`;
       }
 
-      // check out the item
+      // check out the item unless it's an enterprise item category
       let sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
-      let bSuccess = await enterpriseService.checkOutItem(sUri, language);
-      if (bSuccess) {
-        enterpriseTreeProvider.setItemCheckedOutStatus(selectedItem, true, language);
-        vscode.commands.executeCommand("STARLIMS.GetLocal", selectedItem);
+      if (itemType.indexOf("CAT") === -1) {
+        let bSuccess = await enterpriseService.checkOutItem(sUri, language);
+        if (bSuccess) {
+          enterpriseTreeProvider.setItemCheckedOutStatus(selectedItem, true, language);
+          vscode.commands.executeCommand("STARLIMS.GetLocal", selectedItem);
+        }
       }
 
       enterpriseTreeProvider.refresh();
@@ -1123,7 +1125,7 @@ export async function activate(context: vscode.ExtensionContext) {
       let sItemName = selectedItem.label.toString();
       if (sItemName.indexOf("[") > 0) {
         sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
-      } else if (sItemName.indexOf('(Checked out')) {
+      } else if (sItemName.indexOf('(Checked out') > 0) {
         sItemName = sItemName.substring(0, sItemName.indexOf("(Checked out") - 1);
       }
 

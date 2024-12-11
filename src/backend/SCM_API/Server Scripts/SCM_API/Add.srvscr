@@ -139,7 +139,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 			DoProc("Enterprise_Data_Providers.AppClientScriptProvider.Add", {sAppID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
-		:CASE sItemType == "SSCATEGORY";
+		:CASE sItemType == "SSCATEGORY" .OR. sItemType == "SSCAT";
 			DoProc("Enterprise_Data_Providers.ServerScriptCategProvider.Add", {sItemName});
 		:EXITCASE;
 
@@ -149,7 +149,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 			DoProc("Enterprise_Data_Providers.ServerScriptProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
-		:CASE sItemType == "DSCATEGORY";
+		:CASE sItemType == "DSCATEGORY"  .OR. sItemType == "DSCAT";
 			DoProc("Enterprise_Data_Providers.DataSourceCategProvider.Add", {sItemName});
 		:EXITCASE;
 
@@ -158,7 +158,7 @@ oUtils := CreateUDObject("SCM_API.Utils", {});
 			DoProc("Enterprise_Data_Providers.DataSourceProvider.Add", {sCategoryID, sItemName, "", sScriptLang});
 		:EXITCASE;
 
-		:CASE sItemType == "CSCATEGORY";
+		:CASE sItemType == "CSCATEGORY"  .OR. sItemType == "CSCAT";
 			DoProc("Enterprise_Data_Providers.ClientScriptCategProvider.Add", {sItemName});
 		:EXITCASE;
 
