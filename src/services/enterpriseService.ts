@@ -26,7 +26,6 @@ export class EnterpriseService implements IEnterpriseService {
    */
   private urlSuffix: string = "lims";
   public languages: string[] = [];
-  
 
   /**
    * Constructor
@@ -475,7 +474,12 @@ export class EnterpriseService implements IEnterpriseService {
    * @param returnCode if true, the function will return the code as a string instead of the local file path
    * @returns the local file path if returnCode is false, otherwise the code as a string
    */
-  public async getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean = false, language: string): Promise<string | null> {
+  public async getLocalCopy(
+    uri: string,
+    workspaceFolder: string,
+    returnCode: boolean = false,
+    language: string
+  ): Promise<string | null> {
     const item = await this.getEnterpriseItemCode(uri, language);
     if (item) {
       // create local file path
@@ -684,8 +688,8 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the enterprise item found
    */
   public async searchForItemByGUID(guid: string, itemType: string): Promise<any> {
-  // get item from GUID first
-  const url = `${this.baseUrl}/SCM_API.GetItemByGUID.${this.urlSuffix}?GUID=${guid}&ItemType=${itemType}`;
+    // get item from GUID first
+    const url = `${this.baseUrl}/SCM_API.GetItemByGUID.${this.urlSuffix}?GUID=${guid}&ItemType=${itemType}`;
   }
   /**
    * Global search for items by occuring text
@@ -895,7 +899,10 @@ export class EnterpriseService implements IEnterpriseService {
     if (!uri) {
       return "";
     }
-    let remotePath = uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length);
+    const hasFolderPath = uri.lastIndexOf(this.SLVSCODE_FOLDER) !== -1;
+    let remotePath = hasFolderPath
+      ? uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length)
+      : uri;
     return remotePath;
   }
 

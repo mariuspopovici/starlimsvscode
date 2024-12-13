@@ -17,13 +17,22 @@ This is an unofficial, unsupported, extension so use at your own risk.
 ## Pre-requisites
 
 - Download STARLIMS .sdp package attached to [current release](https://github.com/mariuspopovici/starlimsvscode/releases).
-- Import .sdp package into STARLIMS Designer. Subsequent versions will be updated automatically.
+- Import .sdp package into STARLIMS Designer; subsequent versions will be updated automatically whenever a new version is released.
   - If you are deploying on a product development environment (System Layer ID 200) please make sure to select the "Overwrite System Layer" option during the package import
 - Add the following setting to STARLIMS web.config file
 
 ```
 <add key="HTTPServices" value="SCM_API.*"/>
 ```
+
+## How to Use
+
+- Import the .sdp package from Pre-requisites
+- Add a local folder to the current VS Code workspace. This will serve as your local STARLIMS code repository.
+- Install the latest version of the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=MariusPopovici.vscode-starlims&ssr=false#qna)
+- Activate the extension clicking the STARLIMS logo in the VS Code sidebar.
+- Configure the extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time. The root folder should be set as the path to the folder selected in the previous step.
+- Configure the VS Code Color Theme and activate the **SSL Language Theme (Dark)** theme.
 
 ## Vision
 
@@ -51,6 +60,7 @@ Features:
 - HTML Form Designer (alpha version)
 
 To Do:
+
 - Form Designer:
   - Add support for all controls (buttonlist, listview, etc.)
   - implement root table designer
@@ -72,14 +82,6 @@ This extension contributes the following settings:
 - `STARLIMS.password`: User password STARLIMS authentication
 - `STARLIMS.browser`: Browser for debugging forms (only Chrome or Edge supported)
 - `STARLIMS.rootPath`: Path for storing temporary files (downloaded forms and scripts)
-
-## How to Use
-
-- Install the latest version of the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=MariusPopovici.vscode-starlims&ssr=false#qna)
-- Add a local folder to the current VS Code workspace. This will serve as your local STARLIMS code repository.
-- Activate the extension clicking the STARLIMS logo in the VS Code sidebar.
-- Configure the extension settings (STARLIMS url, user and password, root folder). You will be prompted to set these upon attempting to activate the extension for the first time. The root folder should be set as the path to the folder selected in the previous step.
-- Configure the VS Code Color Theme and activate the **SSL Language Theme (Dark)** theme.
 
 ## Known Issues
 
