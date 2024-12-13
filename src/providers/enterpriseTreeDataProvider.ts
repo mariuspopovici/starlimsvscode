@@ -157,7 +157,7 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
    * @param element The element to return the parent for.
    * @returns The parent of the given element or undefined if no element is passed.
    */
-  getTreeItem(item: TreeEnterpriseItem): TreeEnterpriseItem {
+  getTreeItem(item: TreeEnterpriseItem): vscode.TreeItem {
     item.command = {
       command: "STARLIMS.selectEnterpriseItem",
       title: "Select Node",
