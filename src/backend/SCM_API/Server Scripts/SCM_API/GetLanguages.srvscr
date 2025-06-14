@@ -11,16 +11,10 @@ oResponse := CreateUDObject({
 
 aResult := SqlExecute("select LANGID, LANGUAGE from limsLanguages order by LANGUAGE", "DICTIONARY");
 
-:IF !Empty(aResult);
-    json := "[";
-    :FOR i:=1 :TO Len(aResult);
-        json += '["' + aResult[i][1] + '","' + aResult[i][2] + '"]';
-        json += iif(i < Len(aResult), ",", "");
-    :NEXT;
-    json += "]";
+:IF !Empty(aResult);    
     Response:StatusCode := 200;
     oResponse:success := .T.;
-    oResponse:data := json;
+    oResponse:data := aResult;
 :ELSE;
     Response:StatusCode := 500;
     oResponse:success := .F.;
