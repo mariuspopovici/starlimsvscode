@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { IEnterpriseService } from "./iEnterpriseService";
 import { connectBridge } from "../utilities/bridge";
-import { cleanUrl } from "../utilities/miscUtils";
+import { cleanUrl, isJson } from "../utilities/miscUtils";
 import { DOMParser } from "@xmldom/xmldom";
 
 /**
@@ -1038,7 +1038,7 @@ export class EnterpriseService implements IEnterpriseService {
       const { success, data }: { success: boolean; data: any } = await response.json();
 
       if (success) {
-        this.languages = JSON.parse(data);
+        this.languages = isJson(data) ? data : JSON.parse(data);
         return true;
       } else {
         vscode.window.showErrorMessage("Could not retrieve languages.");

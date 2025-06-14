@@ -33,3 +33,18 @@ export function executeWithProgress(fn: Function, progressMessage: string) {
     }
   );
 }
+
+/**
+ * Checks if the provided string is a valid JSON string.
+ *
+ * @param str A string or character sequence to be tested for JSON validity.
+ * @returns `true` if the string is valid JSON, otherwise `false`.
+ */
+export function isJson(str: string) {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
