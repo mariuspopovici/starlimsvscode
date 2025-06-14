@@ -1038,7 +1038,7 @@ export class EnterpriseService implements IEnterpriseService {
       const { success, data }: { success: boolean; data: any } = await response.json();
 
       if (success) {
-        this.languages = isJson(data) ? data : JSON.parse(data);
+        this.languages = isJson(data) ? JSON.parse(data) : data;
         return true;
       } else {
         vscode.window.showErrorMessage("Could not retrieve languages.");
