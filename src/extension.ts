@@ -1080,19 +1080,18 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       // check out the item unless it's an enterprise item category
-      let sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
+      
+      let sUri = appName !== 'N/A' ? `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}` :
+        `/${root}/${categoryName}/${itemName}`;
+
       if (itemType.indexOf("CAT") === -1) {
         let bSuccess = await enterpriseService.checkOutItem(sUri, language);
-        if (bSuccess) {
-          enterpriseTreeProvider.setItemCheckedOutStatus(selectedItem, true, language);
-          vscode.commands.executeCommand("STARLIMS.GetLocal", selectedItem);
-        }
       }
 
-      enterpriseTreeProvider.refresh();
+      await enterpriseTreeProvider.refresh();            
 
       // wait for the tree to refresh
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       // open newly created item (works only if section is expanded)
       let newItem = await enterpriseTreeProvider.getTreeItemByUri(sUri);

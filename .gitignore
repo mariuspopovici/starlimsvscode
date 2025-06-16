@@ -15,3 +15,4 @@ dist/*.sdp
 *.js
 *.js.map
 .env
+CLAUDE.md
