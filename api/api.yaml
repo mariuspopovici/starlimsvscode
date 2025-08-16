@@ -39,6 +39,23 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalError"
+  /SCM.API.GetLanguages.lims:        
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.GetLanguages.lims` endpoint returns the list of system languages.
+      operationId: GetLanguages
+      responses:
+        "200":
+          description: A list of supported code languages.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLanguagesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /SCM.API.Delete.lims:
     get:
       tags:
@@ -135,7 +152,7 @@ paths:
       tags:
         - "Code Management"
       description: The `SCM_API.CheckOut.lims` endpoint checks out the item at the specified URI.
-      operationId: CheckIn
+      operationId: CheckOut
       parameters:
         - in: query
           name: URI
@@ -203,6 +220,46 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalError"
+  /SCM_API.CheckInAll.lims:
+    get:
+      tags:
+        - "Code Management"
+      description: The `SCM_API.CheckInAll.lims` endpoint checks in the item at the specified URI.
+      operationId: CheckInAll
+      parameters:
+        - in: query
+          name: AllUsers
+          schema:
+            type: boolean
+          description: Set to `true` to check in all items checked out by all users.
+          example: true
+          required: false
+        - in: query
+          name: Reason
+          schema:
+            type: string
+          description: The check in reason.
+          example: Checked in bug fix.
+          required: true
+        - in: header
+          name: Content-Type
+          required: true
+          description: Content-Type header must be set to `application/json`
+          schema:
+            type: string
+            pattern: ^application/json$
+          example: application/json
+      responses:
+        "200":
+          description: The operation response (success status and error or success message).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckInResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"          
   /SCM_API.SaveCode.lims:
     post:
       tags:
@@ -604,6 +661,19 @@ components:
         guid:
           type: string
           example: A8C3D515-48A6-E040-AC7A-8617E5DE0FC7
+    GetLanguagesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+              example: [["ENG", "English"], ["FR", "French"], ["GER", "German"]]
     ClearLogResponse:
       type: object
       properties:
@@ -838,16 +908,21 @@ components:
           type: string
           example: MARIUS
           description: The user ID who has the item checked out if item is currently checked out
-        language:
+        scriptLanguage:
           type: string
           example: SSL
           description: |
-            The programming language of the item. One of: SSL, JS, XML, SLSQL
+            The programming language of the item. One of: SSL, JS, XML, SQL
           enum:
             - SSL
             - JS
             - XML
-            - SLSQL
+            - SQL
+            - JSON
+        language:
+          type: string
+          example: ENG
+          description: The language of the item, e.g. ENG for English, GER for German, etc.
         isFolder:
           type: boolean
           example: false
@@ -856,6 +931,10 @@ components:
           type: string
           example: 12345678-1234-1234-1234-123456789012
           description: The item GUID, only set for HTML forms so far.
+        version: 
+          type: string
+          example: 1.0.0
+          description: The version of the code item
   responses:
     OK:
       description: Operation ran successfully.
