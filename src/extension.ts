@@ -12,6 +12,7 @@ import { ResourcesDataViewPanel } from "./panels/ResourcesDataViewPanel";
 import { GenericDataViewPanel } from "./panels/GenericDataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
+import * as crypto from 'crypto';
 
 const { version } = require('../package.json');
 const SLVSCODE_FOLDER = "SLVSCODE";
@@ -26,6 +27,10 @@ export async function activate(context: vscode.ExtensionContext) {
   let reloadConfig = false;
   let selectedItem: TreeEnterpriseItem | undefined;
   let languages: any[] = [];
+
+  const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+  const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+  const secretKey = `${workspaceId}:userPassword`;
 
   // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
@@ -56,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ignoreFocusOut: true
     }) ?? '';
 
-    secretStorage.store("userPassword", passwordInput);
+    secretStorage.store(secretKey, passwordInput);
   });
 
   // ensure Starlims user name is defined and prompt for it if not
@@ -78,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   // get password from secret storage
-  password = await secretStorage.get("userPassword");
+  password = await secretStorage.get(secretKey);
 
   // prompt for password if not found in secret storage
   if (!password) {
