@@ -8,6 +8,7 @@ import { IEnterpriseService } from "./iEnterpriseService";
 import { connectBridge } from "../utilities/bridge";
 import { cleanUrl, isJson } from "../utilities/miscUtils";
 import { DOMParser } from "@xmldom/xmldom";
+import * as crypto from 'crypto';
 
 /**
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
@@ -109,10 +110,14 @@ export class EnterpriseService implements IEnterpriseService {
       return;
     }
     const readStream = fs.createReadStream(sdpPackage);
+    
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+    const secretKey = `${workspaceId}:userPassword`;
 
     const headers = new Headers([
       ["STARLIMSUser", this.config.user],
-      ["STARLIMSPass", await this.secretStorage.get("userPassword")],
+      ["STARLIMSPass", await this.secretStorage.get(secretKey)],
       ["Accept", "*/*"],
       ["Accept-Encoding", "gzip, deflate, br"],
       ["Content-length", stats.size.toString()]
@@ -561,9 +566,12 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns an array of string arrays with header name and value.
    */
   private async getAPIHeaders(): Promise<string[][]> {
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+    const secretKey = `${workspaceId}:userPassword`;
     return [
       ["STARLIMSUser", this.config.user],
-      ["STARLIMSPass", await this.secretStorage.get("userPassword")],
+      ["STARLIMSPass", await this.secretStorage.get(secretKey)],
       ["Content-Type", "application/json"],
       ["Accept", "*/*"]
     ];
