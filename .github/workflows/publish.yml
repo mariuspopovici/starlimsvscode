@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout to branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: setup git config
         run: |
@@ -21,7 +21,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Install packages
         run: npm ci
