@@ -12,6 +12,7 @@ import { ResourcesDataViewPanel } from "./panels/ResourcesDataViewPanel";
 import { GenericDataViewPanel } from "./panels/GenericDataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
+import * as crypto from 'crypto';
 
 const { version } = require('../package.json');
 const SLVSCODE_FOLDER = "SLVSCODE";
@@ -26,6 +27,10 @@ export async function activate(context: vscode.ExtensionContext) {
   let reloadConfig = false;
   let selectedItem: TreeEnterpriseItem | undefined;
   let languages: any[] = [];
+
+  const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+  const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+  const secretKey = `${workspaceId}:userPassword`;
 
   // ensure STARLIMS URL is defined and prompt for value if not
   if (!url) {
@@ -56,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ignoreFocusOut: true
     }) ?? '';
 
-    secretStorage.store("userPassword", passwordInput);
+    secretStorage.store(secretKey, passwordInput);
   });
 
   // ensure Starlims user name is defined and prompt for it if not
@@ -78,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   // get password from secret storage
-  password = await secretStorage.get("userPassword");
+  password = await secretStorage.get(secretKey);
 
   // prompt for password if not found in secret storage
   if (!password) {
@@ -1079,18 +1084,19 @@ export async function activate(context: vscode.ExtensionContext) {
         selectedItemType = `${selectedItemType}/${itemLanguage}`;
       }
 
-      // check out the item
-      let sUri = `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}`;
-      let bSuccess = await enterpriseService.checkOutItem(sUri, language);
-      if (bSuccess) {
-        enterpriseTreeProvider.setItemCheckedOutStatus(selectedItem, true, language);
-        vscode.commands.executeCommand("STARLIMS.GetLocal", selectedItem);
+      // check out the item unless it's an enterprise item category
+      
+      let sUri = appName !== 'N/A' ? `/${root}/${categoryName}/${appName}/${selectedItemType}/${itemName}` :
+        `/${root}/${categoryName}/${itemName}`;
+
+      if (itemType.indexOf("CAT") === -1) {
+        let bSuccess = await enterpriseService.checkOutItem(sUri, language);
       }
 
-      enterpriseTreeProvider.refresh();
+      await enterpriseTreeProvider.refresh();            
 
       // wait for the tree to refresh
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       // open newly created item (works only if section is expanded)
       let newItem = await enterpriseTreeProvider.getTreeItemByUri(sUri);
@@ -1123,7 +1129,7 @@ export async function activate(context: vscode.ExtensionContext) {
       let sItemName = selectedItem.label.toString();
       if (sItemName.indexOf("[") > 0) {
         sItemName = sItemName.substring(0, sItemName.indexOf("[") - 1);
-      } else if (sItemName.indexOf('(Checked out')) {
+      } else if (sItemName.indexOf('(Checked out') > 0) {
         sItemName = sItemName.substring(0, sItemName.indexOf("(Checked out") - 1);
       }
 

@@ -6,8 +6,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { IEnterpriseService } from "./iEnterpriseService";
 import { connectBridge } from "../utilities/bridge";
-import { cleanUrl } from "../utilities/miscUtils";
+import { cleanUrl, isJson } from "../utilities/miscUtils";
 import { DOMParser } from "@xmldom/xmldom";
+import * as crypto from 'crypto';
 
 /**
  * STARLIMS Enterprise Designer service. Provides main services for the VS Code extensions,
@@ -26,7 +27,6 @@ export class EnterpriseService implements IEnterpriseService {
    */
   private urlSuffix: string = "lims";
   public languages: string[] = [];
-  
 
   /**
    * Constructor
@@ -110,10 +110,14 @@ export class EnterpriseService implements IEnterpriseService {
       return;
     }
     const readStream = fs.createReadStream(sdpPackage);
+    
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+    const secretKey = `${workspaceId}:userPassword`;
 
     const headers = new Headers([
       ["STARLIMSUser", this.config.user],
-      ["STARLIMSPass", await this.secretStorage.get("userPassword")],
+      ["STARLIMSPass", await this.secretStorage.get(secretKey)],
       ["Accept", "*/*"],
       ["Accept-Encoding", "gzip, deflate, br"],
       ["Content-length", stats.size.toString()]
@@ -475,7 +479,12 @@ export class EnterpriseService implements IEnterpriseService {
    * @param returnCode if true, the function will return the code as a string instead of the local file path
    * @returns the local file path if returnCode is false, otherwise the code as a string
    */
-  public async getLocalCopy(uri: string, workspaceFolder: string, returnCode: boolean = false, language: string): Promise<string | null> {
+  public async getLocalCopy(
+    uri: string,
+    workspaceFolder: string,
+    returnCode: boolean = false,
+    language: string
+  ): Promise<string | null> {
     const item = await this.getEnterpriseItemCode(uri, language);
     if (item) {
       // create local file path
@@ -557,9 +566,12 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns an array of string arrays with header name and value.
    */
   private async getAPIHeaders(): Promise<string[][]> {
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+    const secretKey = `${workspaceId}:userPassword`;
     return [
       ["STARLIMSUser", this.config.user],
-      ["STARLIMSPass", await this.secretStorage.get("userPassword")],
+      ["STARLIMSPass", await this.secretStorage.get(secretKey)],
       ["Content-Type", "application/json"],
       ["Accept", "*/*"]
     ];
@@ -684,8 +696,8 @@ export class EnterpriseService implements IEnterpriseService {
    * @returns the enterprise item found
    */
   public async searchForItemByGUID(guid: string, itemType: string): Promise<any> {
-  // get item from GUID first
-  const url = `${this.baseUrl}/SCM_API.GetItemByGUID.${this.urlSuffix}?GUID=${guid}&ItemType=${itemType}`;
+    // get item from GUID first
+    const url = `${this.baseUrl}/SCM_API.GetItemByGUID.${this.urlSuffix}?GUID=${guid}&ItemType=${itemType}`;
   }
   /**
    * Global search for items by occuring text
@@ -895,7 +907,10 @@ export class EnterpriseService implements IEnterpriseService {
     if (!uri) {
       return "";
     }
-    let remotePath = uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length);
+    const hasFolderPath = uri.lastIndexOf(this.SLVSCODE_FOLDER) !== -1;
+    let remotePath = hasFolderPath
+      ? uri.slice(uri.lastIndexOf(this.SLVSCODE_FOLDER) + this.SLVSCODE_FOLDER.length)
+      : uri;
     return remotePath;
   }
 
@@ -1031,7 +1046,7 @@ export class EnterpriseService implements IEnterpriseService {
       const { success, data }: { success: boolean; data: any } = await response.json();
 
       if (success) {
-        this.languages = JSON.parse(data);
+        this.languages = isJson(data) ? JSON.parse(data) : data;
         return true;
       } else {
         vscode.window.showErrorMessage("Could not retrieve languages.");

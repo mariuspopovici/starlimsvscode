@@ -371,15 +371,6 @@ aControlProperties :={
 {'Label', 'TabIndex', '0', 'Behavior'},
 {'Label', 'TabStop', 'True', 'Behavior'},
 
-{'Line', 'ToolTip', NIL, 'Appearance'},
-{'Line', 'Anchor', NIL, 'Layout'},
-{'Line', 'Horizontal', 'True', 'Layout'},
-{'Line', 'Left', NIL, 'Layout'},
-{'Line', 'Length', NIL, 'Layout'},
-{'Line', 'Top', NIL, 'Layout'},
-{'Line', '(Id)', NIL, 'Other'},
-{'Line', 'Visible', 'True', 'Behavior'},
-
 {'LinkBar', 'BackColor', NIL, 'Appearance'},
 {'LinkBar', 'BorderStyle', 'SINGLE', 'Appearance'},
 {'LinkBar', 'Cursor', NIL, 'Appearance'},
@@ -1188,7 +1179,7 @@ aControlProperties :={
 {'DataGridTable', 'TotalRow', 'False', 'Data'},
 {'DataGridTable', 'TotalRowFormat', NIL, 'Data'},
 {'DataGridTable', 'TranslateAttrColumn', 'False', 'Data'},
-{'DataGridTable', '(Id)', NIL, 'Other'}
+{'DataGridTable', '(Id)', NIL, 'Other'},
 
 {'Line', 'Anchor', NIL, 'Layout'},
 {'Line', 'Horizontal', 'True', 'Layout'},
