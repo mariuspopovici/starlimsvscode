@@ -12,6 +12,7 @@ import { ResourcesDataViewPanel } from "./panels/ResourcesDataViewPanel";
 import { GenericDataViewPanel } from "./panels/GenericDataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
+import { ServerSelectorWebviewProvider, ServerConfig } from "./providers/serverSelectorWebviewProvider";
 import * as crypto from 'crypto';
 
 const { version } = require('../package.json');
@@ -62,6 +63,17 @@ export async function activate(context: vscode.ExtensionContext) {
     }) ?? '';
 
     secretStorage.store(secretKey, passwordInput);
+  });
+
+  // register server configuration commands
+  vscode.commands.registerCommand('STARLIMS.configureServer', async () => {
+    // This will be handled by the webview provider
+    vscode.commands.executeCommand('workbench.view.extension.STARLIMSVSCode');
+  });
+
+  vscode.commands.registerCommand('STARLIMS.selectServer', async () => {
+    // This will be handled by the webview provider
+    vscode.commands.executeCommand('workbench.view.extension.STARLIMSVSCode');
   });
 
   // ensure Starlims user name is defined and prompt for it if not
@@ -119,6 +131,27 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // create enterprise service
   const enterpriseService = new EnterpriseService(config, secretStorage);
+
+  // Create the server selector webview provider
+  const serverSelectorProvider = new ServerSelectorWebviewProvider(
+    context.extensionUri,
+    context,
+    async (serverConfig: ServerConfig | undefined) => {
+      // For now, just show a message when server changes
+      if (serverConfig) {
+        vscode.window.showInformationMessage(`Selected server: ${serverConfig.name}`);
+      } else {
+        vscode.window.showInformationMessage("No server selected");
+      }
+    }
+  );
+  
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      ServerSelectorWebviewProvider.viewType,
+      serverSelectorProvider
+    )
+  );
 
   const expressServer = new ExpressServer();
   expressServer.start();
