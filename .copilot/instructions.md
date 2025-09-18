@@ -3,7 +3,7 @@
 ## Getting Started
 
 ### Prerequisites
-- Node.js 14+ and npm
+- Node.js 16.x, 18.x, or 22.x and npm
 - VS Code for testing the extension
 - Access to a STARLIMS server for integration testing
 
