@@ -117,9 +117,18 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
     if (!url) return;
 
     const user = await vscode.window.showInputBox({
-      prompt: "Enter username (optional)",
+      prompt: "Enter username",
       placeHolder: "username"
     });
+
+    if (!user) return;
+
+    const password = await vscode.window.showInputBox({
+      prompt: `Enter password for user '${user}'`,
+      password: true
+    });
+
+    if (!password) return;
 
     const urlSuffix = await vscode.window.showInputBox({
       prompt: "Enter URL suffix (optional)",
@@ -133,6 +142,12 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
       user: user || undefined,
       urlSuffix: urlSuffix || "lims"
     };
+
+    // Store password in secret storage with server-specific key
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = require('crypto').createHash('sha1').update(workspaceKey).digest('hex');
+    const serverSecretKey = `${workspaceId}:${name}:userPassword`;
+    await this._context.secrets.store(serverSecretKey, password);
 
     this._servers.push(newServer);
     const config = vscode.workspace.getConfiguration("STARLIMS");
@@ -161,6 +176,33 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
     });
 
     if (user === undefined) return;
+
+    // Ask for password
+    const setPassword = await vscode.window.showQuickPick(
+      [
+        { label: "Keep current password" },
+        { label: "Set new password" }
+      ],
+      { 
+        placeHolder: "Password setting",
+        ignoreFocusOut: true
+      }
+    );
+
+    if (setPassword?.label === "Set new password") {
+      const password = await vscode.window.showInputBox({
+        prompt: `Enter password for user '${user}'`,
+        password: true
+      });
+
+      if (password !== undefined) {
+        // Store password in secret storage with server-specific key
+        const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+        const workspaceId = require('crypto').createHash('sha1').update(workspaceKey).digest('hex');
+        const serverSecretKey = `${workspaceId}:${server.name}:userPassword`;
+        await this._context.secrets.store(serverSecretKey, password);
+      }
+    }
 
     const urlSuffix = await vscode.window.showInputBox({
       prompt: "Enter URL suffix",

@@ -137,14 +137,113 @@ export async function activate(context: vscode.ExtensionContext) {
     context.extensionUri,
     context,
     async (serverConfig: ServerConfig | undefined) => {
-      // For now, just show a message when server changes
       if (serverConfig) {
-        vscode.window.showInformationMessage(`Selected server: ${serverConfig.name}`);
+        await switchToServer(serverConfig);
       } else {
-        vscode.window.showInformationMessage("No server selected");
+        await switchToServer(undefined);
       }
     }
   );
+
+  // Variables to hold current server context
+  let currentEnterpriseService: EnterpriseService | undefined;
+  let currentEnterpriseTreeProvider: EnterpriseTreeDataProvider | undefined;
+  let currentCheckedOutTreeProvider: CheckedOutTreeDataProvider | undefined;
+  let currentEnterpriseTextContentProvider: EnterpriseTextDocumentContentProvider | undefined;
+
+  // Function to switch to a different server
+  const switchToServer = async (serverConfig: ServerConfig | undefined) => {
+    if (!serverConfig) {
+      // Clear all providers
+      currentEnterpriseService = undefined;
+      if (currentEnterpriseTreeProvider) {
+        currentEnterpriseTreeProvider.clear();
+      }
+      if (currentCheckedOutTreeProvider) {
+        vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree", 
+          new CheckedOutTreeDataProvider("", enterpriseService));
+      }
+      return;
+    }
+
+    try {
+      // Create server-specific configuration wrapper
+      const serverSpecificConfig = createServerSpecificConfig(serverConfig);
+      
+      // Create new enterprise service for this server
+      currentEnterpriseService = new EnterpriseService(serverSpecificConfig, secretStorage);
+      
+      // Update tree providers
+      currentEnterpriseTreeProvider = new EnterpriseTreeDataProvider(currentEnterpriseService);
+      vscode.window.registerTreeDataProvider("STARLIMSMainTree", currentEnterpriseTreeProvider);
+
+      // Update text content provider
+      currentEnterpriseTextContentProvider = new EnterpriseTextDocumentContentProvider(
+        currentEnterpriseService, 
+        currentEnterpriseTreeProvider
+      );
+
+      // Load checked out items for the new server
+      try {
+        let checkedOutItems = await currentEnterpriseService.getCheckedOutItems(false);
+        currentCheckedOutTreeProvider = new CheckedOutTreeDataProvider(checkedOutItems, currentEnterpriseService);
+        vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree", currentCheckedOutTreeProvider);
+      } catch (error) {
+        console.error("Error loading checked out items:", error);
+        currentCheckedOutTreeProvider = new CheckedOutTreeDataProvider("", currentEnterpriseService);
+        vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree", currentCheckedOutTreeProvider);
+      }
+
+      // Update global variables used by commands
+      selectedEnterpriseService = currentEnterpriseService;
+      selectedEnterpriseTreeProvider = currentEnterpriseTreeProvider;
+
+      vscode.window.showInformationMessage(`Connected to server: ${serverConfig.name}`);
+    } catch (error) {
+      console.error("Error switching to server:", error);
+      vscode.window.showErrorMessage(`Failed to connect to server: ${serverConfig.name}`);
+    }
+  };
+
+  // Function to create server-specific configuration
+  const createServerSpecificConfig = (serverConfig: ServerConfig): vscode.WorkspaceConfiguration => {
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+    
+    return {
+      get: (key: string) => {
+        switch(key) {
+          case "url": return serverConfig.url;
+          case "user": return serverConfig.user;
+          case "urlSuffix": return serverConfig.urlSuffix || "lims";
+          default: 
+            // Fall back to global configuration for other settings
+            return config.get(key);
+        }
+      },
+      update: config.update.bind(config),
+      has: config.has.bind(config),
+      inspect: config.inspect.bind(config)
+    } as any;
+  };
+
+  // Extend secret storage to use server-specific keys
+  const originalSecretStorage = secretStorage;
+  const serverAwareSecretStorage: vscode.SecretStorage = {
+    get: async (key: string) => {
+      const selectedServer = serverSelectorProvider.getSelectedServer();
+      if (key.includes("userPassword") && selectedServer) {
+        const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+        const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
+        const serverSecretKey = `${workspaceId}:${selectedServer.name}:userPassword`;
+        return originalSecretStorage.get(serverSecretKey);
+      }
+      return originalSecretStorage.get(key);
+    },
+    store: originalSecretStorage.store.bind(originalSecretStorage),
+    delete: originalSecretStorage.delete.bind(originalSecretStorage),
+    onDidChange: originalSecretStorage.onDidChange
+  };
   
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
@@ -152,6 +251,21 @@ export async function activate(context: vscode.ExtensionContext) {
       serverSelectorProvider
     )
   );
+
+  // Variables for backward compatibility and commands that need to access current services
+  let selectedEnterpriseService: EnterpriseService | undefined;
+  let selectedEnterpriseTreeProvider: EnterpriseTreeDataProvider | undefined;
+
+  // Initialize with the selected server
+  const selectedServerConfig = serverSelectorProvider.getSelectedServer();
+  if (selectedServerConfig) {
+    await switchToServer(selectedServerConfig);
+  } else {
+    // Fall back to legacy configuration if no servers are configured
+    selectedEnterpriseService = enterpriseService;
+    selectedEnterpriseTreeProvider = new EnterpriseTreeDataProvider(enterpriseService);
+    vscode.window.registerTreeDataProvider("STARLIMSMainTree", selectedEnterpriseTreeProvider);
+  }
 
   const expressServer = new ExpressServer();
   expressServer.start();
@@ -165,7 +279,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // install ESlint to SLVSCODE folder if not already installed
   // check for .eslintrc.json file
   const eslintConfigFile = path.join(rootPath!, ".eslintrc.json");
-  if (!await enterpriseService.fileExists(eslintConfigFile)) {
+  if (selectedEnterpriseService && !await selectedEnterpriseService.fileExists(eslintConfigFile)) {
     executeWithProgress(async () => {
       // copy .eslintrc and package.json to folder
       const eslintConfig = context.asAbsolutePath("src/client/eslint/.eslintrc.json");
@@ -185,37 +299,26 @@ export async function activate(context: vscode.ExtensionContext) {
     }, "Installing ESlint to SLVSCODE folder...");
   }
 
-  // verify API version
-  enterpriseService.getVersion()
-    .then(async (apiVersion) => {
-      if (!apiVersion) {
-        vscode.window.showWarningMessage('STARLIMS VS Code API is not reachable. Please check connection info or install API package. See extension README for installation instructions.');
-        return;
-      }
-
-      if (version !== apiVersion) {
-        const selection = await vscode.window.showInformationMessage(`A new version (${version}) of the STARLIMS VS Code API is available. Select Upgrade to deploy the new version.`,
-          'Upgrade', 'Continue');
-        if (selection === 'Upgrade') {
-          const sdpPackage = context.asAbsolutePath("dist/SCM_API.sdp");
-          executeWithProgress(async () => {
-            await enterpriseService.upgradeBackend(sdpPackage);
-            const selection = await vscode.window.showInformationMessage(`We recommend that you restart Visual Studio Code.`,
-              'Restart', 'Cancel');
-            if (selection === "Restart") {
-              vscode.commands.executeCommand("workbench.action.reloadWindow");
-            }
-          }, "Upgrading the extension backend API.");
-        }
-      }
-    });
+  // verify API version (this will be done per-server in switchToServer function)
+  // enterpriseService.getVersion() moved to switchToServer
 
   // register the refreshLogChannel command
   vscode.commands.registerCommand("STARLIMS.RefreshLogChannel",
     async () => {
+      if (!selectedEnterpriseService) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+      
+      const selectedServer = serverSelectorProvider.getSelectedServer();
+      if (!selectedServer || !selectedServer.user) {
+        vscode.window.showErrorMessage("No user configured for selected server");
+        return;
+      }
+
       // get current user's log
-      const logUri = "/ServerLogs/" + user + ".log";
-      var log = await enterpriseService.getEnterpriseItemCode(logUri, undefined);
+      const logUri = "/ServerLogs/" + selectedServer.user + ".log";
+      var log = await selectedEnterpriseService.getEnterpriseItemCode(logUri, undefined);
       if (log) {
         logChannel.clear();
         logChannel.appendLine(log.code);
@@ -227,12 +330,23 @@ export async function activate(context: vscode.ExtensionContext) {
   // register the clearLogChannel command
   vscode.commands.registerCommand("STARLIMS.ClearLogChannel",
     async () => {
+      if (!selectedEnterpriseService) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+
+      const selectedServer = serverSelectorProvider.getSelectedServer();
+      if (!selectedServer || !selectedServer.user) {
+        vscode.window.showErrorMessage("No user configured for selected server");
+        return;
+      }
+
       // clear current user's log
-      let remoteUri = "/ServerLogs/" + user;
-      await enterpriseService.clearLog(remoteUri);
+      let remoteUri = "/ServerLogs/" + selectedServer.user;
+      await selectedEnterpriseService.clearLog(remoteUri);
 
       // refresh log
-      var log = await enterpriseService.getEnterpriseItemCode(remoteUri + ".log", undefined);
+      var log = await selectedEnterpriseService.getEnterpriseItemCode(remoteUri + ".log", undefined);
       if (log) {
         logChannel.clear();
         logChannel.appendLine(log.code);
@@ -241,50 +355,51 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // load current user's log
-  vscode.commands.executeCommand("STARLIMS.RefreshLogChannel");
-
-  // load system languages from server into config
-  await enterpriseService.getLanguages();
-  for (let lang of enterpriseService.languages) {
-    languages.push({ label: lang[0], description: lang[1] });
+  // load current user's log when a server is selected
+  if (selectedEnterpriseService) {
+    vscode.commands.executeCommand("STARLIMS.RefreshLogChannel");
   }
 
-  // register a custom tree data provider for the STARLIMS enterprise designer explorer
-  const enterpriseTreeProvider = new EnterpriseTreeDataProvider(enterpriseService);
-  vscode.window.registerTreeDataProvider("STARLIMSMainTree", enterpriseTreeProvider);
-
-  // register a custom tree data provider for the STARLIMS checked out items
-  let checkedOutItems = await enterpriseService.getCheckedOutItems(false);
-  const checkedOutTreeDataProvider = new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService);
-  vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree", checkedOutTreeDataProvider);
+  // The tree providers are now managed by the switchToServer function
+  // Languages will be loaded per-server
 
   vscode.commands.registerCommand(
     "STARLIMS.GetCheckedOutItems",
     async () => {
-      let checkedOutItems = await enterpriseService.getCheckedOutItems(false);
+      if (!selectedEnterpriseService) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+      let checkedOutItems = await selectedEnterpriseService.getCheckedOutItems(false);
       vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree",
-        new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService));
+        new CheckedOutTreeDataProvider(checkedOutItems, selectedEnterpriseService));
     }
   );
 
   // register a text content provider to viewing remote code items. it responds to the starlims:/ URI
-  const enterpriseTextContentProvider =
-    new EnterpriseTextDocumentContentProvider(enterpriseService, enterpriseTreeProvider);
-  context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(
-      "starlims",
-      enterpriseTextContentProvider
-    )
-  );
+  // This will be updated when server changes, but we need a fallback
+  let enterpriseTextContentProvider: EnterpriseTextDocumentContentProvider | undefined;
+  if (selectedEnterpriseService && selectedEnterpriseTreeProvider) {
+    enterpriseTextContentProvider = new EnterpriseTextDocumentContentProvider(selectedEnterpriseService, selectedEnterpriseTreeProvider);
+    context.subscriptions.push(
+      vscode.workspace.registerTextDocumentContentProvider(
+        "starlims",
+        enterpriseTextContentProvider
+      )
+    );
+  }
 
   // register the GetAllCheckedOutItems command
   vscode.commands.registerCommand(
     "STARLIMS.GetAllCheckedOutItems",
     async () => {
-      let checkedOutItems = await enterpriseService.getCheckedOutItems(true);
+      if (!selectedEnterpriseService) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+      let checkedOutItems = await selectedEnterpriseService.getCheckedOutItems(true);
       vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree",
-        new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService));
+        new CheckedOutTreeDataProvider(checkedOutItems, selectedEnterpriseService));
     }
   );
 
@@ -292,6 +407,11 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.CheckInAllItems",
     async () => {
+      if (!selectedEnterpriseService) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+
       // ask for confirmation
       const confirm = await vscode.window.showWarningMessage(
         `Are you sure you want to check in all items?`,
@@ -310,7 +430,7 @@ export async function activate(context: vscode.ExtensionContext) {
       });
 
       // refresh tree
-      await enterpriseService.checkInAllItems(checkinReason);
+      await selectedEnterpriseService.checkInAllItems(checkinReason);
       vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
     }
   );
@@ -336,10 +456,15 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.selectEnterpriseItem",
     async (item: TreeEnterpriseItem | any) => {
+      if (!selectedEnterpriseTreeProvider) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+
       // if no item is defined, get the item from the active editor
       if (!(item instanceof TreeEnterpriseItem)) {
         if (item.path !== undefined) {
-          item = await enterpriseTreeProvider.getTreeItemFromPath(item.path, false) as TreeEnterpriseItem;
+          item = await selectedEnterpriseTreeProvider.getTreeItemFromPath(item.path, false) as TreeEnterpriseItem;
         }
       }
 
@@ -366,8 +491,13 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "STARLIMS.GetLocal",
     async (item: TreeEnterpriseItem | any) => {
+      if (!selectedEnterpriseService) {
+        vscode.window.showErrorMessage("No server selected");
+        return;
+      }
+
       // get local copy of the item
-      const localFilePath = await enterpriseService.getLocalCopy(
+      const localFilePath = await selectedEnterpriseService.getLocalCopy(
         item.uri ||
         (item.path
           ? item.path.slice(0, item.path.lastIndexOf("."))
