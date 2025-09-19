@@ -51,17 +51,6 @@ export class EnterpriseService implements IEnterpriseService {
     this.baseUrl = cleanUrl(serverConfig.url);
     this.urlSuffix = serverConfig.urlSuffix || "lims";
     this.currentServerName = serverName;
-    
-    // Update the config object to return new values
-    const originalGet = this.config.get.bind(this.config);
-    this.config.get = (key: string) => {
-      switch(key) {
-        case "url": return serverConfig.url;
-        case "user": return serverConfig.user;
-        case "urlSuffix": return serverConfig.urlSuffix || "lims";
-        default: return originalGet(key);
-      }
-    };
   }
   async moveItem(uri: string, destination: string) {
     const url = `${this.baseUrl}/SCM_API.Move.${this.urlSuffix}?URI=${uri}&Destination=${destination}`;

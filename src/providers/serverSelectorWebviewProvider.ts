@@ -47,6 +47,12 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
         case 'configureServer':
           this.configureCurrentServer();
           break;
+        case 'addServer':
+          this.createNewServer();
+          break;
+        case 'deleteServer':
+          this.deleteCurrentServer();
+          break;
         case 'ready':
           this.updateWebview();
           break;
@@ -93,12 +99,12 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
     const selectedServerConfig = this._servers.find(s => s.name === this._selectedServer);
     
     if (!selectedServerConfig) {
-      // Create new server
-      await this.createNewServer();
-    } else {
-      // Edit existing server
-      await this.editServer(selectedServerConfig);
+      vscode.window.showErrorMessage("No server selected to configure.");
+      return;
     }
+
+    // Edit existing server
+    await this.editServer(selectedServerConfig);
   }
 
   private async createNewServer() {
@@ -153,11 +159,10 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
     const config = vscode.workspace.getConfiguration("STARLIMS");
     await config.update("servers", this._servers, false);
     
-    if (this._servers.length === 1) {
-      this._selectedServer = newServer.name;
-      await config.update("selectedServer", this._selectedServer, false);
-      this._onServerChanged(newServer);
-    }
+    // Select the new server and trigger refresh
+    this._selectedServer = newServer.name;
+    await config.update("selectedServer", this._selectedServer, false);
+    this._onServerChanged(newServer);
     
     this.updateWebview();
   }
@@ -224,9 +229,57 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
     }
     
     this.updateWebview();
+    this.refresh();
   }
 
-  public refreshServers() {
+  private async deleteCurrentServer() {
+    const selectedServerConfig = this._servers.find(s => s.name === this._selectedServer);
+    
+    if (!selectedServerConfig) {
+      vscode.window.showErrorMessage("No server selected to delete.");
+      return;
+    }
+
+    // Ask for confirmation
+    const confirm = await vscode.window.showWarningMessage(
+      `Are you sure you want to delete the server "${selectedServerConfig.name}"?`,
+      { modal: true },
+      "Yes"
+    );
+
+    if (confirm !== "Yes") {
+      return;
+    }
+
+    // Remove the server from the list
+    this._servers = this._servers.filter(s => s.name !== this._selectedServer);
+
+    // Remove password from secret storage
+    const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
+    const workspaceId = require('crypto').createHash('sha1').update(workspaceKey).digest('hex');
+    const serverSecretKey = `${workspaceId}:${selectedServerConfig.name}:userPassword`;
+    await this._context.secrets.delete(serverSecretKey);
+
+    // Update configuration
+    const config = vscode.workspace.getConfiguration("STARLIMS");
+    await config.update("servers", this._servers, false);
+
+    // If the deleted server was selected, select another one or none
+    if (this._servers.length > 0) {
+      this._selectedServer = this._servers[0].name;
+      await config.update("selectedServer", this._selectedServer, false);
+      this._onServerChanged(this._servers[0]);
+    } else {
+      this._selectedServer = "";
+      await config.update("selectedServer", "", false);
+      this._onServerChanged(undefined);
+    }
+
+    this.updateWebview();
+    this.refresh();
+  }
+
+  public refresh() {
     this.loadServers();
     this.updateWebview();
   }
@@ -254,7 +307,7 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
         <title>Server Selector</title>
         <style>
             body {
-                padding: 10px;
+                padding: 6px;
                 font-family: var(--vscode-font-family);
                 font-size: var(--vscode-font-size);
                 color: var(--vscode-foreground);
@@ -262,35 +315,46 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
             .server-selector {
                 display: flex;
                 align-items: center;
-                gap: 8px;
-                margin-bottom: 10px;
+                gap: 4px;
+                margin-bottom: 0px;
             }
             select {
                 flex: 1;
-                padding: 4px 8px;
+                padding: 2px 4px;
                 background: var(--vscode-input-background);
                 color: var(--vscode-input-foreground);
                 border: 1px solid var(--vscode-input-border);
                 border-radius: 2px;
                 font-size: var(--vscode-font-size);
+                min-width: 0;
             }
             button {
-                padding: 4px 8px;
+                padding: 2px 6px;
                 background: var(--vscode-button-background);
                 color: var(--vscode-button-foreground);
                 border: none;
                 border-radius: 2px;
                 cursor: pointer;
-                font-size: var(--vscode-font-size);
+                font-size: 12px;
                 white-space: nowrap;
+                min-width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             button:hover {
                 background: var(--vscode-button-hoverBackground);
             }
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
             .no-servers {
                 color: var(--vscode-descriptionForeground);
                 font-style: italic;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
+                font-size: 11px;
             }
         </style>
     </head>
@@ -299,16 +363,20 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
             <select id="serverSelect">
                 <option value="">No servers configured</option>
             </select>
-            <button id="configureBtn" title="Configure Server">⚙️</button>
+            <button id="configureBtn" title="Configure Server" disabled>⚙️</button>
+            <button id="addBtn" title="Add New Server">+</button>
+            <button id="deleteBtn" title="Delete Server" disabled>🗑️</button>
         </div>
         <div id="noServers" class="no-servers" style="display: none;">
-            No servers configured. Click the configure button to add a server.
+            No servers configured. Click + to add.
         </div>
 
         <script>
             const vscode = acquireVsCodeApi();
             const serverSelect = document.getElementById('serverSelect');
             const configureBtn = document.getElementById('configureBtn');
+            const addBtn = document.getElementById('addBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
             const noServers = document.getElementById('noServers');
 
             serverSelect.addEventListener('change', () => {
@@ -316,11 +384,24 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
                     type: 'serverSelected',
                     serverName: serverSelect.value
                 });
+                updateButtonStates();
             });
 
             configureBtn.addEventListener('click', () => {
                 vscode.postMessage({
                     type: 'configureServer'
+                });
+            });
+
+            addBtn.addEventListener('click', () => {
+                vscode.postMessage({
+                    type: 'addServer'
+                });
+            });
+
+            deleteBtn.addEventListener('click', () => {
+                vscode.postMessage({
+                    type: 'deleteServer'
                 });
             });
 
@@ -354,6 +435,13 @@ export class ServerSelectorWebviewProvider implements vscode.WebviewViewProvider
                         serverSelect.appendChild(option);
                     });
                 }
+                updateButtonStates();
+            }
+
+            function updateButtonStates() {
+                const hasSelection = serverSelect.value !== '' && serverSelect.value !== 'No servers configured';
+                configureBtn.disabled = !hasSelection;
+                deleteBtn.disabled = !hasSelection;
             }
 
             // Initialize
