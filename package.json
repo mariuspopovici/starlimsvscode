@@ -43,6 +43,11 @@
     "views": {
       "STARLIMSVSCode": [
         {
+          "id": "STARLIMSServerSelector",
+          "name": "Server Selection",
+          "type": "webview"
+        },
+        {
           "id": "STARLIMSMainTree",
           "name": "STARLIMS Enterprise"
         },
@@ -240,6 +245,18 @@
       {
         "command": "STARLIMS.OpenCodeBehind",
         "title": "Open Form Code Behind"
+      },
+      {
+        "command": "STARLIMS.configureServer",
+        "title": "Configure Server",
+        "icon": {
+          "dark": "resources/dark/settings.svg",
+          "light": "resources/light/settings.svg"
+        }
+      },
+      {
+        "command": "STARLIMS.selectServer",
+        "title": "Select Server"
       }
     ],
     "keybindings": [
@@ -609,6 +626,39 @@
             "type": "string",
             "default": "lims",
             "description": "The web service request url suffix. Use lims2 with older versions of the STARLIMS Technology Platform which don't recognize the HTTPServices web.config setting key"
+          },
+          "STARLIMS.servers": {
+            "type": "array",
+            "default": [],
+            "description": "List of configured STARLIMS servers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the server"
+                },
+                "url": {
+                  "type": "string",
+                  "description": "STARLIMS Installation URL"
+                },
+                "user": {
+                  "type": "string",
+                  "description": "STARLIMS User Name"
+                },
+                "urlSuffix": {
+                  "type": "string",
+                  "default": "lims",
+                  "description": "The web service request url suffix"
+                }
+              },
+              "required": ["name", "url"]
+            }
+          },
+          "STARLIMS.selectedServer": {
+            "type": "string",
+            "default": "",
+            "description": "Currently selected server name"
           }
         }
       }

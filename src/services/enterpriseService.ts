@@ -27,6 +27,7 @@ export class EnterpriseService implements IEnterpriseService {
    */
   private urlSuffix: string = "lims";
   public languages: string[] = [];
+  private currentServerName: string = ""; // Track current server for secret key
 
   /**
    * Constructor
@@ -39,6 +40,17 @@ export class EnterpriseService implements IEnterpriseService {
     if (config.urlSuffix) {
       this.urlSuffix = config.urlSuffix;
     }
+  }
+
+  /**
+   * Update server configuration for this service instance
+   * @param serverConfig New server configuration
+   * @param serverName Name of the server for secret key management
+   */
+  public updateServerConfig(serverConfig: { url: string; user?: string; urlSuffix?: string }, serverName: string) {
+    this.baseUrl = cleanUrl(serverConfig.url);
+    this.urlSuffix = serverConfig.urlSuffix || "lims";
+    this.currentServerName = serverName;
   }
   async moveItem(uri: string, destination: string) {
     const url = `${this.baseUrl}/SCM_API.Move.${this.urlSuffix}?URI=${uri}&Destination=${destination}`;
@@ -568,7 +580,11 @@ export class EnterpriseService implements IEnterpriseService {
   private async getAPIHeaders(): Promise<string[][]> {
     const workspaceKey = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "default";
     const workspaceId = crypto.createHash('sha1').update(workspaceKey).digest('hex');
-    const secretKey = `${workspaceId}:userPassword`;
+    // Use server-specific secret key if available, otherwise fall back to legacy key
+    const secretKey = this.currentServerName 
+      ? `${workspaceId}:${this.currentServerName}:userPassword`
+      : `${workspaceId}:userPassword`;
+    
     return [
       ["STARLIMSUser", this.config.user],
       ["STARLIMSPass", await this.secretStorage.get(secretKey)],

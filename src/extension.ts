@@ -12,6 +12,7 @@ import { ResourcesDataViewPanel } from "./panels/ResourcesDataViewPanel";
 import { GenericDataViewPanel } from "./panels/GenericDataViewPanel";
 import { cleanUrl, executeWithProgress } from "./utilities/miscUtils";
 import { CheckedOutTreeDataProvider } from "./providers/checkedOutTreeDataProvider";
+import { ServerSelectorWebviewProvider, ServerConfig } from "./providers/serverSelectorWebviewProvider";
 import * as crypto from 'crypto';
 
 const { version } = require('../package.json');
@@ -62,6 +63,17 @@ export async function activate(context: vscode.ExtensionContext) {
     }) ?? '';
 
     secretStorage.store(secretKey, passwordInput);
+  });
+
+  // register server configuration commands
+  vscode.commands.registerCommand('STARLIMS.configureServer', async () => {
+    // This will be handled by the webview provider
+    vscode.commands.executeCommand('workbench.view.extension.STARLIMSVSCode');
+  });
+
+  vscode.commands.registerCommand('STARLIMS.selectServer', async () => {
+    // This will be handled by the webview provider
+    vscode.commands.executeCommand('workbench.view.extension.STARLIMSVSCode');
   });
 
   // ensure Starlims user name is defined and prompt for it if not
@@ -225,6 +237,58 @@ export async function activate(context: vscode.ExtensionContext) {
   let checkedOutItems = await enterpriseService.getCheckedOutItems(false);
   const checkedOutTreeDataProvider = new CheckedOutTreeDataProvider(checkedOutItems, enterpriseService);
   vscode.window.registerTreeDataProvider("STARLIMSCheckedOutTree", checkedOutTreeDataProvider);
+
+  // Create the server selector webview provider (now that tree providers exist)
+  const serverSelectorProvider = new ServerSelectorWebviewProvider(
+    context.extensionUri,
+    context,
+    async (serverConfig: ServerConfig | undefined) => {
+      if (serverConfig) {
+        try {
+          // Update the enterprise service with the new server configuration
+          enterpriseService.updateServerConfig(serverConfig, serverConfig.name);
+          
+          // Refresh the tree data providers to show data from the new server
+          enterpriseTreeProvider.refresh();
+          
+          // Update checked out items for the new server
+          vscode.commands.executeCommand("STARLIMS.GetCheckedOutItems");
+          
+          // Load languages for the new server
+          try {
+            await enterpriseService.getLanguages();
+            languages = [];
+            for (let lang of enterpriseService.languages) {
+              languages.push({ label: lang[0], description: lang[1] });
+            }
+          } catch (error) {
+            console.error("Error loading languages for server:", error);
+          }
+          
+          vscode.window.showInformationMessage(`Connected to server: ${serverConfig.name} (${serverConfig.url})`);
+        } catch (error) {
+          console.error("Error switching to server:", error);
+          vscode.window.showErrorMessage(`Failed to connect to server: ${serverConfig.name}`);
+        }
+      } else {
+        vscode.window.showInformationMessage("No server selected");
+      }
+    }
+  );
+  
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      ServerSelectorWebviewProvider.viewType,
+      serverSelectorProvider
+    )
+  );
+
+  // Initialize with the selected server if available
+  const selectedServerConfig = serverSelectorProvider.getSelectedServer();
+  if (selectedServerConfig) {
+    // Update service with selected server on startup
+    enterpriseService.updateServerConfig(selectedServerConfig, selectedServerConfig.name);
+  }
 
   vscode.commands.registerCommand(
     "STARLIMS.GetCheckedOutItems",

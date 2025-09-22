@@ -179,7 +179,17 @@ export class EnterpriseTreeDataProvider implements vscode.TreeDataProvider<TreeE
     uri = uri.replace(/\\/g, "/");
 
     // get tree item from the server
-    const [item] = await this.service.getEnterpriseItems(uri, bSilent);
+    const items = await this.service.getEnterpriseItems(uri, bSilent);
+    
+    // Check if items array is empty or the first item is undefined
+    if (!items || items.length === 0 || !items[0]) {
+      if (!bSilent) {
+        console.warn(`No enterprise item found for path: ${localPath}`);
+      }
+      return undefined;
+    }
+
+    const item = items[0];
 
     let newItem = new TreeEnterpriseItem(
       item.type,
